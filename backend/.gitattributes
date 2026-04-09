@@ -1,0 +1,37 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+.metadata
+bin/
+
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+.docker/
+*.log
+logs/
+.env
+
+src/main/resources/application.yaml
