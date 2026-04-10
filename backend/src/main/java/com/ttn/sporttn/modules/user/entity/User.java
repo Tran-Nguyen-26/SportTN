@@ -31,11 +31,13 @@ public class User {
     @Column(length = 20)
     private String phone;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private UserRole role = UserRole.CUSTOMER;
 
-    @Column(length = 20)
-    private String status = "ACTIVE";
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
 
     @Column(name = "total_points")
     private Integer totalPoints = 0;
