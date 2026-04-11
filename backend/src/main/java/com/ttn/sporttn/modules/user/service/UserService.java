@@ -15,8 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -71,6 +73,29 @@ public class UserService {
                 .tokenType("Bearer")
                 .expiresIn(refreshExpiration)
                 .build();
+    }
+
+    //Oauth
+    @Transactional
+    public AuthResponse processSocialLogin(String email, String name, String picture, String provider) {
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setUsername(UUID.randomUUID().toString());
+            newUser.setProvider(AuthProvider.valueOf(provider));
+            newUser.setStatus(UserStatus.ACTIVE);
+            newUser.setRole(UserRole.CUSTOMER);
+
+            Profile profile = new Profile();
+            profile.setFullName(name);
+//            profile.setAvatarUrl(picture);
+            profile.setUser(newUser);
+
+            newUser.setProfile(profile);
+            return userRepository.save(newUser);
+        });
+
+        return generateTokenPair(user);
     }
 
     //Đăng ký

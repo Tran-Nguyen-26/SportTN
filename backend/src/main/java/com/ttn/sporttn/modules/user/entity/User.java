@@ -22,7 +22,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash", nullable = true)
     private String passwordHash;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -34,6 +34,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private UserRole role = UserRole.CUSTOMER;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.LOCAL;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
