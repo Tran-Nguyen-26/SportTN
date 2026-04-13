@@ -2,6 +2,7 @@ package com.ttn.sporttn.modules.user.service;
 
 import com.ttn.sporttn.common.exception.BusinessException;
 import com.ttn.sporttn.common.exception.ErrorCode;
+import com.ttn.sporttn.modules.user.dto.request.ChangePasswordRequest;
 import com.ttn.sporttn.modules.user.dto.request.LoginRequest;
 import com.ttn.sporttn.modules.user.dto.request.RegisterRequest;
 import com.ttn.sporttn.modules.user.dto.response.AuthResponse;
@@ -135,5 +136,34 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
+    }
+
+    public AuthResponse refreshToken(String refreshTokenStr) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TOKEN_INVALID));
+
+        if (refreshToken.isRevoked() || refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BusinessException(ErrorCode.TOKEN_EXPIRED);
+        }
+
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
+        return generateTokenPair(refreshToken.getUser());
+    }
+
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+            throw new BusinessException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+            throw new BusinessException(ErrorCode.SAME_PASSWORD);
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

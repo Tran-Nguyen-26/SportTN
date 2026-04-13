@@ -1,0 +1,29 @@
+.nav-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.nav-actions div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.nav-actions > div:hover {
+  color: #007bff;          
+  transform: translateY(-2px);
+}
+
+.nav-actions mat-icon {
+  font-size: 24px;          
+  color: #555;       
+  transition: color 0.2s;
+}
+
+.nav-actions span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}

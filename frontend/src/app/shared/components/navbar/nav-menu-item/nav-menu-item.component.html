@@ -1,0 +1,9 @@
+<div
+    class="menu-item"
+    [class.active]="isActive"
+    [class.is-new]="highlight === 'new'"
+    [class.is-sale]="highlight === 'sale'"
+>
+    <span class="label">{{ label }}</span>
+    <span class="arrow" *ngIf="hasChildren">▾</span>
+</div>

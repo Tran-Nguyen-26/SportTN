@@ -1,0 +1,11 @@
+<nav class="nav-menu">
+    <app-nav-menu-item
+        *ngFor="let item of menuItems"
+        [label]="item.label"
+        [highlight]="item.highlight"
+        [hasChildren]="item.hasChildren"
+        (click)="selectItem(item)"
+    />
+</nav>
+
+<app-product-card *ngIf="selectedCategory" [category]="selectedCategory"></app-product-card>

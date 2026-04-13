@@ -1,0 +1,17 @@
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;   
+}
+
+.logo img {
+  height: 60px;            
+  width: auto;            
+  object-fit: contain;      
+  cursor: pointer;           
+  transition: transform 0.2s ease-in-out;
+}
+
+.logo img:hover {
+  transform: scale(1.05);  
+}

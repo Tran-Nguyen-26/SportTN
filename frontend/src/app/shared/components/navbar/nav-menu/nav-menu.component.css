@@ -1,0 +1,15 @@
+.nav-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 0 40px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-menu::-webkit-scrollbar {
+  display: none;
+}
+

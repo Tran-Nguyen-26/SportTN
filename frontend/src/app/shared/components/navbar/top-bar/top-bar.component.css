@@ -1,0 +1,27 @@
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 30px;
+  background: #fff;
+  min-height: 60px;
+}
+
+.top-bar app-search-bar {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.top-bar app-logo,
+.top-bar app-location-picker,
+.top-bar app-nav-actions {
+  flex-shrink: 0;
+}
+
+.v-divider {
+  width: 1px;
+  height: 32px;
+  background: #eee;
+  flex-shrink: 0;
+}
