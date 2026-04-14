@@ -1,0 +1,11 @@
+<div class="most-searched">
+  <h2>Sản phẩm được tìm kiếm nhiều nhất</h2>
+  <div class="circle-list">
+    <div class="circle-item" *ngFor="let product of products">
+      <div class="circle">
+        <img [src]="product.image" alt="{{ product.name }}">
+      </div>
+      <span class="product-name">{{ product.name }}</span>
+    </div>
+  </div>
+</div>

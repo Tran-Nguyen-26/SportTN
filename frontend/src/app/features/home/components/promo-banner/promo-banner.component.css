@@ -1,0 +1,75 @@
+.promo-banner {
+  margin: 40px 0;
+  padding: 20px;
+  background: #fff;
+}
+
+.promo-banner h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  text-align: start;
+  margin-bottom: 24px;
+  color: #0066cc;
+}
+
+/* Container cho các banner */
+.banner-cards {
+  display: flex;
+  gap: 20px;
+}
+
+/* Card từng banner */
+.banner-card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.banner-card:hover {
+  transform: translateY(-4px);
+}
+
+.banner-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.banner-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.banner-card p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.banner-card button {
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.banner-card button:hover {
+  background: #004c99;
+}
+
+/* Responsive: màn hình lớn thì xếp ngang */
+@media (min-width: 768px) {
+  .banner-cards {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}

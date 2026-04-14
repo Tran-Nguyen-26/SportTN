@@ -7,12 +7,12 @@ import { NavigationEnd, Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  isLoginPage = false;
+  isAuthPage = false;
 
   constructor(private router: Router) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.isLoginPage = event.url.includes('/login');
+        this.isAuthPage = event.url.includes('/auth');
       }
     })
   }

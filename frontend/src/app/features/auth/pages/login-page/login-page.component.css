@@ -1,58 +1,78 @@
-body {
-  background: #f5f5f5;
-  font-family: Arial, sans-serif;
+.login-container {
+  width: 480px;              /* tăng chiều rộng */
+  margin: 80px auto;
+  background: #fff;
+  padding: 40px;            
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease;
 }
 
-.login-container {
-  width: 360px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.login-container:hover {
+  transform: translateY(-6px);
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 20px;
-}
-
-.back-btn {
-  border: none;
-  background: transparent;
-  color: #007bff;
-  cursor: pointer;
-  margin-bottom: 10px;
+  margin-bottom: 32px;
 }
 
 .logo {
-  width: 120px;
-  margin-bottom: 12px;
+  width: 160px;            
+  margin-bottom: 20px;
+}
+
+.login-header h2 {
+  font-size: 26px;         
+  color: #222;
+  margin: 0;
+  font-weight: 700;
 }
 
 .login-form label {
   display: block;
-  margin-bottom: 6px;
-  font-weight: bold;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
+  font-size: 15px;
 }
+
+.login-form input,
+.btn-primary,
+.social-login button {
+  width: 100%;
+  box-sizing: border-box;   
+  border-radius: 8px;
+  font-size: 15px;
+}
+
 
 .login-form input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.2s ease;
+}
+
+.login-form input:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 .btn-primary {
   width: 100%;
-  padding: 10px;
+  padding: 14px;
   background: #007bff;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -61,12 +81,19 @@ body {
 
 .social-login button {
   width: 100%;
-  padding: 10px;
-  margin-top: 8px;
+  padding: 14px;
+  margin-top: 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.social-login button:hover {
+  opacity: 0.9;
 }
 
 .btn-facebook { background: #3b5998; }
@@ -75,21 +102,42 @@ body {
 
 .signup {
   text-align: center;
-  margin: 20px 0;
+  margin: 28px 0;
+  font-size: 15px;
 }
 
 .signup a {
   color: #007bff;
   text-decoration: none;
+  font-weight: 600;
+}
+
+.signup a:hover {
+  text-decoration: underline;
 }
 
 .benefits {
-  font-size: 14px;
-  margin-bottom: 20px;
+  font-size: 15px;
+  margin-bottom: 28px;
+  color: #555;
+}
+
+.benefits ul {
+  padding-left: 22px;
 }
 
 .login-footer {
   text-align: center;
-  font-size: 12px;
-  color: #666;
+  font-size: 13px;
+  color: #777;
+  margin-top: 20px;
+}
+
+.login-footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
 }

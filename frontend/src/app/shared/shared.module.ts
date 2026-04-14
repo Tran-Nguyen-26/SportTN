@@ -33,7 +33,8 @@ const FOOTER_COMPONENTS = [
 @NgModule({
   declarations: [
     ...NAVBAR_COMPONENTS,
-    ...FOOTER_COMPONENTS
+    ...FOOTER_COMPONENTS,
+    ProductCardComponent
   ],
   imports: [
     CommonModule, 
@@ -43,7 +44,8 @@ const FOOTER_COMPONENTS = [
   ],
   exports: [
     ...NAVBAR_COMPONENTS,
-    ...FOOTER_COMPONENTS
+    ...FOOTER_COMPONENTS,
+    ProductCardComponent
   ]
 })
 export class SharedModule { }

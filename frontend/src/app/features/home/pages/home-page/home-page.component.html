@@ -1,1 +1,50 @@
-<p>home-page works!</p>
+<div class="homepage">
+
+  <!-- Hero banner -->
+  <app-hero-banner></app-hero-banner>
+
+  <!-- Value bar -->
+  <app-value-bar></app-value-bar>
+
+  <!-- Category circles -->
+  <app-category-circles></app-category-circles>
+
+  <!-- Most searched -->
+  <app-most-searched></app-most-searched>
+
+  <!-- Sports popular -->
+  <app-sports-popular></app-sports-popular>
+
+  <!-- Best seller -->
+  <app-best-seller></app-best-seller>
+
+  <!-- Cheap quality -->
+  <app-cheap-quality></app-cheap-quality>
+
+  <!-- Section: Bơi lội -->
+  <app-section
+    [title]="'Tự tin bơi lội'"
+    [banners]="swimBanners"
+    [products]="swimProducts">
+  </app-section>
+
+  <!-- Section: Chạy bộ -->
+  <app-section
+    [title]="'Bền bỉ mọi chặng đường'"
+    [banners]="runBanners"
+    [products]="runProducts">
+  </app-section>
+
+  <!-- Section: Chống nắng -->
+  <app-section
+    [title]="'Thoải mái dưới nắng'"
+    [banners]="sunBanners"
+    [products]="sunProducts">
+  </app-section>
+
+  <!-- Promo banner -->
+  <app-promo-banner></app-promo-banner>
+
+  <app-services></app-services>
+
+</div>

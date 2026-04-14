@@ -4,8 +4,5 @@
         [label]="item.label"
         [highlight]="item.highlight"
         [hasChildren]="item.hasChildren"
-        (click)="selectItem(item)"
     />
 </nav>
-
-<app-product-card *ngIf="selectedCategory" [category]="selectedCategory"></app-product-card>

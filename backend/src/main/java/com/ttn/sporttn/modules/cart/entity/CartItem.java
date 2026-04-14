@@ -1,5 +1,7 @@
 package com.ttn.sporttn.modules.cart.entity;
 
+import java.time.LocalDateTime;
+
 import com.ttn.sporttn.modules.product.entity.ProductVariant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,4 +39,7 @@ public class CartItem {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(name = "added_at", nullable = false)
+    private LocalDateTime addedAt = LocalDateTime.now();
 }

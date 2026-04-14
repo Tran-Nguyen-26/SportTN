@@ -1,0 +1,16 @@
+<div class="best-seller">
+    <h2>Sản phẩm bán chạy nhất</h2>
+    <div class="product-list">  
+        <app-product-card
+            *ngFor="let product of products"
+            [name]="product.name"
+            [brand]="product.brand"
+            [newPrice]="product.newPrice"
+            [oldPrice]="product.oldPrice"
+            [rating]="product.rating"
+            [reviews]="product.reviews"
+            [label]="product.label"
+            [image]="product.image">
+        </app-product-card>
+    </div>
+</div>

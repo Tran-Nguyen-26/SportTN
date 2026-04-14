@@ -9,6 +9,14 @@ import { CategoryCirclesComponent } from './components/category-circles/category
 import { FlashSaleSectionComponent } from './components/flash-sale-section/flash-sale-section.component';
 import { FeaturedProductsComponent } from './components/featured-products/featured-products.component';
 import { PromoBannerComponent } from './components/promo-banner/promo-banner.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MostSearchedComponent } from './components/most-searched/most-searched.component';
+import { SportsPopularComponent } from './components/sports-popular/sports-popular.component';
+import { BestSellerComponent } from './components/best-seller/best-seller.component';
+import { CheapQualityComponent } from './components/cheap-quality/cheap-quality.component';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { SectionComponent } from './components/section/section.component';
+import { ServicesComponent } from './components/services/services.component';
 
 
 @NgModule({
@@ -19,11 +27,19 @@ import { PromoBannerComponent } from './components/promo-banner/promo-banner.com
     CategoryCirclesComponent,
     FlashSaleSectionComponent,
     FeaturedProductsComponent,
-    PromoBannerComponent
+    PromoBannerComponent,
+    MostSearchedComponent,
+    SportsPopularComponent,
+    BestSellerComponent,
+    CheapQualityComponent,
+    SectionComponent,
+    ServicesComponent,
   ],
   imports: [
     CommonModule,
-    HomeRoutingModule
+    HomeRoutingModule,
+    MatIconModule,
+    SharedModule
   ]
 })
 export class HomeModule { }

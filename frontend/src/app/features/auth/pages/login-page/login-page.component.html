@@ -1,37 +1,13 @@
-<div class="login-container">
-  <div class="login-header">
-    <button class="back-btn" (click)="goBack()">Quay lại</button>
-    <img src="assets/logo-decathlon.png" alt="Decathlon Logo" class="logo">
-    <h2>Đăng nhập</h2>
-  </div>
-
-  <form class="login-form">
+<app-auth-form-layout title="Đăng nhập">
+  
+  <form form-content class="login-form">
     <label for="email">Nhập địa chỉ email</label>
     <input type="email" id="email" placeholder="Email">
     <button type="submit" class="btn-primary">TIẾP</button>
   </form>
 
-  <div class="social-login">
-    <button class="btn-facebook">Continue with Facebook</button>
-    <button class="btn-google">Continue with Google</button>
-    <button class="btn-apple">Continue with Apple</button>
+  <div footer-link>
+    <p>Bạn chưa có tài khoản SportTN? <a routerLink="/auth/register">Đăng ký ngay!</a></p>
   </div>
 
-  <div class="signup">
-    <p>Bạn chưa có tài khoản Decathlon? <a href="#">Đăng ký ngay!</a></p>
-    <button class="btn-secondary">Tạo tài khoản</button>
-  </div>
-
-  <div class="benefits">
-    <p>Đăng nhập để luôn nắm bắt thông tin mới nhất từ Decathlon</p>
-    <ul>
-      <li>✔ Tham gia Chương trình tích điểm miễn phí</li>
-      <li>✔ Chương trình giảm giá và ưu đãi độc quyền</li>
-      <li>✔ 365 ngày đổi trả miễn phí với sản phẩm Decathlon</li>
-    </ul>
-  </div>
-
-  <footer class="login-footer">
-    <a href="#">Hỗ trợ</a> | <a href="#">Bảo mật</a> | <a href="#">Về Decathlon</a>
-  </footer>
-</div>
+</app-auth-form-layout>

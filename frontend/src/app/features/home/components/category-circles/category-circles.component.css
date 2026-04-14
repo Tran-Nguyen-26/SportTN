@@ -1,0 +1,52 @@
+.category-circles {
+  padding: 20px;
+  background-color: #fff;
+}
+
+.category-circles h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: start;
+  color: #222;
+}
+
+.circle-list {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: nowrap;           
+  overflow-x: auto;          
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.circle-item {
+  flex: 0 0 auto;
+  width: 70px;               
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;              
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.circle-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Màu sắc cho từng loại */
+.red { background-color: #e74c3c; }
+.yellow { background-color: #f1c40f; color: #333; }
+.green { background-color: #2ecc71; }
+.blue { background-color: #3498db; }
+.orange { background-color: #e67e22; }
+.navy { background-color: #34495e; }
+.pink { background-color: #e84393; }
+.teal { background-color: #1abc9c; }

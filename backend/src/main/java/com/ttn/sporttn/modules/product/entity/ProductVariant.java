@@ -44,4 +44,12 @@ public class ProductVariant {
 
     @Column(name = "weight_gram")
     private Integer weightGram;
+
+    public BigDecimal getEffectivePrice() {
+        if (salePrice != null && salePrice.compareTo(originalPrice) < 0) {
+            return salePrice;
+        }
+        return originalPrice;
+    }
+
 }

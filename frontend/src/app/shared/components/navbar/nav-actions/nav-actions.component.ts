@@ -12,4 +12,13 @@ export class NavActionsComponent {
   goLogin() {
     this.router.navigate(['/login']);
   }
+
+  goCart() {
+    this.router.navigate(['/cart']);
+  }
+
+  isLoggedIn = false;
+  userName = 'Trần Nguyên';
+  userEmail = 'trannguyeen2005@gmail.com';
+  userPoints = 0;
 }

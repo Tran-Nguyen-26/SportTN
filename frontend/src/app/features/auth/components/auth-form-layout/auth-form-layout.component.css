@@ -1,0 +1,125 @@
+/* Container giữ nguyên cấu trúc của bạn */
+.login-container {
+  width: 480px;
+  margin: 60px auto; /* Giảm nhẹ margin để cân đối hơn trên laptop */
+  background: #fff;
+  padding: 40px;            
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease;
+}
+
+.login-container:hover {
+  transform: translateY(-6px);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  width: 160px;            
+  margin-bottom: 20px;
+}
+
+.login-header h2 {
+  font-size: 26px;         
+  color: #222;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Phần Form: Các class này sẽ áp dụng cho bất kỳ form nào "bắn" vào ng-content */
+::ng-deep .login-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
+  font-size: 15px;
+}
+
+::ng-deep .login-form input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box; /* Quan trọng để input không bị tràn */
+  transition: border-color 0.2s ease;
+}
+
+::ng-deep .login-form input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+::ng-deep .btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+::ng-deep .btn-primary:hover {
+  background: #0056b3;
+}
+
+/* Social Buttons */
+.social-login button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.btn-facebook { background: #3b5998; }
+.btn-google { background: #db4437; }
+.btn-apple { background: #000; }
+
+/* Link điều hướng */
+.signup {
+  text-align: center;
+  margin: 28px 0;
+  font-size: 15px;
+}
+
+::ng-deep .signup a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Lợi ích và Footer */
+.benefits {
+  font-size: 15px;
+  margin-bottom: 28px;
+  color: #555;
+  border-top: 1px solid #eee; /* Thêm đường kẻ mờ để phân cách */
+  padding-top: 20px;
+}
+
+.benefits ul {
+  padding-left: 22px;
+  line-height: 1.8;
+}
+
+.login-footer {
+  text-align: center;
+  font-size: 13px;
+  color: #777;
+  margin-top: 20px;
+}

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ProductCategory } from '../../product-card/product-card.component';
 
 interface MenuItem {
   label: string;
@@ -25,22 +24,7 @@ export class NavMenuComponent {
     { label: 'Giá Rẻ Hơn', highlight: 'sale', hasChildren: false },
   ];
 
-  selectedCategory: ProductCategory | null = null;
 
-  selectItem(item: MenuItem) {
-    switch (item.label) {
-      case 'Bơi Lội':
-        this.selectedCategory = { title: 'Bơi Lội', items: ['Đồ bơi','Kính bơi','Mũ bơi'] };
-        break;
-      case 'Nam':
-        this.selectedCategory = { title: 'Nam', items: ['Áo nam','Quần nam','Giày nam'] };
-        break;
-      case 'Nữ':
-        this.selectedCategory = { title: 'Nữ', items: ['Áo nữ','Quần nữ','Giày nữ'] };
-        break;
-      default:
-        this.selectedCategory = { title: item.label, items: ['Sản phẩm mẫu 1','Sản phẩm mẫu 2'] };
-    }
-  }
+
 }
 

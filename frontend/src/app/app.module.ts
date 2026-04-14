@@ -5,6 +5,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from "./shared/shared.module";
 import { MatIconModule } from '@angular/material/icon';
+import { HomeModule } from './features/home/home.module';
+import { AuthModule } from './features/auth/auth.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +16,9 @@ import { MatIconModule } from '@angular/material/icon';
     BrowserModule,
     AppRoutingModule,
     SharedModule,
-    MatIconModule
+    MatIconModule,
+    HomeModule,
+    AuthModule
 ],
   providers: [],
   bootstrap: [AppComponent]

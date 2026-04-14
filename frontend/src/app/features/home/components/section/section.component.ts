@@ -1,0 +1,28 @@
+import { Component, Input } from '@angular/core';
+
+interface Banner {
+  title: string;
+  image: string;
+}
+
+interface Product {
+  name: string;
+  brand: string;
+  newPrice: number;
+  oldPrice?: number | null;
+  rating?: number;
+  reviews?: number;
+  label?: string;
+  image: string;
+}
+
+@Component({
+  selector: 'app-section',
+  templateUrl: './section.component.html',
+  styleUrls: ['./section.component.css']
+})
+export class SectionComponent {
+  @Input() title!: string;
+  @Input() banners: Banner[] = [];
+  @Input() products: Product[] = [];
+}

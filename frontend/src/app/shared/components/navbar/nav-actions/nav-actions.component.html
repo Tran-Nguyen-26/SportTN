@@ -1,17 +1,45 @@
 <div class="nav-actions">
-    <div (click)="goLogin()" class="nav-item">
+    <div (click)="goLogin()" class="nav-item account-menu">
         <mat-icon>account_circle</mat-icon>
         <span>Đăng nhập</span>
+        <div class="dropdown">
+            <ul>
+                <li><a href="#">{{userName}}</a></li>
+                <li><a href="#">{{userEmail}}</a></li>
+                <li><a href="#">{{userPoints}} điểm</a></li>
+                <li><a href="#">Tài khoản</a></li>
+                <li><a href="#">Địa chỉ của tôi</a></li>
+                <li><a href="#">Lịch sử mua hàng</a></li>
+                <li><a href="#">Quản lí điểm tích lũy</a></li>
+                <li><a href="#">Đăng xuất</a></li>
+            </ul>
+        </div>
     </div>
     <div>
         <mat-icon>shop</mat-icon>
         <span>Cửa hàng</span>
     </div>
-    <div>
+    <div class="nav-item support-menu">
         <mat-icon>contact_support</mat-icon>
         <span>Hỗ trợ</span>
+        <div class="dropdown">
+            <ul>
+                <li>
+                    <mat-icon>blur_circular</mat-icon>
+                    <a routerLink="/support/orders">Theo dõi đơn hàng</a>
+                </li>
+                <li>
+                    <mat-icon>swap_horiz</mat-icon>
+                    <a routerLink="/support/returns">Đổi trả & Bảo hành</a>
+                </li>
+                <li>
+                    <mat-icon>supervisor_account</mat-icon>
+                    <a routerLink="/support/contact">Liên hệ CSKH</a>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div>
+    <div (click)="goCart()" class="nav-item">
         <mat-icon>add_shopping_cart</mat-icon>
         <span>Giỏ hàng</span>
     </div>

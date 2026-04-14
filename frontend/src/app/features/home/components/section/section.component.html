@@ -1,0 +1,27 @@
+<div class="section">
+  <h2>{{ title }}</h2>
+
+  <!-- Banner images -->
+  <div class="banner-list">
+    <div class="banner-card" *ngFor="let banner of banners">
+      <img [src]="banner.image" alt="{{ banner.title }}">
+      <h3>{{ banner.title }}</h3>
+      <button>Khám phá ngay</button>
+    </div>
+  </div>
+
+  <!-- Product list -->
+  <div class="product-list">
+    <app-product-card
+      *ngFor="let product of products"
+      [name]="product.name"
+      [brand]="product.brand"
+      [newPrice]="product.newPrice"
+      [oldPrice]="product.oldPrice"
+      [rating]="product.rating"
+      [reviews]="product.reviews"
+      [label]="product.label"
+      [image]="product.image">
+    </app-product-card>
+  </div>
+</div>

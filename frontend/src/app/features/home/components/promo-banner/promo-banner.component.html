@@ -1,1 +1,11 @@
-<p>promo-banner works!</p>
+<div class="promo-banner">
+    <h2>Khám phá các ưu đãi khác</h2>
+    <div class="banner-cards">
+        <div class="banner-card" *ngFor="let banner of banners">
+        <img [src]="banner.image" alt="{{ banner.title }}">
+        <h3>{{ banner.title }}</h3>
+        <p>{{ banner.description }}</p>
+        <button>{{ banner.button }}</button>
+    </div>
+    </div>
+</div>

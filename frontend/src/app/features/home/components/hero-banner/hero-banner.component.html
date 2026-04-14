@@ -1,1 +1,20 @@
-<p>hero-banner works!</p>
+<div class="hero-banner">
+    <div class="slides" [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
+        <div class="slide" *ngFor="let slide of slides">
+            <img [src]="slide.image" alt="banner">
+        </div>
+    </div>
+    <div class="controls">
+        <button (click)="prev()">←</button>
+        <button (click)="next()">→</button>
+    </div>
+
+    <div class="dots">
+        <span 
+            *ngFor="let slide of slides; let i = index"
+            [class.active]="i === currentIndex"
+            (click)="goToSlide(i)"
+            >
+        </span>
+    </div>
+</div>

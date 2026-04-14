@@ -1,0 +1,11 @@
+<div class="sports-popular">
+  <h2>Môn Thể Thao Phổ Biến</h2>
+  <div class="sports-list">
+    <div class="sport-item" *ngFor="let sport of sports">
+      <div class="sport-image">
+        <img [src]="sport.image" alt="{{ sport.name }}">
+      </div>
+      <span class="sport-name">{{ sport.name }}</span>
+    </div>
+  </div>
+</div>
