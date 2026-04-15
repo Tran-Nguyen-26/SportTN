@@ -3,14 +3,17 @@ package com.ttn.sporttn.modules.product.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "product_variants")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -45,11 +48,19 @@ public class ProductVariant {
     @Column(name = "weight_gram")
     private Integer weightGram;
 
+    @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariantImage> variantImages;
+
     public BigDecimal getEffectivePrice() {
         if (salePrice != null && salePrice.compareTo(originalPrice) < 0) {
             return salePrice;
         }
         return originalPrice;
+    }
+
+    public void addImage(ProductVariantImage image) {
+        variantImages.add(image);
+        image.setVariant(this);
     }
 
 }

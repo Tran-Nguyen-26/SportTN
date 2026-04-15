@@ -1,0 +1,80 @@
+package com.ttn.sporttn.modules.product.controller;
+
+import com.ttn.sporttn.common.dto.ApiResponse;
+import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
+import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
+import com.ttn.sporttn.modules.product.service.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/products")
+@RequiredArgsConstructor
+public class ProductController {
+
+    private final ProductService productService;
+
+    /**
+     * Get product by ID
+     * GET /api/v1/products/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDetailResponse>> getProduct(
+        @PathVariable Long id
+    ) {
+        ProductDetailResponse product = productService.getProduct(id);
+        return ResponseEntity.ok(ApiResponse.ok(product, "Lấy sản phẩm thành công"));
+    }
+
+    /**
+     * Create new product (Admin only)
+     * POST /api/v1/products
+     */
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<ProductDetailResponse>> createProduct(
+        @Valid @RequestBody ProductRequest request
+    ) {
+        ProductDetailResponse product = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiResponse.ok(product, "Tạo sản phẩm thành công"));
+    }
+
+    /**
+     * Update product (Admin only)
+     * PUT /api/v1/products/{id}
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<ProductDetailResponse>> updateProduct(
+        @PathVariable Long id,
+        @Valid @RequestBody ProductRequest request
+    ) {
+        ProductDetailResponse product = productService.updateProduct(id, request);
+        return ResponseEntity.ok(ApiResponse.ok(product, "Cập nhật sản phẩm thành công"));
+    }
+
+    /**
+     * Delete product (Admin only)
+     * DELETE /api/v1/products/{id}
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(
+        @PathVariable Long id
+    ) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(ApiResponse.ok("Xóa sản phẩm thành công"));
+    }
+}

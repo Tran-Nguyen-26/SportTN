@@ -1,11 +1,9 @@
 package com.ttn.sporttn.common.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter

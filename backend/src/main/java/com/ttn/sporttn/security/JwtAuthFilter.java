@@ -1,5 +1,6 @@
 package com.ttn.sporttn.security;
 
+import com.ttn.sporttn.modules.user.entity.UserStatus;
 import com.ttn.sporttn.modules.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,10 +46,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         Long userId = jwtService.extractUserId(token);
         userRepository.findById(userId).ifPresent(user -> {
+            CustomUserDetails userDetails = CustomUserDetails.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .password(user.getPasswordHash())
+                    .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())))
+                    .enabled(user.getStatus() == UserStatus.ACTIVE)
+                    .build();
+
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
-                            userId.toString(), null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                            userDetails, null,
+                            userDetails.getAuthorities()
                     );
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
