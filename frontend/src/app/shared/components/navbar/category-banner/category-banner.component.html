@@ -1,0 +1,21 @@
+<div class="category-banner">
+  <!-- Menu bên trái -->
+  <div class="left-menu">
+    <h3>Môn Thể Thao</h3>
+    <ul>
+      <li *ngFor="let cat of categories" (click)="onSelectCategory(cat)">
+        {{cat.name}}
+      </li>
+    </ul>
+  </div>
+
+  <!-- Banner bên phải -->
+  <div class="right-banner" *ngIf="selectedCategory">
+    <h2>{{selectedCategory.name}}</h2>
+    <ul>
+      <li *ngFor="let sub of selectedCategory.children" (click)="onSelectCategory(sub)">
+        {{sub.name}}
+      </li>
+    </ul>
+  </div>
+</div>

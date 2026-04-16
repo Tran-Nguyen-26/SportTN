@@ -11,7 +11,17 @@
       <span class="new-price">{{ newPrice | currency:'VND' }}</span>
     </p>
     <div class="rating" *ngIf="rating">
-      ★ {{ rating }} ({{ reviews }} đánh giá)
+      <app-rating-stars [rating]="rating"></app-rating-stars>
+      {{ rating }} ({{ reviews }} đánh giá)
+    </div>
+    <div class="product-actions">
+      <button mat-raised-button color="primary" (click)="onAddToCart()" class="add-to-cart-btn">
+        <mat-icon>shopping_cart</mat-icon>
+        Thêm vào giỏ
+      </button>
+      <button mat-icon-button (click)="onAddToWishlist()" class="wishlist-btn">
+        <mat-icon>favorite_border</mat-icon>
+      </button>
     </div>
   </div>
 </div>

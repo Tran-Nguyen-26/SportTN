@@ -1,14 +1,178 @@
-<app-auth-form-layout title="Đăng ký">
-  
-  <form form-content class="login-form">
-    <label for="email">Đăng ký bằng email</label>
-    <input type="email" id="email" placeholder="Email của bạn">
-    <button type="submit" class="btn-primary">TIẾP TỤC ĐĂNG KÝ</button>
-  </form>
+<app-auth-form-layout title="Create Your Account">
+  <div form-content class="register-form">
+    <div *ngIf="errorMessage" class="error-message">
+      <mat-icon>error</mat-icon>
+      {{ errorMessage }}
+    </div>
 
-  <div footer-link>
-    <p>Đã có tài khoản SportTN? <a routerLink="/auth/login">Đăng nhập</a></p>
+    <div *ngIf="successMessage" class="success-message">
+      <mat-icon>check_circle</mat-icon>
+      {{ successMessage }}
+    </div>
+
+    <!-- Step 1: Email -->
+    <div *ngIf="currentStep === 1" class="step-content">
+      <h3>Create Your Account</h3>
+      <p class="step-subtitle">Register with your email address</p>
+
+      <form [formGroup]="registerForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="your.email@example.com">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="button" 
+          (click)="nextStep()"
+          [disabled]="!registerForm.get('email')?.valid || isLoading"
+          class="full-width">
+          <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+          <span *ngIf="!isLoading">Continue</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: Details -->
+    <div *ngIf="currentStep === 2" class="step-content">
+      <h3>Complete Your Profile</h3>
+      <p class="step-subtitle">Tell us about yourself</p>
+
+      <form [formGroup]="registerForm">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="registerForm.get('firstName')?.hasError('required')">First name is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName">
+            <mat-error *ngIf="registerForm.get('lastName')?.hasError('required')">Last name is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phoneNumber" type="tel" placeholder="+91 XXXXX XXXXX">
+          <mat-icon matPrefix>phone</mat-icon>
+          <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('required')">Phone number is required</mat-error>
+          <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('pattern')">Invalid phone number format</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-hint>At least 8 characters with uppercase, lowercase, number & special character</mat-hint>
+          <mat-error *ngIf="registerForm.get('password')?.hasError('required')">Password is required</mat-error>
+          <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">Password must be at least 8 characters</mat-error>
+          <mat-error *ngIf="registerForm.get('password')?.hasError('passwordStrength')">Password must contain uppercase, lowercase, number & special character</mat-error>
+        </mat-form-field>
+
+        <!-- Password Strength Indicator -->
+        <div *ngIf="registerForm.get('password')?.value" class="password-strength">
+          <div class="strength-bar" [style.background-color]="getPasswordStrengthColor()"></div>
+          <span class="strength-text">Password Strength: <strong>{{ getPasswordStrengthMessage() }}</strong></span>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword">
+          <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hideConfirmPassword">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required')">Please confirm your password</mat-error>
+          <mat-error *ngIf="registerForm.hasError('passwordMismatch')">Passwords do not match</mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="button" 
+            (click)="nextStep()"
+            [disabled]="!registerForm.valid || isLoading"
+            class="full-width">
+            <span *ngIf="!isLoading">Review & Confirm</span>
+            <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+          </button>
+          <button 
+            mat-stroked-button 
+            type="button" 
+            (click)="previousStep()"
+            class="full-width">
+            Back
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div *ngIf="currentStep === 3" class="step-content">
+      <h3>Confirm Your Details</h3>
+      <p class="step-subtitle">Review and complete your registration</p>
+
+      <form [formGroup]="registerForm">
+        <mat-card class="review-card">
+          <mat-card-content>
+            <div class="review-item">
+              <span class="label">Email:</span>
+              <span class="value">{{ registerForm.get('email')?.value }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="review-item">
+              <span class="label">Name:</span>
+              <span class="value">{{ registerForm.get('firstName')?.value }} {{ registerForm.get('lastName')?.value }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="review-item">
+              <span class="label">Phone:</span>
+              <span class="value">{{ registerForm.get('phoneNumber')?.value }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-checkbox formControlName="agreeTerms" class="terms-checkbox">
+          I agree to the <a href="#" target="_blank">Terms & Conditions</a> and <a href="#" target="_blank">Privacy Policy</a>
+        </mat-checkbox>
+        <mat-error *ngIf="registerForm.get('agreeTerms')?.hasError('required')" class="checkbox-error">
+          You must agree to the terms and conditions
+        </mat-error>
+
+        <div class="form-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="button" 
+            (click)="register()"
+            [disabled]="!registerForm.valid || isLoading"
+            class="full-width">
+            <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+            <span *ngIf="!isLoading">Complete Registration</span>
+          </button>
+          <button 
+            mat-stroked-button 
+            type="button" 
+            (click)="previousStep()"
+            class="full-width">
+            Back
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
+  <div footer-link>
+    <p>Already have an account? <a routerLink="/auth/login">Login here</a></p>
+  </div>
 </app-auth-form-layout>
 

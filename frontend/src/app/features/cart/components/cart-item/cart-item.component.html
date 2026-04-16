@@ -1,1 +1,38 @@
-<p>cart-item works!</p>
+<div class="cart-item">
+  <div class="item-image">
+    <img [src]="item.product.image" [alt]="item.product.name" />
+  </div>
+
+  <div class="item-details">
+    <h3>{{ item.product.name }}</h3>
+    <p class="brand">{{ item.product.brand }}</p>
+    <div class="rating">
+      <span class="stars">{{ item.product.rating }}/5</span>
+      <span class="reviews">({{ item.product.reviews }} reviews)</span>
+    </div>
+  </div>
+
+  <div class="quantity-section">
+    <button mat-icon-button (click)="decreaseQuantity()" [disabled]="item.quantity <= 1">
+      <mat-icon>remove</mat-icon>
+    </button>
+    <input type="number" [(ngModel)]="item.quantity" min="1" readonly />
+    <button mat-icon-button (click)="increaseQuantity()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div class="price-section">
+    <div class="prices">
+      <span class="unit-price">{{ item.price | currency:'VND' }}/đơn</span>
+      <span class="total-price">{{ getTotalPrice() | currency:'VND' }}</span>
+    </div>
+    <div *ngIf="getSavings() > 0" class="savings">
+      Tiết kiệm {{ getSavings() | currency:'VND' }}
+    </div>
+  </div>
+
+  <button mat-icon-button color="warn" (click)="remove()" matTooltip="Remove item">
+    <mat-icon>delete</mat-icon>
+  </button>
+</div>

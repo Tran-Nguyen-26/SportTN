@@ -1,18 +1,10 @@
 <div class="cheap-quality">
     <h2>Giá rẻ hơn - chất lượng không đổi</h2>
         <div class="cheap-quality">
-        <h2>Giá rẻ hơn - chất lượng không đổi</h2>
         <div class="product-list">
             <app-product-card
             *ngFor="let product of products"
-            [name]="product.name"
-            [brand]="product.brand"
-            [newPrice]="product.newPrice"
-            [oldPrice]="product.oldPrice"
-            [rating]="product.rating"
-            [reviews]="product.reviews"
-            [label]="product.label"
-            [image]="product.image">
+            [product]="product">
             </app-product-card>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 interface MenuItem {
   label: string;
@@ -24,7 +24,10 @@ export class NavMenuComponent {
     { label: 'Giá Rẻ Hơn', highlight: 'sale', hasChildren: false },
   ];
 
+  @Output() toggleCategory = new EventEmitter<void>();
 
-
+  onClickCategoryMenu() {
+    this.toggleCategory.emit();
+  }
 }
 

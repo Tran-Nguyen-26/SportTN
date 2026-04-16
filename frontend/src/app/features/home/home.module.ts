@@ -9,7 +9,6 @@ import { CategoryCirclesComponent } from './components/category-circles/category
 import { FlashSaleSectionComponent } from './components/flash-sale-section/flash-sale-section.component';
 import { FeaturedProductsComponent } from './components/featured-products/featured-products.component';
 import { PromoBannerComponent } from './components/promo-banner/promo-banner.component';
-import { MatIconModule } from '@angular/material/icon';
 import { MostSearchedComponent } from './components/most-searched/most-searched.component';
 import { SportsPopularComponent } from './components/sports-popular/sports-popular.component';
 import { BestSellerComponent } from './components/best-seller/best-seller.component';
@@ -18,6 +17,11 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { SectionComponent } from './components/section/section.component';
 import { ServicesComponent } from './components/services/services.component';
 
+// Material Modules
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -39,6 +43,9 @@ import { ServicesComponent } from './components/services/services.component';
     CommonModule,
     HomeRoutingModule,
     MatIconModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
     SharedModule
   ]
 })

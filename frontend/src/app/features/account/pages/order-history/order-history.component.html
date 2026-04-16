@@ -1,1 +1,138 @@
-<p>order-history works!</p>
+<div class="order-history-container">
+  <h2>Order History</h2>
+
+  <mat-progress-spinner *ngIf="isLoading" diameter="50" mode="indeterminate"></mat-progress-spinner>
+
+  <div *ngIf="!isLoading && dataSource.data.length > 0" class="orders-list">
+    <div *ngFor="let order of dataSource.data" class="order-card" [@expandCollapse]>
+      <div class="order-header">
+        <div class="order-info">
+          <h3>{{ order.id }}</h3>
+          <p class="order-date">{{ order.createdAt | date:'MMM dd, yyyy' }}</p>
+        </div>
+
+        <div class="order-status" [ngClass]="statusColors[order.status]">
+          <mat-icon>{{ getStatusIcon(order.status) }}</mat-icon>
+          <span>{{ order.status }}</span>
+        </div>
+
+        <div class="order-total">
+          <span class="label">Total:</span>
+          <span class="amount">{{ order.totalPrice | currency:'VND' }}</span>
+        </div>
+
+        <div class="order-actions">
+          <button mat-icon-button (click)="viewOrderDetails(order)" matTooltip="View Details">
+            <mat-icon>expand_more</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="order === dataSource.data[dataSource.data.length - 1] ? false : true"></mat-divider>
+    </div>
+
+    <mat-paginator 
+      #paginator 
+      [pageSizeOptions]="[5, 10, 25]" 
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+  <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+    <mat-icon>receipt_long</mat-icon>
+    <p>No orders found. Start shopping!</p>
+  </div>
+
+  <!-- Order Details Dialog -->
+  <div *ngIf="showDetails && selectedOrder" class="order-details-overlay" [@fadeIn]>
+    <mat-card class="order-details-card">
+      <div class="details-header">
+        <h2>Order Details - {{ selectedOrder.id }}</h2>
+        <button mat-icon-button (click)="closeDetails()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content>
+        <!-- Order Status Timeline -->
+        <div class="status-timeline">
+          <h3>Order Status</h3>
+          <div class="timeline">
+            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status !== 'PENDING' }">
+              <mat-icon>shopping_cart</mat-icon>
+              <span>Ordered</span>
+            </div>
+            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status !== 'PENDING' && selectedOrder.status !== 'CONFIRMED' }">
+              <mat-icon>check_circle</mat-icon>
+              <span>Confirmed</span>
+            </div>
+            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status === 'SHIPPED' || selectedOrder.status === 'DELIVERED' }">
+              <mat-icon>local_shipping</mat-icon>
+              <span>Shipped</span>
+            </div>
+            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status === 'DELIVERED' }">
+              <mat-icon>home</mat-icon>
+              <span>Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-items">
+          <h3>Items</h3>
+          <div *ngFor="let item of selectedOrder.items" class="item-row">
+            <div class="item-image">
+              <img [src]="item.product.image" [alt]="item.product.name">
+            </div>
+            <div class="item-details">
+              <h4>{{ item.product.name }}</h4>
+              <p>Qty: {{ item.quantity }}</p>
+            </div>
+            <div class="item-price">
+              ₹{{ item.price * item.quantity | number:'1.2-2' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="delivery-section">
+          <h3>Delivery Address</h3>
+          <p>{{ selectedOrder.deliveryAddress.name }}</p>
+          <p>{{ selectedOrder.deliveryAddress.address }}</p>
+          <p>{{ selectedOrder.deliveryAddress.city }}, {{ selectedOrder.deliveryAddress.state }} {{ selectedOrder.deliveryAddress.postalCode }}</p>
+          <p>{{ selectedOrder.deliveryAddress.country }}</p>
+          <p><strong>Phone:</strong> {{ selectedOrder.deliveryAddress.phoneNumber }}</p>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <h3>Order Summary</h3>
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>₹{{ selectedOrder.totalPrice | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Tax:</span>
+            <span>₹{{ (selectedOrder.totalPrice * 0.18) | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total:</span>
+            <span>₹{{ (selectedOrder.totalPrice * 1.18) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-divider></mat-divider>
+
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" (click)="downloadInvoice()">
+          <mat-icon>download</mat-icon>
+          Download Invoice
+        </button>
+        <button mat-stroked-button (click)="closeDetails()">Close</button>
+      </div>
+    </mat-card>
+  </div>
+</div>

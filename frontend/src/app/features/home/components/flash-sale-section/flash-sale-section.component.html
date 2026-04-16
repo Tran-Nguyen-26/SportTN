@@ -1,0 +1,41 @@
+<div class="flash-sale-section">
+  <div class="flash-sale-header">
+    <div class="header-left">
+      <mat-icon class="flash-icon">flash_on</mat-icon>
+      <h2>Flash Sale</h2>
+    </div>
+    <div class="timer">
+      <span class="timer-label">Ending in:</span>
+      <span class="timer-value">{{ getTimeString() }}</span>
+    </div>
+    <a href="#" class="view-all">View All →</a>
+  </div>
+
+  <div class="products-carousel">
+    <div *ngFor="let product of flashSaleProducts" class="product-card">
+      <div class="product-image-wrapper">
+        <img [src]="product.image" [alt]="product.name" class="product-image">
+        <div class="discount-badge">-{{ product.discount }}%</div>
+        <div *ngIf="product.stock < 15" class="stock-warning">Low Stock</div>
+      </div>
+
+      <div class="product-info">
+        <h4 class="product-name">{{ product.name }}</h4>
+        
+        <div class="pricing">
+          <span class="sale-price">₹{{ product.salePrice }}</span>
+          <span class="original-price">₹{{ product.originalPrice }}</span>
+        </div>
+
+        <div class="stock-bar">
+          <div class="stock-progress" [style.width]="((6 - (product.stock > 20 ? 1 : product.stock > 15 ? 2 : 3)) / 6 * 100) + '%'"></div>
+        </div>
+
+        <button mat-raised-button color="primary" class="add-to-cart-btn" (click)="addToCart(product)">
+          <mat-icon>shopping_cart</mat-icon>
+          Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

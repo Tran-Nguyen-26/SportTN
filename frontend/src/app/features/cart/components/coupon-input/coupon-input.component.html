@@ -1,1 +1,43 @@
-<p>coupon-input works!</p>
+<mat-card class="coupon-card">
+  <mat-card-header>
+    <mat-card-title>Have a coupon?</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div *ngIf="!appliedCoupon" class="coupon-input-section">
+      <form [formGroup]="couponForm" (ngSubmit)="applyCoupon()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Enter coupon code</mat-label>
+          <input matInput formControlName="couponCode" placeholder="e.g., SAVE10">
+          <mat-icon matPrefix>local_offer</mat-icon>
+        </mat-form-field>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          [disabled]="!couponForm.valid || isLoading"
+          class="apply-btn">
+          <mat-icon *ngIf="!isLoading">check</mat-icon>
+          <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+          Apply
+        </button>
+      </form>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <mat-icon>error</mat-icon>
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <div *ngIf="appliedCoupon" class="applied-coupon">
+      <div class="coupon-badge">
+        <mat-icon>verified</mat-icon>
+        <span>{{ appliedCoupon }}</span>
+      </div>
+      <p class="coupon-success">{{ successMessage }}</p>
+      <button mat-stroked-button color="warn" (click)="removeCoupon()">
+        Remove
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

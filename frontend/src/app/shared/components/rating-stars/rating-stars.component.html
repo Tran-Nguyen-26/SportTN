@@ -1,1 +1,7 @@
-<p>rating-stars works!</p>
+<div class="rating-stars">
+  <span *ngFor="let star of stars" class="star">
+    <mat-icon *ngIf="isFilledStar(star)" class="filled">star</mat-icon>
+    <mat-icon *ngIf="isHalfFilledStar(star)" class="half">star_half</mat-icon>
+    <mat-icon *ngIf="!isFilledStar(star) && !isHalfFilledStar(star)" class="empty">star_border</mat-icon>
+  </span>
+</div>

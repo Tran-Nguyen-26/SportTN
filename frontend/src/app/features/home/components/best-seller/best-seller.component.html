@@ -3,14 +3,7 @@
     <div class="product-list">  
         <app-product-card
             *ngFor="let product of products"
-            [name]="product.name"
-            [brand]="product.brand"
-            [newPrice]="product.newPrice"
-            [oldPrice]="product.oldPrice"
-            [rating]="product.rating"
-            [reviews]="product.reviews"
-            [label]="product.label"
-            [image]="product.image">
+            [product]="product">
         </app-product-card>
     </div>
 </div>

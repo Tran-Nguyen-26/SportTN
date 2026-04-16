@@ -1,4 +1,7 @@
 <header class="navbar">
+  <div class="navbar-inner">
     <app-top-bar/>
-    <app-nav-menu/>
+    <app-nav-menu (toggleCategory)="toggleCategoryBanner()"/>
+    <app-category-banner *ngIf="showCategoryBanner"/>
+  </div>
 </header>

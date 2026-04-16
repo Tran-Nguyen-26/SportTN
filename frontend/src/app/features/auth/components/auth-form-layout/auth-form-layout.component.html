@@ -1,31 +1,61 @@
-<div class="login-container">
-  <div class="login-header">
-    <img src="assets/images/logos/sporttn-logo.png" alt="SportTN Logo" class="logo">
-    <h2>{{ title }}</h2>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo-section">
+        <mat-icon class="logo-icon">sports_basketball</mat-icon>
+        <h1>SportTN</h1>
+      </div>
+      <h2 class="auth-title">{{ title }}</h2>
+    </div>
+
+    <div class="form-section">
+      <ng-content select="[form-content]"></ng-content>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="social-login">
+      <p class="social-title">Or continue with</p>
+      <div class="social-buttons">
+        <button mat-raised-button class="btn-google">
+          <mat-icon svgIcon="google"></mat-icon>
+          <span>Google</span>
+        </button>
+        <button mat-raised-button class="btn-facebook">
+          <mat-icon svgIcon="facebook"></mat-icon>
+          <span>Facebook</span>
+        </button>
+        <button mat-raised-button class="btn-apple">
+          <mat-icon svgIcon="apple"></mat-icon>
+          <span>Apple</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="footer-link-section">
+      <ng-content select="[footer-link]"></ng-content>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="benefits">
+      <h4>Member Benefits</h4>
+      <ul>
+        <li><mat-icon>check_circle</mat-icon> Earn points on every purchase</li>
+        <li><mat-icon>check_circle</mat-icon> Exclusive member-only deals</li>
+        <li><mat-icon>check_circle</mat-icon> 365-day easy return policy</li>
+        <li><mat-icon>check_circle</mat-icon> Extended 2-year warranty</li>
+      </ul>
+    </div>
   </div>
 
-  <ng-content select="[form-content]"></ng-content>
-
-  <div class="social-login">
-    <button class="btn-google">Tiếp tục với Google</button>
-    <button class="btn-facebook">Tiếp tục với Facebook</button>
-    <button class="btn-apple">Tiếp tục với Apple</button>
-  </div>
-
-  <div class="signup">
-    <ng-content select="[footer-link]"></ng-content>
-  </div>
-
-  <div class="benefits">
-    <p>Quyền lợi thành viên <strong>SportTN</strong>:</p>
-    <ul>
-      <li>✔ Tích điểm đổi quà miễn phí</li>
-      <li>✔ Nhận thông báo ưu đãi độc quyền</li>
-      <li>✔ Đổi trả dễ dàng trong 365 ngày</li>
-    </ul>
-  </div>
-
-  <footer class="login-footer">
-    <a href="#">Hỗ trợ</a> | <a href="#">Bảo mật</a> | <a href="#">Về Trang chủ</a>
+  <footer class="auth-footer">
+    <div class="footer-links">
+      <a href="#">Help Center</a> | 
+      <a href="#">Privacy Policy</a> | 
+      <a href="#">Terms of Service</a> | 
+      <a href="#">Contact Us</a>
+    </div>
+    <p class="copyright">&copy; 2024 SportTN. All rights reserved.</p>
   </footer>
 </div>

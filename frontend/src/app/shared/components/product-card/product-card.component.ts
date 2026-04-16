@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Product } from 'src/app/core/models/product/product.model';
 
 @Component({
   selector: 'app-product-card',
@@ -6,12 +7,57 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./product-card.component.css']
 })
 export class ProductCardComponent {
-  @Input() name!: string;
-  @Input() brand!: string;
-  @Input() newPrice!: number;
-  @Input() oldPrice?: number | null = null;
-  @Input() rating?: number;
-  @Input() reviews?: number;
-  @Input() label?: string;
-  @Input() image!: string;
+  @Input() product!: any;
+  @Output() addToCart = new EventEmitter<any>();
+  @Output() addToWishlist = new EventEmitter<any>();
+
+  onAddToCart(): void {
+    this.addToCart.emit(this.product);
+  }
+
+  onAddToWishlist(): void {
+    this.addToWishlist.emit(this.product);
+  }
+
+  get name(): string {
+    return this.product?.name || '';
+  }
+
+  get brand(): string {
+    return this.product?.brand || '';
+  }
+
+  get newPrice(): number {
+    // Support both Product model (discountPrice) and simple data (newPrice)
+    return this.product?.newPrice || this.product?.discountPrice || this.product?.price || 0;
+  }
+
+  get oldPrice(): number | null {
+    // Support both Product model and simple data (oldPrice)
+    if (this.product?.oldPrice) return this.product.oldPrice;
+    if (this.product?.price && this.product?.discountPrice) {
+      return this.product.price;
+    }
+    return null;
+  }
+
+  get rating(): number | undefined {
+    return this.product?.rating;
+  }
+
+  get reviews(): number | undefined {
+    return this.product?.reviews;
+  }
+
+  get label(): string {
+    // Support explicit label or compute from prices
+    if (this.product?.label) return this.product.label;
+    if (!this.product?.discountPrice || !this.product?.price) return '';
+    const discount = Math.round(((this.product.price - this.product.discountPrice) / this.product.price) * 100);
+    return `-${discount}%`;
+  }
+
+  get image(): string {
+    return this.product?.image || '';
+  }
 }

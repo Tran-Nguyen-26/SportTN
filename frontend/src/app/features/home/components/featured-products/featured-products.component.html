@@ -1,1 +1,17 @@
-<p>featured-products works!</p>
+<div class="featured-products-section">
+  <div class="section-header">
+    <h2>Featured Products</h2>
+    <a href="#" class="view-all">Explore All →</a>
+  </div>
+
+  <mat-progress-spinner *ngIf="isLoading" diameter="50" mode="indeterminate"></mat-progress-spinner>
+
+  <div *ngIf="!isLoading" class="products-grid">
+    <app-product-card 
+      *ngFor="let product of featuredProducts"
+      [product]="product"
+      (addToCart)="addToCart($event)"
+      (addToWishlist)="addToWishlist($event)">
+    </app-product-card>
+  </div>
+</div>

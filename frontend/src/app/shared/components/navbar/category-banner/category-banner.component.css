@@ -1,0 +1,21 @@
+.category-banner {
+  display: block;        /* Đảm bảo tag component nhận thuộc tính kích thước */
+  position: absolute;
+  top: 110%;             /* Bắt đầu ngay dưới chân navbar-inner */
+
+  /* Kích thước theo yêu cầu */
+  width: 90%;
+  height: 50vh;          /* 40% chiều cao màn hình (Viewport Height) */
+
+  /* Căn giữa banner (vì width là 90%, dư 10% nên mỗi bên cách 5%) */
+  left: 5%;
+
+  /* Trang trí */
+  background-color: white;
+  z-index: 2000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 8px; /* Bo góc dưới để trông hiện đại hơn */
+
+  /* Xử lý nội dung bên trong nếu quá dài */
+  overflow-y: auto;
+}

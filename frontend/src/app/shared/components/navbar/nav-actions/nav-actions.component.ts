@@ -10,7 +10,7 @@ export class NavActionsComponent {
   constructor(private router: Router) {}
 
   goLogin() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   goCart() {

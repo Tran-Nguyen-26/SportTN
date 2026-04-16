@@ -1,1 +1,54 @@
-<p>order-summary works!</p>
+<mat-card class="order-summary-card">
+  <mat-card-header>
+    <mat-card-title>Order Summary</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="summary-row">
+      <span class="label">Subtotal</span>
+      <span class="value">{{ subtotal | currency:'VND' }}</span>
+    </div>
+
+    <div class="summary-row" *ngIf="discount > 0">
+      <span class="label discount">Discount (5%)</span>
+      <span class="value discount">-{{ discount | currency:'VND' }}</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="label">Tax (18% GST)</span>
+      <span class="value">{{ tax | currency:'VND' }}</span>
+    </div>
+
+    <div class="summary-row" *ngIf="shipping > 0">
+      <span class="label">Shipping</span>
+      <span class="value">{{ shipping | currency:'VND' }}</span>
+    </div>
+
+    <div class="summary-row" *ngIf="shipping === 0 && subtotal > 500">
+      <span class="label text-success">
+        <mat-icon>local_shipping</mat-icon> Free Shipping
+      </span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="summary-row total">
+      <span class="label">Total Amount</span>
+      <span class="value total">{{ total | currency:'VND' }}</span>
+    </div>
+
+    <button 
+      mat-raised-button 
+      color="accent" 
+      class="checkout-btn"
+      (click)="proceedCheckout()">
+      Proceed to Checkout
+    </button>
+
+    <button 
+      mat-stroked-button 
+      class="continue-shopping-btn">
+      Continue Shopping
+    </button>
+  </mat-card-content>
+</mat-card>

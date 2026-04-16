@@ -1,125 +1,484 @@
-/* Container giữ nguyên cấu trúc của bạn */
-.login-container {
-  width: 480px;
-  margin: 60px auto; /* Giảm nhẹ margin để cân đối hơn trên laptop */
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #0052A3 0%, #0066CC 50%, #0088FF 100%);
+  background-attachment: fixed;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Main Auth Container */
+.auth-container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Auth Card */
+.auth-card {
   background: #fff;
-  padding: 40px;            
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  transition: transform 0.2s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  animation: slideUp 0.5s ease;
+  overflow: hidden;
+  position: relative;
 }
 
-.login-container:hover {
-  transform: translateY(-6px);
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.login-header {
+/* Header Section */
+.auth-header {
   text-align: center;
   margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #E8F1FF;
 }
 
-.logo {
-  width: 160px;            
-  margin-bottom: 20px;
+.logo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.login-header h2 {
-  font-size: 26px;         
-  color: #222;
+.logo-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: #0066CC;
+}
+
+.logo-section h1 {
   margin: 0;
+  font-size: 28px;
   font-weight: 700;
+  color: #0052A3;
+  letter-spacing: -0.5px;
 }
 
-/* Phần Form: Các class này sẽ áp dụng cho bất kỳ form nào "bắn" vào ng-content */
-::ng-deep .login-form label {
-  display: block;
-  margin-bottom: 8px;
+.auth-title {
+  margin: 12px 0 0 0;
+  font-size: 22px;
   font-weight: 600;
-  color: #444;
-  font-size: 15px;
+  color: #333;
+  line-height: 1.3;
 }
 
-::ng-deep .login-form input {
+/* Form Section */
+.form-section {
+  margin-bottom: 24px;
+}
+
+::ng-deep .login-form,
+::ng-deep .register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+::ng-deep .login-form mat-form-field,
+::ng-deep .register-form mat-form-field {
   width: 100%;
-  padding: 14px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 15px;
-  box-sizing: border-box; /* Quan trọng để input không bị tràn */
-  transition: border-color 0.2s ease;
 }
 
-::ng-deep .login-form input:focus {
-  border-color: #007bff;
-  outline: none;
+::ng-deep .login-form mat-form-field .mat-mdc-form-field-hint-wrapper,
+::ng-deep .register-form mat-form-field .mat-mdc-form-field-hint-wrapper {
+  padding: 0 0 0 0 !important;
 }
 
-::ng-deep .btn-primary {
+::ng-deep .login-form .full-width,
+::ng-deep .register-form .full-width {
   width: 100%;
-  padding: 14px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
 }
 
-::ng-deep .btn-primary:hover {
-  background: #0056b3;
-}
-
-/* Social Buttons */
-.social-login button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border: none;
+/* Error & Success Messages */
+::ng-deep .error-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFE8E8;
+  border-left: 4px solid #FF6B6B;
+  color: #C92A2A;
+  padding: 12px 16px;
   border-radius: 8px;
-  cursor: pointer;
-  color: #fff;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
-  transition: opacity 0.3s ease;
+  margin-bottom: 16px;
+  animation: slideDown 0.3s ease;
 }
 
-.btn-facebook { background: #3b5998; }
-.btn-google { background: #db4437; }
-.btn-apple { background: #000; }
-
-/* Link điều hướng */
-.signup {
-  text-align: center;
-  margin: 28px 0;
-  font-size: 15px;
+::ng-deep .error-message mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #FF6B6B;
 }
 
-::ng-deep .signup a {
-  color: #007bff;
+::ng-deep .success-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #E8F8F0;
+  border-left: 4px solid #10B981;
+  color: #065F46;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+::ng-deep .success-message mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #10B981;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Login Options */
+::ng-deep .login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+::ng-deep .login-options mat-checkbox {
+  min-width: auto !important;
+}
+
+::ng-deep .login-options .forgot-password {
+  color: #0066CC;
   text-decoration: none;
   font-weight: 600;
+  transition: color 0.2s ease;
+  margin-left: auto;
 }
 
-/* Lợi ích và Footer */
-.benefits {
-  font-size: 15px;
-  margin-bottom: 28px;
+::ng-deep .login-options .forgot-password:hover {
+  color: #0052A3;
+  text-decoration: underline;
+}
+
+/* Buttons */
+::ng-deep .login-button,
+::ng-deep [type="submit"][mat-raised-button] {
+  height: 48px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%) !important;
+  color: white !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  margin-top: 8px;
+}
+
+::ng-deep .login-button:hover:not(:disabled),
+::ng-deep [type="submit"][mat-raised-button]:hover:not(:disabled) {
+  box-shadow: 0 12px 32px rgba(0, 102, 204, 0.35);
+  transform: translateY(-2px);
+}
+
+::ng-deep .login-button:disabled,
+::ng-deep [type="submit"][mat-raised-button]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Divider */
+mat-divider {
+  margin: 24px 0 !important;
+  background: #E8F1FF !important;
+}
+
+/* Social Login Section */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.social-title {
+  margin: 0;
+  font-size: 13px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.social-buttons button {
+  height: 44px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  border: 0 !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px;
+  color: white !important;
+}
+
+.social-buttons mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.btn-google {
+  background: linear-gradient(135deg, #DB4437 0%, #C1331A 100%) !important;
+}
+
+.btn-google:hover {
+  box-shadow: 0 8px 20px rgba(219, 68, 55, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-facebook {
+  background: linear-gradient(135deg, #4267B2 0%, #2D496B 100%) !important;
+}
+
+.btn-facebook:hover {
+  box-shadow: 0 8px 20px rgba(66, 103, 178, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-apple {
+  background: linear-gradient(135deg, #1F2937 0%, #000000 100%) !important;
+}
+
+.btn-apple:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Footer Link */
+.footer-link-section {
+  text-align: center;
+  font-size: 14px;
   color: #555;
-  border-top: 1px solid #eee; /* Thêm đường kẻ mờ để phân cách */
-  padding-top: 20px;
+}
+
+.footer-link-section p {
+  margin: 0;
+}
+
+.footer-link-section a {
+  color: #0066CC;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.footer-link-section a:hover {
+  color: #0052A3;
+  text-decoration: underline;
+}
+
+/* Member Benefits */
+.benefits {
+  background: #F0F5FF;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0;
+}
+
+.benefits h4 {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0052A3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .benefits ul {
-  padding-left: 22px;
-  line-height: 1.8;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.login-footer {
-  text-align: center;
+.benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 13px;
-  color: #777;
-  margin-top: 20px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.benefits mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #10B981;
+  flex-shrink: 0;
+}
+
+/* Auth Footer */
+.auth-footer {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+
+.footer-links {
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  color: #fff;
+}
+
+.copyright {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Step Indicator for Register */
+::ng-deep .step-indicator {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+::ng-deep .step-indicator .step {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #E8F1FF;
+  color: #0066CC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .step-indicator .step.active {
+  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+::ng-deep .step-indicator .step.completed {
+  background: #10B981;
+  color: white;
+}
+
+/* Form Row for Register */
+::ng-deep .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+::ng-deep .form-row.full-width {
+  grid-template-columns: 1fr;
+}
+
+::ng-deep .form-field {
+  width: 100%;
+}
+
+/* Step Content */
+::ng-deep .step-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+::ng-deep .step-subtitle {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 24px;
+  }
+
+  ::ng-deep .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .social-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benefits {
+    padding: 16px;
+  }
+
+  .auth-title {
+    font-size: 18px;
+  }
+
+  .logo-section h1 {
+    font-size: 24px;
+  }
 }
