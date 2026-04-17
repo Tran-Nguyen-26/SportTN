@@ -1,21 +1,70 @@
-<div class="category-banner">
-  <!-- Menu bên trái -->
-  <div class="left-menu">
-    <h3>Môn Thể Thao</h3>
-    <ul>
-      <li *ngFor="let cat of categories" (click)="onSelectCategory(cat)">
-        {{cat.name}}
-      </li>
-    </ul>
-  </div>
+<div class="category-banner" *ngIf="currentLevel">
+  <div class="banner-container">
+    <!-- Header -->
+    <div class="banner-header">
+      <div class="header-content">
+        <!-- Back button + Title -->
+        <div class="title-section">
+          <div class="title-with-back">
+            <button 
+              *ngIf="breadcrumbs.length > 0"
+              class="breadcrumb-btn back-btn"
+              (click)="onBreadcrumbClick(-1)"
+              aria-label="Go back">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <h2 *ngIf="currentLevel">{{ currentLevel.name }}</h2>
+          </div>
+        </div>
+        
+        <!-- Close button -->
+        <button class="close-btn" (click)="closeBanner()" aria-label="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
 
-  <!-- Banner bên phải -->
-  <div class="right-banner" *ngIf="selectedCategory">
-    <h2>{{selectedCategory.name}}</h2>
-    <ul>
-      <li *ngFor="let sub of selectedCategory.children" (click)="onSelectCategory(sub)">
-        {{sub.name}}
-      </li>
-    </ul>
+    <!-- Content - Single Panel that adapts to depth -->
+    <div class="banner-content">
+      <div class="category-items-container">
+        <h3>{{ currentLevel.children && currentLevel.children.length > 0 ? 'Chọn danh mục' : 'Danh mục' }}</h3>
+        
+        <!-- Category List -->
+        <ul class="category-list" *ngIf="currentItems.length > 0">
+          <li 
+            *ngFor="let item of currentItems"
+            (click)="onSelectItem(item)"
+            [class.has-children]="item.children && item.children.length > 0"
+            class="category-item">
+            <span class="cat-name">{{ item.name }}</span>
+            <span class="cat-indicator" *ngIf="item.children && item.children.length > 0">
+              <mat-icon>chevron_right</mat-icon>
+            </span>
+          </li>
+        </ul>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="currentItems.length === 0">
+          <mat-icon class="empty-icon">inbox</mat-icon>
+          <p>Không có danh mục con</p>
+          <p class="empty-hint">Đây là danh mục cuối cùng</p>
+        </div>
+      </div>
+
+      <!-- Advertisement Banner - Right Side -->
+      <div class="ad-banner">
+        <div class="ad-content">
+          <div class="ad-image-placeholder">
+            <mat-icon>sports</mat-icon>
+          </div>
+          <div class="ad-text">
+            <h4>Khuyến Mãi Đặc Biệt</h4>
+            <p class="ad-discount">Giảm <span>30%</span></p>
+            <p class="ad-description">Cho tất cả sản phẩm thể thao</p>
+            <button class="ad-cta">Mua Ngay</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,4 +1,50 @@
 <div class="search-bar">
-    <img src="assets/images/icons/search-icon.png" alt="">
-    <input type="text" placeholder="Tìm kiếm sản phẩm, môn thể thao">
+  <img src="assets/images/icons/search-icon.png" alt="">
+  <input type="text" placeholder="Tìm kiếm sản phẩm, môn thể thao"
+         (focus)="isSearchFocus = true"
+         (blur)="onBlur()">
+
+  <button *ngIf="isSearchFocus" class="close-search">✕</button>
+
+  <div class="search-results-dropdown" *ngIf="isSearchFocus">
+    <div class="search-container">
+
+      <aside class="search-sidebar">
+        <section class="search-section">
+          <h4>Tìm kiếm gần đây</h4>
+          <ul class="suggestion-list">
+            <li><span>dây kháng lực</span> <button class="delete-item">✕</button></li>
+            <li><span>pickleball</span> <button class="delete-item">✕</button></li>
+          </ul>
+        </section>
+
+        <section class="search-section">
+          <h4>Tìm kiếm phổ biến</h4>
+          <ul class="popular-list">
+            <li><mat-icon>grid_view</mat-icon> Giá giảm</li>
+            <li><mat-icon>grid_view</mat-icon> Sản Phẩm Mới</li>
+            <li>
+              <mat-icon>pool</mat-icon>
+              <div>
+                <strong>Bơi lội</strong>
+                <small>trong Môn Thể Thao / Thể Thao Dưới Nước</small>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </aside>
+
+      <main class="search-main">
+        <h4>Sản phẩm phổ biến</h4>
+        <div class="product-search-grid">
+          <app-product-card
+            *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+            [product]="swimProduct"
+          />
+
+        </div>
+      </main>
+
+    </div>
+  </div>
 </div>

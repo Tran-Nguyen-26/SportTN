@@ -1,34 +1,201 @@
+/* --- 1. Container chính của ô Search --- */
 .search-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 6px 12px;
-    width: 70%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f2f2f2; /* Màu xám nhạt đặc trưng */
+  border-radius: 4px;
+  padding: 10px 16px;
+  width: 70%;
+  margin: 0 auto;
+  z-index: 10001; /* Đảm bảo ô search nằm trên cùng khi đang focus */
 }
 
 .search-bar img {
-    width: 20px;
-    height: 20px;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-}
-
-.search-bar img:hover {
-    opacity: 1;
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
 }
 
 .search-bar input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-    color: #333;
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #333;
 }
 
-search-bar input::placeholder {
-  color: #aaa;               
+.search-bar input::placeholder {
+  color: #999;
+}
+
+/* --- 2. Mega Dropdown (Tràn màn hình) --- */
+.search-results-dropdown {
+  position: fixed;
+  top: 60px; /* Chỉnh lại con số này bằng đúng chiều cao của Navbar bạn */
+  left: 0;
+  width: 100vw;
+  height: auto;
+  max-height: 90vh;
+  background: #ffffff;
+  border-top: 1px solid #eee;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 10000;
+  padding: 30px 0;
+  overflow-y: auto;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 3. Bố cục bên trong Dropdown (Container 1200px) --- */
+.search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 60px;
+  padding: 0 20px;
+}
+
+/* --- 4. Cột trái (Sidebar) --- */
+.search-sidebar {
+  flex: 0 0 300px;
+  border-right: 1px solid #f0f0f0;
+  padding-right: 30px;
+}
+
+.search-section {
+  margin-bottom: 30px;
+}
+
+.search-section h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 16px;
+  text-transform: none;
+}
+
+.suggestion-list, .popular-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestion-list li, .popular-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #444;
+  transition: color 0.2s;
+}
+
+.suggestion-list li:hover, .popular-list li:hover {
+  color: #0082c3; /* Màu xanh thương hiệu */
+}
+
+.popular-list li {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.popular-list li mat-icon {
+  color: #666;
+  font-size: 20px;
+}
+
+.popular-list li div {
+  display: flex;
+  flex-direction: column;
+}
+
+.popular-list li small {
+  color: #999;
+  font-size: 11px;
+}
+
+/* --- 5. Cột phải (Main Content - Sản phẩm) --- */
+.search-main {
+  flex: 1;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* Style cho từng item sản phẩm trong search */
+.product-item-mini {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.product-item-mini:hover {
+  transform: translateY(-4px);
+}
+
+.product-item-mini .badge {
+  display: inline-block;
+  background: #ffea00;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  margin-bottom: 8px;
+}
+
+.product-item-mini img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #f9f9f9;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.product-item-mini .price {
+  font-weight: 700;
+  font-size: 15px;
+  color: #333;
+}
+
+.product-item-mini p {
+  font-size: 13px;
+  color: #666;
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+/* --- 6. Backdrop (Làm mờ nền) --- */
+.search-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999; /* Nằm dưới dropdown một bậc */
+}
+
+
+.product-search-grid {
+  display: grid;
+  /* Chia làm 4 cột đều nhau */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* Đảm bảo card component giãn hết chiều rộng cột */
+.product-search-grid app-product-card {
+  width: 100%;
+  display: block;
 }

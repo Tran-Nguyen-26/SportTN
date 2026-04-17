@@ -32,6 +32,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatRadioModule } from '@angular/material/radio';
+import { CategoryModule } from './features/category/category.module';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { MatRadioModule } from '@angular/material/radio';
     HomeModule,
     AuthModule,
     CartModule,
+    CategoryModule,
     AccountModule,
     // Material Modules
     MatIconModule,

@@ -1,0 +1,35 @@
+<div class="product-grid">
+
+  <!-- Phần đầu -->
+  <div class="product-grid-header">
+    <div class="product-count">
+      Tổng số sản phẩm: {{ totalProducts }}
+    </div>
+    <div class="product-sort">
+      <label for="sort">Sắp xếp theo:</label>
+      <select id="sort">
+        <option value="popularity">Phổ biến nhất</option>
+        <option value="priceAsc">Giá tăng dần</option>
+        <option value="priceDesc">Giá giảm dần</option>
+        <option value="newest">Mới nhất</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Phần giữa -->
+  <div class="product-grid-body">
+    <div class="product-list">
+      <app-product-card
+        *ngFor="let product of swimProducts"
+        [product]="product">
+      </app-product-card>
+    </div>
+  </div>
+
+  <!-- Phần cuối -->
+  <div class="product-grid-footer">
+    <button class="load-more">Xem thêm</button>
+    <button class="back-to-top">Quay lại đầu trang</button>
+  </div>
+
+</div>

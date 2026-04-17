@@ -55,7 +55,7 @@ const SHARED_COMPONENTS = [
   declarations: [
     ...NAVBAR_COMPONENTS,
     ...FOOTER_COMPONENTS,
-    ...SHARED_COMPONENTS
+    ...SHARED_COMPONENTS,
   ],
   imports: [
     CommonModule,

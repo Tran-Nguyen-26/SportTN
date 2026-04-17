@@ -10,10 +10,11 @@ export class NavMenuItemComponent {
   @Input() isActive: boolean = false;
   @Input() highlight: 'new' | 'sale' | null = null;
   @Input() hasChildren: boolean = false;
+  @Input() categoryId: string | null = null;
 
-  @Output() itemClick = new EventEmitter<void>();
+  @Output() itemClick = new EventEmitter<string | null>();
 
   onClick() {
-    this.itemClick.emit();
+    this.itemClick.emit(this.categoryId);
   }
 }

@@ -23,16 +23,34 @@
 ::ng-deep .login-form mat-form-field {
   width: 100%;
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 ::ng-deep .login-form .mdc-text-field {
   background-color: #F8FAFC !important;
   border-radius: 8px !important;
+  height: auto !important;
 }
 
 ::ng-deep .login-form .mat-mdc-text-field-wrapper {
-  padding-bottom: 1.5em !important;
+  padding-bottom: 0 !important;
+}
+
+::ng-deep .login-form .mdc-text-field__input {
+  padding: 20px 16px 16px 16px !important;
+  min-height: 48px !important;
+}
+
+::ng-deep .login-form .mat-mdc-floating-label {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #0052A3 !important;
+  top: 24px !important;
+}
+
+::ng-deep .login-form .mat-mdc-floating-label.mdc-floating-label--float-above {
+  font-size: 12px !important;
+  top: 8px !important;
 }
 
 ::ng-deep .login-form .mat-mdc-notched-outline {
@@ -48,18 +66,7 @@
   border-color: #FF6B6B !important;
 }
 
-::ng-deep .login-form .mat-mdc-floating-label {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #0052A3 !important;
-}
-
-::ng-deep .login-form .mat-mdc-floating-label.mdc-floating-label--float-above {
-  font-size: 12px !important;
-}
-
 ::ng-deep .login-form input {
-  padding: 12px 16px !important;
   font-size: 15px !important;
   color: #333 !important;
 }
@@ -72,6 +79,15 @@
 ::ng-deep .login-form input:focus {
   outline: none !important;
 }
+
+::ng-deep .login-form .mat-mdc-form-field-prefix {
+  margin-right: 8px !important;
+}
+
+::ng-deep .login-form .mat-icon-notranslate {
+  color: #0066CC !important;
+}
+
 
 /* Helper Text */
 ::ng-deep .login-form .mat-mdc-form-field-error {

@@ -1,7 +1,10 @@
 <header class="navbar">
   <div class="navbar-inner">
     <app-top-bar/>
-    <app-nav-menu (toggleCategory)="toggleCategoryBanner()"/>
-    <app-category-banner *ngIf="showCategoryBanner"/>
+    <app-nav-menu (selectCategory)="onSelectCategory($event)"/>
+    <app-category-banner
+      *ngIf="showCategoryBanner"
+      [selectedCategoryId]="selectedCategoryId"
+      (close)="onBannerClose()"/>
   </div>
 </header>

@@ -114,16 +114,34 @@
 
 ::ng-deep .register-form mat-form-field {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 ::ng-deep .register-form .mdc-text-field {
   background-color: #F8FAFC !important;
   border-radius: 8px !important;
+  height: auto !important;
 }
 
 ::ng-deep .register-form .mat-mdc-text-field-wrapper {
-  padding-bottom: 1.5em !important;
+  padding-bottom: 0 !important;
+}
+
+::ng-deep .register-form .mdc-text-field__input {
+  padding: 20px 16px 16px 16px !important;
+  min-height: 48px !important;
+}
+
+::ng-deep .register-form .mat-mdc-floating-label {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #0052A3 !important;
+  top: 24px !important;
+}
+
+::ng-deep .register-form .mat-mdc-floating-label.mdc-floating-label--float-above {
+  font-size: 12px !important;
+  top: 8px !important;
 }
 
 ::ng-deep .register-form .mat-mdc-notched-outline {
@@ -135,19 +153,8 @@
   border-width: 2px !important;
 }
 
-::ng-deep .register-form .mat-mdc-floating-label {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #0052A3 !important;
-}
-
-::ng-deep .register-form .mat-mdc-floating-label.mdc-floating-label--float-above {
-  font-size: 12px !important;
-}
-
 ::ng-deep .register-form input,
 ::ng-deep .register-form textarea {
-  padding: 12px 16px !important;
   font-size: 15px !important;
   color: #333 !important;
 }
@@ -158,40 +165,15 @@
   opacity: 1;
 }
 
-/* Form Field Label */
-::ng-deep .form-field label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #0052A3;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
 /* Material Form Field Overrides */
 ::ng-deep .register-form .mdc-text-field--filled {
   background-color: #F8FAFC !important;
-}
-
-::ng-deep .register-form .mat-mdc-notched-outline {
-  border-color: #D1E0F7 !important;
-}
-
-::ng-deep .register-form .mat-mdc-form-field.mat-focused .mat-mdc-notched-outline {
-  border-color: #0066CC !important;
-  border-width: 2px !important;
 }
 
 ::ng-deep .register-form .mat-mdc-form-field.mat-form-field-invalid .mat-mdc-notched-outline {
   border-color: #FF6B6B !important;
 }
 
-::ng-deep .register-form input::placeholder,
-::ng-deep .register-form textarea::placeholder {
-  color: #999 !important;
-  opacity: 1;
-}
 
 /* Helper Text */
 ::ng-deep .register-form .mat-mdc-form-field-error {

@@ -4,6 +4,7 @@
         [label]="item.label"
         [highlight]="item.highlight"
         [hasChildren]="item.hasChildren"
-        (itemClick)="onClickCategoryMenu()"
+        [categoryId]="item.categoryId"
+        (itemClick)="onClickMenuItem($event)"
     />
 </nav>

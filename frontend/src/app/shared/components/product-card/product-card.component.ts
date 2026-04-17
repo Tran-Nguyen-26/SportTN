@@ -1,6 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Product } from 'src/app/core/models/product/product.model';
 
+interface Spec {
+  icon: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
@@ -8,6 +13,7 @@ import { Product } from 'src/app/core/models/product/product.model';
 })
 export class ProductCardComponent {
   @Input() product!: any;
+  @Input() specs: Spec[] = [];
   @Output() addToCart = new EventEmitter<any>();
   @Output() addToWishlist = new EventEmitter<any>();
 

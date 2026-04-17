@@ -7,8 +7,23 @@ import { Component } from '@angular/core';
 })
 export class NavbarComponent {
   showCategoryBanner = false;
+  selectedCategoryId: string | null = null;
 
-  toggleCategoryBanner() {
-    this.showCategoryBanner = !this.showCategoryBanner;
+  onSelectCategory(categoryId: string | null) {
+    if (categoryId) {
+      this.selectedCategoryId = categoryId;
+      this.showCategoryBanner = true;
+    } else {
+      this.closeCategoryBanner();
+    }
+  }
+
+  closeCategoryBanner() {
+    this.showCategoryBanner = false;
+    this.selectedCategoryId = null;
+  }
+
+  onBannerClose() {
+    this.closeCategoryBanner();
   }
 }

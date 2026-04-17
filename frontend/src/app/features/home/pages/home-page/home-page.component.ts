@@ -7,9 +7,9 @@ import { Component } from '@angular/core';
 })
 export class HomePageComponent {
   swimBanners = [
-    { title: 'Kính bơi', image: 'assets/banner-swim-goggles.jpg' },
-    { title: 'Đồ bơi', image: 'assets/banner-swimwear.jpg' },
-    { title: 'Phụ kiện bơi', image: 'assets/banner-swim-accessories.jpg' }
+    { title: 'Kính bơi', image: 'assets/banner-swim-goggles.webp' },
+    { title: 'Đồ bơi', image: 'assets/banner-swim-goggles.webp' },
+    { title: 'Phụ kiện bơi', image: 'assets/banner-swim-goggles.webp' }
   ];
   swimProducts = [
     { name: 'Kính bơi Ready xám', newPrice: 69000, oldPrice: null, brand: 'DECATHLON', rating: 4.5, reviews: 115, label: 'MỚI', image: 'assets/kinhboi.jpg' },

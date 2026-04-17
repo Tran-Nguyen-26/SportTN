@@ -1,0 +1,16 @@
+.category-page {
+  padding: 50px;
+}
+
+.category-header {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 40px;
+  border-bottom: #0e0e11;
+}
+
+.category-content {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
