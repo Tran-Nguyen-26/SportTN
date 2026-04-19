@@ -1,83 +1,66 @@
+/* Container chính */
 .my-account-container {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 0 16px;
 }
 
 .my-account-container h2 {
   font-size: 28px;
   font-weight: 600;
   color: #333;
-  margin: 0 0 24px 0;
+  margin: 0 0 8px 0;
+}
+
+.my-account-container p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* Thông báo trạng thái (Success/Error) */
+.success-message, .error-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 4px solid;
+  animation: slideDown 0.3s ease;
 }
 
 .success-message {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   background: #ecf8f3;
-  border-left: 4px solid #10b981;
+  border-color: #10b981;
   color: #065f46;
-  padding: 14px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
-}
-
-.success-message mat-icon {
-  color: #10b981;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
 }
 
 .error-message {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   background: #fce4e4;
-  border-left: 4px solid #d32f2f;
+  border-color: #d32f2f;
   color: #b71c1c;
-  padding: 14px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
-}
-
-.error-message mat-icon {
-  color: #d32f2f;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* Card thiết kế theo phong cách hiện đại */
 .section-card {
   border-radius: 12px !important;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
   border: 1px solid #f0f0f0 !important;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
   overflow: hidden;
 }
 
 .section-card mat-card-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 20px 24px !important;
-  margin: 0 !important;
+  padding: 16px 24px !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -87,11 +70,7 @@
   font-size: 18px !important;
   margin: 0 !important;
   font-weight: 600;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
+  color: white !important;
 }
 
 .header-actions button {
@@ -99,94 +78,172 @@
 }
 
 .section-card mat-card-content {
-  padding: 24px !important;
+  padding: 32px 24px !important;
 }
 
+/* Bố cục Form */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 16px;
-}
-
-.form-row.full-width {
-  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 8px;
 }
 
 .form-field {
   width: 100%;
 }
 
+/* Custom ô hiển thị điểm tích lũy */
+.points-display-box {
+  background: #f8faff;
+  border: 2px dashed #e0e7ff;
+  border-radius: 8px;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 56px; /* Khớp chiều cao với mat-form-field */
+}
+
+.points-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #764ba2;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.points-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #333;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.points-value mat-icon {
+  color: #f59e0b;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Nhóm nút bấm điều khiển */
 .action-buttons {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 32px;
+  padding-top: 24px;
   border-top: 1px solid #f0f0f0;
 }
 
 .action-buttons button {
-  min-width: 120px;
-  height: 44px;
+  min-width: 130px;
+  height: 45px;
   font-weight: 600;
-}
-
-.action-buttons button[color="primary"] {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  border: 0 !important;
+  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
-.action-buttons button[color="primary"]:hover:not(:disabled) {
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+/* Nút Lưu thay đổi với Gradient */
+.btn-save {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.btn-save:hover:not(:disabled) {
+  box-shadow: 0 8px 20px rgba(118, 75, 162, 0.3);
   transform: translateY(-2px);
 }
 
-.action-buttons button[mat-stroked-button] {
-  border: 2px solid #667eea !important;
-  color: #667eea !important;
-  transition: all 0.3s ease;
+.btn-cancel {
+  border: 2px solid #e0e0e0 !important;
+  color: #666 !important;
 }
 
-.action-buttons button[mat-stroked-button]:hover {
-  background: rgba(102, 126, 234, 0.05) !important;
+.btn-cancel:hover {
+  background: #f5f5f5 !important;
+  border-color: #bdbdbd !important;
 }
 
-.mat-form-field-wrapper {
-  padding-bottom: 0 !important;
+/* Định dạng các Icon trong Input */
+mat-icon[matPrefix] {
+  margin-right: 12px;
+  color: #764ba2;
+  opacity: 0.7;
 }
 
-/* Change Password Section */
-.change-password-section {
-  margin-top: 30px;
-  padding-top: 30px;
-  border-top: 2px solid #f0f0f0;
+/* Loading Spinner trong button */
+mat-spinner {
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
 }
 
-.change-password-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 20px 0;
-}
-
+/* Responsive cho Mobile */
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .my-account-container h2 {
-    font-size: 22px;
-  }
-
   .action-buttons {
-    flex-direction: column;
-    justify-content: stretch;
+    flex-direction: column-reverse;
   }
 
   .action-buttons button {
     width: 100%;
+    min-width: unset;
   }
+
+  .section-card mat-card-content {
+    padding: 20px 16px !important;
+  }
+}
+
+/* Tùy chỉnh màu sắc khi Focus vào Input của Angular Material */
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #667eea !important;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-label {
+  color: #667eea !important;
+}
+
+.change-password-card {
+  margin-top: 20px;
+}
+
+.form-instruction {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.password-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.password-actions button {
+  height: 56px; /* Khớp với chiều cao của form field để nhìn cân đối */
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Hiệu ứng khi mật khẩu không khớp */
+mat-error {
+  font-size: 11px;
+}
+
+/* Đảm bảo icon lock trong header trắng giống các icon khác */
+.change-password-card mat-card-header mat-icon {
+  color: white;
+  opacity: 0.8;
 }

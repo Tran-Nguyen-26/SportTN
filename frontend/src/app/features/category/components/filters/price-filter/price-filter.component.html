@@ -1,1 +1,32 @@
-<p>price-filter works!</p>
+<div class="price-filter">
+  <h4>CHỌN GIÁ</h4>
+  <div class="slider-container">
+    <div class="slider-track"
+         [style.left.%]="(selectedMin - minPrice) / (maxPrice - minPrice) * 100"
+         [style.right.%]="100 - (selectedMax - minPrice) / (maxPrice - minPrice) * 100">
+    </div>
+
+    <!-- Label giá min -->
+    <div class="price-label"
+         [style.left.%]="(selectedMin - minPrice) / (maxPrice - minPrice) * 100">
+      {{ selectedMin | number }}
+    </div>
+
+    <!-- Label giá max -->
+    <div class="price-label"
+         [style.left.%]="(selectedMax - minPrice) / (maxPrice - minPrice) * 100">
+      {{ selectedMax | number }}
+    </div>
+
+    <input type="range"
+           [min]="minPrice"
+           [max]="maxPrice"
+           [(ngModel)]="selectedMin"
+           (input)="updateMin($event)">
+    <input type="range"
+           [min]="minPrice"
+           [max]="maxPrice"
+           [(ngModel)]="selectedMax"
+           (input)="updateMax($event)">
+  </div>
+</div>

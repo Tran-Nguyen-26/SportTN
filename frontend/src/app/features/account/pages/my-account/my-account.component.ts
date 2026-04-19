@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { User, UpdateUserRequest } from 'src/app/core/models/user/user.model';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-my-account',
@@ -10,13 +11,22 @@ import { User, UpdateUserRequest } from 'src/app/core/models/user/user.model';
 export class MyAccountComponent implements OnInit {
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
-  user: User | null = null;
+
+  // Lấy stream dữ liệu từ AuthService
+  user$ = this.authService.currentUser$.pipe(map(auth => auth?.userResponse || null));
+
+  hideOld = true;
+  hideNew = true;
+  hideConfirm = true;
   isLoading = false;
   isEditing = false;
   successMessage = '';
   errorMessage = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
     this.initForms();
   }
 
@@ -26,10 +36,11 @@ export class MyAccountComponent implements OnInit {
 
   initForms(): void {
     this.profileForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.pattern(/^\+?[\d\s-()]+$/)]]
+      // Thay đổi field cho khớp với userResponse (username thay vì firstName/lastName)
+      username: [{value: '', disabled: true}, Validators.required],
+      email: [{value: '', disabled: true}, [Validators.required, Validators.email]],
+      phone: [{value: '', disabled: true}, [Validators.pattern(/^\+?[\d\s-()]+$/)]],
+      totalPoints: [{value: 0, disabled: true}] // Chỉ để hiển thị
     });
 
     this.passwordForm = this.fb.group({
@@ -40,28 +51,28 @@ export class MyAccountComponent implements OnInit {
   }
 
   passwordMatchValidator(group: FormGroup): { [key: string]: any } | null {
-    const password = group.get('newPassword');
-    const confirmPassword = group.get('confirmPassword');
+    const password = group.get('newPassword')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
     return password && confirmPassword && password.value === confirmPassword.value ? null : { passwordMismatch: true };
   }
 
   loadUserProfile(): void {
-    // Mock data - Replace with UserService.getProfile()
-    this.user = {
-      id: '1',
-      email: 'user@example.com',
-      firstName: 'Nguyễn',
-      lastName: 'Trần',
-      phoneNumber: '+84905123456'
-    };
-
-    this.profileForm.patchValue(this.user);
-    this.profileForm.disable();
+    // Lấy giá trị hiện tại từ AuthService (không cần mock)
+    const user = this.authService.currentUserValue;
+    if (user) {
+      this.profileForm.patchValue({
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        totalPoints: user.totalPoints
+      });
+    }
   }
 
   editProfile(): void {
     this.isEditing = true;
-    this.profileForm.enable();
+    // Chỉ cho phép sửa một số trường nhất định, thường username và email sẽ bị khóa
+    this.profileForm.get('phone')?.enable();
   }
 
   cancelEdit(): void {
@@ -73,10 +84,9 @@ export class MyAccountComponent implements OnInit {
   saveProfile(): void {
     if (this.profileForm.valid) {
       this.isLoading = true;
-      // Mock save - Replace with UserService.updateProfile()
+      // Tạm thời mô phỏng:
       setTimeout(() => {
-        this.user = this.profileForm.value;
-        this.successMessage = 'Profile updated successfully!';
+        this.successMessage = 'Cập nhật thông tin thành công!';
         this.isLoading = false;
         this.isEditing = false;
         this.profileForm.disable();
@@ -88,13 +98,21 @@ export class MyAccountComponent implements OnInit {
   changePassword(): void {
     if (this.passwordForm.valid) {
       this.isLoading = true;
-      // Mock change - Replace with UserService.changePassword()
+      const { oldPassword, newPassword } = this.passwordForm.value;
+
+      // Gọi UserService.changePassword({oldPassword, newPassword})
+      console.log('Đang đổi mật khẩu...', { oldPassword, newPassword });
+
       setTimeout(() => {
-        this.successMessage = 'Password changed successfully!';
+        this.successMessage = 'Đổi mật khẩu thành công!';
         this.passwordForm.reset();
+        // Reset trạng thái validation sau khi reset form
+        Object.keys(this.passwordForm.controls).forEach(key => {
+          this.passwordForm.get(key)?.setErrors(null);
+        });
         this.isLoading = false;
         setTimeout(() => this.successMessage = '', 3000);
-      }, 1000);
+      }, 1500);
     }
   }
 }

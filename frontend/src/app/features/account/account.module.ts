@@ -25,6 +25,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { MatChipsModule } from '@angular/material/chips';
     MatSelectModule,
     MatDialogModule,
     MatChipsModule,
+    MatCheckboxModule,
   ]
 })
 export class AccountModule { }

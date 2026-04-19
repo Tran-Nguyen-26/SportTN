@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Entity
@@ -39,7 +40,7 @@ public class ProductVariant {
     @Column(name = "original_price", nullable = false, precision = 18, scale = 2)
     private BigDecimal originalPrice;
 
-    @Column(name = "sale_price", nullable = false, precision = 18, scale = 2)
+    @Column(name = "sale_price", precision = 18, scale = 2)
     private BigDecimal salePrice;
 
     @Column(name = "stock_quantity", nullable = false)
@@ -48,11 +49,20 @@ public class ProductVariant {
     @Column(name = "weight_gram")
     private Integer weightGram;
 
+    @Column(name = "sold_quantity")
+    private Integer soldQuantity = 0;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
+    @Column(name = "main_image_url")
+    private String mainImageUrl;
+
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariantImage> variantImages;
 
     public BigDecimal getEffectivePrice() {
-        if (salePrice != null && salePrice.compareTo(originalPrice) < 0) {
+        if (isOnSale()) {
             return salePrice;
         }
         return originalPrice;
@@ -63,4 +73,26 @@ public class ProductVariant {
         image.setVariant(this);
     }
 
+    public boolean isOnSale() {
+        return salePrice != null
+                && salePrice.compareTo(BigDecimal.ZERO) > 0
+                && salePrice.compareTo(originalPrice) < 0;
+    }
+
+    public Integer getDiscountPercent() {
+        if(!isOnSale()) return 0;
+        return originalPrice
+                .subtract(salePrice)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(originalPrice, 0, RoundingMode.HALF_UP)
+                .intValue();
+    }
+
+    public boolean isInStock() {
+        return stockQuantity != null && stockQuantity > 0;
+    }
+
+    public void increaseSoldQuantity(int quantity) {
+        this.soldQuantity += quantity;
+    }
 }

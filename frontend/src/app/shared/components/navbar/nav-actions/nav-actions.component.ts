@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import {AuthService} from "../../../../core/services/auth/auth.service";
 
 @Component({
   selector: 'app-nav-actions',
@@ -7,18 +8,31 @@ import { Router } from '@angular/router';
   styleUrls: ['./nav-actions.component.css']
 })
 export class NavActionsComponent {
-  constructor(private router: Router) {}
+
+  constructor(private router: Router, private authService: AuthService) {}
+
+  currentUser$ = this.authService.currentUser$;
+  isLoggedIn$ = this.authService.isLoggedIn$;
 
   goLogin() {
-    this.router.navigate(['/auth/login']);
+    const token = this.authService.getAccessToken();
+    if (!token) {
+      this.router.navigate(['/auth/login']);
+    } else {
+      console.log('Bạn đã đăng nhập.');
+    }
   }
 
   goCart() {
     this.router.navigate(['/cart']);
   }
 
-  isLoggedIn = false;
-  userName = 'Trần Nguyên';
-  userEmail = 'trannguyeen2005@gmail.com';
-  userPoints = 0;
+  goToAccount() {
+    this.router.navigate(['/account/my-account']);
+  }
+
+  handleLogout(): void {
+    this.authService.logout();
+  }
+
 }

@@ -13,6 +13,7 @@ public class ProductDetailResponse {
     private String description;
     private String categoryName;
     private String brandName;
+    private String mainImageUrl;
     
     private List<VariantResponse> variants;
     private List<ImageResponse> images;

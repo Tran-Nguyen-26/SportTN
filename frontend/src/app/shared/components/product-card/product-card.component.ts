@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Product } from 'src/app/core/models/product/product.model';
+import {Router} from "@angular/router";
 
 interface Spec {
   icon: string;
@@ -16,6 +17,9 @@ export class ProductCardComponent {
   @Input() specs: Spec[] = [];
   @Output() addToCart = new EventEmitter<any>();
   @Output() addToWishlist = new EventEmitter<any>();
+
+  constructor(private router: Router) {
+  }
 
   onAddToCart(): void {
     this.addToCart.emit(this.product);
@@ -65,5 +69,9 @@ export class ProductCardComponent {
 
   get image(): string {
     return this.product?.image || '';
+  }
+
+  goToProduct() {
+    this.router.navigate(['/product'])
   }
 }

@@ -2,6 +2,7 @@ package com.ttn.sporttn.modules.user.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.user.dto.request.LoginRequest;
+import com.ttn.sporttn.modules.user.dto.request.LogoutRequest;
 import com.ttn.sporttn.modules.user.dto.request.RegisterRequest;
 import com.ttn.sporttn.modules.user.dto.request.SocialLoginRequest;
 import com.ttn.sporttn.modules.user.dto.response.AuthResponse;
@@ -56,10 +57,16 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public  ResponseEntity<ApiResponse<UserDetailResponse>> register(
+    public ResponseEntity<ApiResponse<UserDetailResponse>> register(
                 @Valid @RequestBody RegisterRequest request) {
         UserDetailResponse userDetailResponse = userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(userDetailResponse, "Đăng ký thành công"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
+        userService.logout(request.getRefreshToken());
+        return ResponseEntity.noContent().build();
     }
 }

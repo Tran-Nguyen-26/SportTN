@@ -1,4 +1,4 @@
-<div class="product-card">
+<div class="product-card" (click)="goToProduct()">
   <!-- Old Price Badge -->
   <div class="old-price-badge" *ngIf="oldPrice">
     GIÁ CŨ {{ oldPrice | number:'1.0-0' }}<span class="k">K</span>

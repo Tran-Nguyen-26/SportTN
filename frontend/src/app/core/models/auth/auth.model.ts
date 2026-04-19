@@ -10,16 +10,29 @@ export interface RegisterRequest {
   lastName: string;
 }
 
-export interface AuthResponse {
-  token: string;
-  refreshToken?: string;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
+export interface LogoutRequest {
+  refreshToken: string;
 }
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: string;
+  totalPoints: number;
+  provider: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+  userResponse: UserResponse;
+}
+
 
 export interface PasswordChangeRequest {
   oldPassword: string;

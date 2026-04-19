@@ -4,11 +4,13 @@ import { MyAccountComponent } from './pages/my-account/my-account.component';
 import { AccountPageComponent } from './pages/account-page/account-page.component';
 import { AddressComponent } from './pages/address/address.component';
 import { OrderHistoryComponent } from './pages/order-history/order-history.component';
+import {authGuard} from "../../core/guards/auth/auth.guard";
 
 const routes: Routes = [
   {
     path: '',
     component: AccountPageComponent,
+    canActivate: [authGuard],
     children: [
       { path: 'my-account', component: MyAccountComponent },
       { path: 'address', component: AddressComponent },

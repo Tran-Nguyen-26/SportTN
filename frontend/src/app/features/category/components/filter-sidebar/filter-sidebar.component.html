@@ -1,9 +1,66 @@
 <div class="filter-sidebar">
-    <app-sport-filter/>
-    <app-brand-filter/>
+
+    <div class="categories">
+        <ul class="category-list">
+            <li *ngFor="let cat of categories">
+                <img [src]="cat.image">
+                <span>{{ cat.label }} ({{ cat.count }})</span>
+            </li>
+        </ul>
+    </div>
+
+
+    <h4>Bộ lọc</h4>
+
+    <!-- Brand Filter -->
+    <app-filter-section
+        [title]="'Thương hiệu'"
+        [items]="[
+        {label:'Nike', count:120},
+        {label:'Adidas', count:95},
+        {label:'Decathlon', count:80},
+        {label:'Puma', count:60},
+        {label:'Khác', count:40}
+        ]">
+    </app-filter-section>
+
+    <!-- Color Filter -->
     <app-color-filter/>
-    <app-gender-filter/>
+
+    <!-- Gender Filter -->
+    <app-filter-section
+        [title]="'Giới tính'"
+        [items]="[
+        {label:'Nam', count:200},
+        {label:'Nữ', count:180},
+        {label:'Trẻ em', count:90}
+        ]">
+    </app-filter-section>
+
+    <!-- Price Filter -->
     <app-price-filter/>
-    <app-type-filter/>
-    <app-size-filter/>
+
+    <!-- Type Filter -->
+    <app-filter-section
+        [title]="'Loại sản phẩm'"
+        [items]="[
+        {label:'Áo thun', count:222},
+        {label:'Quần ngắn', count:191},
+        {label:'Tất', count:183},
+        {label:'Giày', count:174},
+        {label:'Balo', count:119}
+        ]">
+    </app-filter-section>
+
+    <!-- Size Filter -->
+    <app-filter-section
+        [title]="'Kích cỡ'"
+        [items]="[
+        {label:'1', count:36},
+        {label:'2', count:35},
+        {label:'3', count:39},
+        {label:'4', count:30},
+        {label:'5', count:24}
+        ]">
+    </app-filter-section>
 </div>

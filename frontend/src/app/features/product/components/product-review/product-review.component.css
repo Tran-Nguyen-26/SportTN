@@ -1,0 +1,119 @@
+.product-review {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  background: #fff;
+  border-radius: 6px;
+}
+
+
+/* Nút quay lại trang chủ */
+.back-home {
+  width: 100%;
+  max-width: 450px; /* Khớp với chiều rộng của auth-card */
+  margin: 0 auto 16px; /* Cách card một khoảng */
+  display: flex;
+  justify-content: flex-start;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+
+.back-link mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.back-link:hover {
+  color: #0066CC;
+  background-color: rgba(0, 102, 204, 0.05);
+}
+
+/* Tùy chỉnh responsive cho nút back */
+@media (max-width: 480px) {
+  .back-home {
+    padding-left: 16px;
+  }
+}
+
+.product-review h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.review-summary {
+  margin-bottom: 20px;
+}
+
+.average-rating {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.rating-bars div {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.review-reward {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.review-reward p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.join-btn {
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.review-item strong {
+  font-size: 0.95rem;
+}
+
+.see-all {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.see-all a {
+  color: #0066cc;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}

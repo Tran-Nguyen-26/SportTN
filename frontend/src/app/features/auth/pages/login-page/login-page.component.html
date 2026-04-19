@@ -9,9 +9,14 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Email Address</mat-label>
         <input matInput formControlName="email" type="email" placeholder="your.email@example.com">
-        <mat-icon matPrefix>email</mat-icon>
-        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
-        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')
+                    && loginForm.get('email')?.touched">
+          Email is required
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')
+                    && loginForm.get('email')?.touched">
+          Please enter a valid email
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
@@ -20,8 +25,14 @@
         <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
           <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
-        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
-        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Password must be at least 6 characters</mat-error>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')
+                    && loginForm.get('password')?.touched">
+          Password is required
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')
+                    && loginForm.get('password')?.touched">
+          Password must be at least 6 characters
+        </mat-error>
       </mat-form-field>
 
       <div class="login-options">
@@ -29,19 +40,20 @@
         <a href="#" (click)="forgotPassword(); $event.preventDefault()" class="forgot-password">Forgot password?</a>
       </div>
 
-      <button 
-        mat-raised-button 
-        color="primary" 
-        type="submit" 
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
         [disabled]="!loginForm.valid || isLoading"
         class="full-width login-button">
-        <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
-        <span *ngIf="!isLoading">Login</span>
+<!--        <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>-->
+        <app-loading-spinner *ngIf="isLoading" [diameter]="20"></app-loading-spinner>
+        <span *ngIf="!isLoading">Đăng nhập</span>
       </button>
     </form>
   </div>
 
   <div footer-link>
-    <p>Don't have an account? <a routerLink="/auth/register">Sign up here</a></p>
+    <p>Don't have an account? <a routerLink="/auth/register">Đăng ký</a></p>
   </div>
 </app-auth-form-layout>

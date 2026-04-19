@@ -1,0 +1,60 @@
+.product-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-header h2 {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.product-price {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.current-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #0066cc;
+}
+
+.promo-banner {
+  background: #e6f2ff;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.product-variant {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-action .add-to-cart {
+  background: #0066cc;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.product-policy ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.product-policy li {
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}

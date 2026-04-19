@@ -16,16 +16,20 @@ public class CategoryResponse {
 
     private Long id;
     private String name;
+    private String slug;
     private String description;
     private String imageUrl;
+    private String linkUrl;
     private Boolean active;
 
     public static CategoryResponse from(Category category) {
         return CategoryResponse.builder()
             .id(category.getId())
             .name(category.getName())
+            .slug(category.getSlug())
             .description(category.getDescription())
             .imageUrl(category.getImageUrl())
+            .linkUrl(category.getLinkUrl())
             .active(category.getActive())
             .build();
     }

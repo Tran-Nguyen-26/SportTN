@@ -1,4 +1,10 @@
 import { Component } from '@angular/core';
+import {
+  BannerResponse, CategoryResponse,
+  CategorySectionResponse,
+  ProductCardResponse
+} from "../../../../core/models/home-response/home-response";
+import {HomeService} from "../../../../core/services/home/home.service";
 
 @Component({
   selector: 'app-homepage',
@@ -35,4 +41,41 @@ export class HomePageComponent {
     { name: 'Kính mát hiking MH100', newPrice: 99000, oldPrice: 129000, brand: 'DECATHLON', rating: 4.6, reviews: 3000, label: 'GIẢM GIÁ', image: 'assets/kinhmat.jpg' },
     { name: 'Áo chống nắng trekking', newPrice: 299000, oldPrice: 399000, brand: 'QUECHUA', rating: 4.8, reviews: 1200, label: 'GIẢM GIÁ', image: 'assets/aochongnang.jpg' }
   ];
+
+  heroBanners: BannerResponse[] = [];
+
+  categories: CategoryResponse[] = [];
+
+  sportsPopular: CategoryResponse[] = [];
+
+  categorySections: CategorySectionResponse[] = [];
+
+  mostSearched: ProductCardResponse[] = [];
+
+  cheapQuality: ProductCardResponse[] = [];
+
+  bestSellers: ProductCardResponse[] = [];
+
+  constructor(private homeService: HomeService) {
+  }
+
+  ngOnInit() {
+    this.homeService.getHomeData().subscribe({
+      next: (response) => {
+        if (response.success) {
+          const data = response.data;
+          this.heroBanners = data.heroBanners;
+          this.categories = data.categories;
+          this.sportsPopular = data.sportsPopular;
+          this.categorySections = data.categorySections;
+          this.mostSearched = data.mostSearched;
+          this.cheapQuality = data.cheapQuality;
+          this.bestSellers = data.bestSellers;
+
+          console.log('Home data loaded: ', data);
+        }
+      },
+      error: (err) => console.error('Lỗi khi load trong Home', err)
+    });
+  }
 }

@@ -1,639 +1,85 @@
-/* Register Form Styling */
-::ng-deep .register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.register-form {
+  padding: 10px 5px;
 }
 
-::ng-deep .register-form mat-form-field {
-  width: 100%;
-}
-
-/* Step Indicator */
-::ng-deep .step-indicator {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 28px;
-  justify-content: center;
-  align-items: center;
-}
-
-::ng-deep .step-indicator .step {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #E8F1FF;
-  color: #0066CC;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
+.step-content h3 {
+  margin-bottom: 8px;
   font-weight: 700;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-::ng-deep .step-indicator .step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  width: 30px;
-  height: 2px;
-  background: #D1E0F7;
-  transform: translateY(-50%);
-}
-
-@media (max-width: 480px) {
-  ::ng-deep .step-indicator .step:not(:last-child)::after {
-    width: 15px;
-  }
-}
-
-::ng-deep .step-indicator .step.active {
-  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
-  color: white;
-  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.25);
-  transform: scale(1.05);
-}
-
-::ng-deep .step-indicator .step.completed {
-  background: #10B981;
-  color: white;
-}
-
-::ng-deep .step-indicator .step.completed::after {
-  background: #10B981;
-}
-
-/* Step Content */
-::ng-deep .step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: fadeInUp 0.4s ease;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-::ng-deep .step-content h3 {
-  margin: 0 0 8px 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #0052A3;
-  line-height: 1.3;
-}
-
-::ng-deep .step-content p {
-  margin: 0;
-  font-size: 14px;
-  color: #999;
-  line-height: 1.6;
-}
-
-/* Form Row for Step 2 (Full Name + Phone) */
-::ng-deep .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-::ng-deep .form-row.full-width {
-  grid-template-columns: 1fr;
-}
-
-::ng-deep .register-form mat-form-field {
-  display: block;
-  margin-bottom: 16px;
-}
-
-::ng-deep .register-form .mdc-text-field {
-  background-color: #F8FAFC !important;
-  border-radius: 8px !important;
-  height: auto !important;
-}
-
-::ng-deep .register-form .mat-mdc-text-field-wrapper {
-  padding-bottom: 0 !important;
-}
-
-::ng-deep .register-form .mdc-text-field__input {
-  padding: 20px 16px 16px 16px !important;
-  min-height: 48px !important;
-}
-
-::ng-deep .register-form .mat-mdc-floating-label {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #0052A3 !important;
-  top: 24px !important;
-}
-
-::ng-deep .register-form .mat-mdc-floating-label.mdc-floating-label--float-above {
-  font-size: 12px !important;
-  top: 8px !important;
-}
-
-::ng-deep .register-form .mat-mdc-notched-outline {
-  border-color: #D1E0F7 !important;
-}
-
-::ng-deep .register-form .mat-mdc-form-field.mat-focused .mat-mdc-notched-outline {
-  border-color: #0066CC !important;
-  border-width: 2px !important;
-}
-
-::ng-deep .register-form input,
-::ng-deep .register-form textarea {
-  font-size: 15px !important;
-  color: #333 !important;
-}
-
-::ng-deep .register-form input::placeholder,
-::ng-deep .register-form textarea::placeholder {
-  color: #999 !important;
-  opacity: 1;
-}
-
-/* Material Form Field Overrides */
-::ng-deep .register-form .mdc-text-field--filled {
-  background-color: #F8FAFC !important;
-}
-
-::ng-deep .register-form .mat-mdc-form-field.mat-form-field-invalid .mat-mdc-notched-outline {
-  border-color: #FF6B6B !important;
-}
-
-
-/* Helper Text */
-::ng-deep .register-form .mat-mdc-form-field-error {
-  font-size: 12px !important;
-  color: #FF6B6B !important;
-}
-
-/* Radio Buttons for Step 2 */
-::ng-deep .gender-options {
-  display: flex;
-  gap: 24px;
-  margin-top: 8px;
-}
-
-::ng-deep .gender-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-::ng-deep .gender-option mat-radio-button {
-  --mat-radio-checked-color: #0066CC;
-}
-
-::ng-deep .gender-option label {
-  margin: 0;
-  font-size: 14px !important;
-  font-weight: 500;
-  color: #555;
-  text-transform: none;
-  letter-spacing: normal;
-  cursor: pointer;
-}
-
-/* Agreement Checkbox */
-::ng-deep .terms-agreement {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-::ng-deep .terms-agreement mat-checkbox {
-  margin-top: -6px;
-}
-
-::ng-deep .terms-agreement mat-checkbox .mdc-checkbox__background {
-  border-color: #D1E0F7 !important;
-}
-
-::ng-deep .terms-agreement mat-checkbox.mat-mdc-checkbox.mat-checked .mdc-checkbox__background {
-  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%) !important;
-  border-color: transparent !important;
-}
-
-::ng-deep .terms-text {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.6;
-}
-
-::ng-deep .terms-text a {
-  color: #0066CC;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s ease;
-}
-
-::ng-deep .terms-text a:hover {
-  color: #0052A3;
-  text-decoration: underline;
-}
-
-/* Buttons */
-::ng-deep .button-group {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-::ng-deep .button-group button {
-  flex: 1;
-  height: 48px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-::ng-deep .button-group button.prev-btn {
-  background: #E8F1FF;
-  color: #0066CC;
-  border: 2px solid #D1E0F7;
-}
-
-::ng-deep .button-group button.prev-btn:hover:not(:disabled) {
-  background: #D1E0F7;
-  color: #0052A3;
-  transform: translateY(-2px);
-}
-
-::ng-deep .button-group button.next-btn,
-::ng-deep .button-group button.submit-btn {
-  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25);
-}
-
-::ng-deep .button-group button.next-btn:hover:not(:disabled),
-::ng-deep .button-group button.submit-btn:hover:not(:disabled) {
-  box-shadow: 0 12px 32px rgba(0, 102, 204, 0.35);
-  transform: translateY(-2px);
-}
-
-::ng-deep .button-group button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Success Message */
-::ng-deep .success-message {
-  background: #E8F8F0;
-  border-left: 4px solid #10B981;
-  color: #065F46;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: slideDown 0.3s ease;
-}
-
-::ng-deep .success-message mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-  color: #10B981;
-  flex-shrink: 0;
-}
-
-::ng-deep .success-message p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* Error Message */
-::ng-deep .error-message {
-  background: #FFE8E8;
-  border-left: 4px solid #FF6B6B;
-  color: #C92A2A;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: slideDown 0.3s ease;
-}
-
-::ng-deep .error-message mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-  color: #FF6B6B;
-  flex-shrink: 0;
-}
-
-::ng-deep .error-message p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Signup Link for Existing Users */
-::ng-deep .signin-section {
-  text-align: center;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #E8F1FF;
-}
-
-::ng-deep .signin-section p {
-  margin: 0;
-  font-size: 14px;
-  color: #555;
-}
-
-::ng-deep .signin-section a {
-  color: #0066CC;
-  text-decoration: none;
-  font-weight: 700;
-  transition: color 0.2s ease;
-}
-
-::ng-deep .signin-section a:hover {
-  color: #0052A3;
-  text-decoration: underline;
-}
-
-/* Loading Spinner */
-::ng-deep .spinner-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-::ng-deep .spinner-container mat-spinner {
-  margin: 0 !important;
-}
-
-/* Confirmation Step */
-::ng-deep .confirmation-card {
-  background: #F8FAFC;
-  border: 2px solid #00A8FF;
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-::ng-deep .confirmation-card mat-icon {
-  font-size: 56px;
-  width: 56px;
-  height: 56px;
-  color: #10B981;
-  margin: 0 auto 16px;
-}
-
-::ng-deep .confirmation-card h4 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #0052A3;
-}
-
-::ng-deep .confirmation-card p {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
-}
-
-/* Password Strength Indicator */
-::ng-deep .password-strength {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: -8px 0 16px 0;
-}
-
-::ng-deep .password-strength .strength-bar {
-  height: 6px;
-  border-radius: 3px;
-  background: transparent;
-  transition: all 0.3s ease;
-}
-
-::ng-deep .password-strength .strength-text {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.4;
-}
-
-/* Form Actions */
-::ng-deep .form-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-::ng-deep .form-actions button {
-  height: 48px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-::ng-deep .form-actions button[mat-raised-button] {
-  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25);
-}
-
-::ng-deep .form-actions button[mat-raised-button]:hover:not(:disabled) {
-  box-shadow: 0 12px 32px rgba(0, 102, 204, 0.35);
-  transform: translateY(-2px);
-}
-
-::ng-deep .form-actions button[mat-stroked-button] {
-  background: #E8F1FF;
-  color: #0066CC;
-  border: 2px solid #D1E0F7;
-}
-
-::ng-deep .form-actions button[mat-stroked-button]:hover:not(:disabled) {
-  background: #D1E0F7;
-  color: #0052A3;
-  transform: translateY(-2px);
-}
-
-::ng-deep .form-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Review Card */
-::ng-deep .review-card {
-  background: #F8FAFC !important;
-  border: 2px solid #E8F1FF !important;
-  border-radius: 12px !important;
-  margin-bottom: 20px !important;
-  padding: 0 !important;
-}
-
-::ng-deep .review-card .mat-mdc-card-content {
-  padding: 20px !important;
-}
-
-::ng-deep .review-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  font-size: 14px;
-}
-
-::ng-deep .review-item .label {
-  font-weight: 600;
-  color: #0052A3;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-::ng-deep .review-item .value {
   color: #333;
-  font-weight: 500;
+  text-align: center;
 }
 
-::ng-deep .review-card .mat-divider {
-  background: #D1E0F7 !important;
-  margin: 12px 0 !important;
+.step-subtitle {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 24px;
 }
 
-/* Terms Checkbox */
-::ng-deep .terms-checkbox {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  margin: 16px 0 !important;
-  font-size: 13px !important;
-  line-height: 1.6;
+.full-width {
+  width: 100%;
+  margin-bottom: 12px;
 }
 
-::ng-deep .terms-checkbox .mdc-checkbox__background {
-  border-color: #D1E0F7 !important;
+/* Đảm bảo các thông báo lỗi hiển thị gọn gàng */
+mat-error {
+  font-size: 12px;
 }
 
-::ng-deep .terms-checkbox.mat-mdc-checkbox.mat-checked .mdc-checkbox__background {
-  background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%) !important;
-  border-color: transparent !important;
+.terms-checkbox {
+  margin: 10px 0 20px 0;
+  display: block;
 }
 
-::ng-deep .terms-checkbox a {
+.terms-checkbox a {
   color: #0066CC;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.2s ease;
 }
 
-::ng-deep .terms-checkbox a:hover {
-  color: #0052A3;
-  text-decoration: underline;
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-::ng-deep .checkbox-error {
-  display: block;
-  font-size: 12px;
-  color: #FF6B6B;
-  margin-top: 8px;
+.form-actions button {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
-/* Full Width Inputs */
-::ng-deep .full-width {
-  width: 100% !important;
-}
-
-/* Step Subtitle */
-::ng-deep .step-subtitle {
+/* Alert messages */
+.error-message, .success-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
   font-size: 14px;
-  color: #999;
-  line-height: 1.6;
-  margin: 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  ::ng-deep .form-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+}
 
-  ::ng-deep .step-indicator {
-    gap: 8px;
-    margin-bottom: 20px;
-  }
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
 
-  ::ng-deep .step-indicator .step {
-    width: 36px;
-    height: 36px;
-    font-size: 12px;
-  }
+/* Hiệu ứng mượt mà khi đổi step */
+.step-content {
+  animation: fadeIn 0.4s ease-in-out;
+}
 
-  ::ng-deep .step-indicator .step:not(:last-child)::after {
-    width: 12px;
-  }
-
-  ::ng-deep .form-actions {
-    flex-direction: column;
-  }
-
-  ::ng-deep .form-actions button {
-    width: 100%;
-  }
-
-  ::ng-deep .step-content h3 {
-    font-size: 18px;
-  }
-
-  ::ng-deep .gender-options {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  ::ng-deep .review-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

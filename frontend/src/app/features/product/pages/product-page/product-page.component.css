@@ -1,0 +1,46 @@
+.product-page {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+}
+
+/* Phần trên: ảnh bên trái + thông tin bên phải */
+.product-top {
+  display: flex;
+  gap: 40px;
+}
+
+/* Bên trái: list ảnh sản phẩm */
+.product-left {
+  flex: 3;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.product-left img {
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* Bên phải: thông tin sản phẩm */
+.product-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Phần dưới: mô tả + review */
+.product-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}

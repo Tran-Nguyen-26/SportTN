@@ -1,0 +1,14 @@
+<div class="filter-section">
+  <h3>{{ title }}</h3>
+  <ul>
+    <li *ngFor="let item of visibleItems">
+      <label>
+        <input type="checkbox" />
+        {{ item.label }} ({{ item.count }})
+      </label>
+    </li>
+  </ul>
+  <button *ngIf="items.length > 5" (click)="toggleShowAll()">
+    {{ showAll ? 'Thu gọn' : 'Xem thêm' }}
+  </button>
+</div>

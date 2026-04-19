@@ -1,3 +1,52 @@
 .filter-sidebar {
   width: 300px;
+  padding: 16px;
+  background: #fff;
+}
+
+.filter-sidebar h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-list li {
+  padding: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  background-color: rgb(249, 247, 247);
+}
+
+.category-list li img {
+  height: 30px;
+}
+
+.category-list li span {
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.category-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.category-item span {
+  font-size: 0.9rem;
+  color: #333;
 }

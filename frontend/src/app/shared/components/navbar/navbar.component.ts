@@ -11,8 +11,12 @@ export class NavbarComponent {
 
   onSelectCategory(categoryId: string | null) {
     if (categoryId) {
-      this.selectedCategoryId = categoryId;
-      this.showCategoryBanner = true;
+      if (this.selectedCategoryId === categoryId && this.showCategoryBanner) {
+        this.closeCategoryBanner();
+      } else {
+        this.selectedCategoryId = categoryId;
+        this.showCategoryBanner = true;
+      }
     } else {
       this.closeCategoryBanner();
     }

@@ -7,6 +7,7 @@ import com.ttn.sporttn.modules.user.dto.request.LoginRequest;
 import com.ttn.sporttn.modules.user.dto.request.RegisterRequest;
 import com.ttn.sporttn.modules.user.dto.response.AuthResponse;
 import com.ttn.sporttn.modules.user.dto.response.UserDetailResponse;
+import com.ttn.sporttn.modules.user.dto.response.UserResponse;
 import com.ttn.sporttn.modules.user.entity.*;
 import com.ttn.sporttn.modules.user.repository.RefreshTokenRepository;
 import com.ttn.sporttn.modules.user.repository.UserRepository;
@@ -51,7 +52,21 @@ public class UserService {
             log.warn("[AUTH] Truy cập bị chặn. Tài khoản bị khóa. email={}, status={}", loginRequest.getEmail(), user.getStatus());
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
+
+        UserResponse userResponse =
+                UserResponse.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .phone(user.getPhone())
+                    .role(user.getRole())
+                    .status(user.getStatus())
+                    .totalPoints(user.getTotalPoints())
+                    .provider(user.getProvider())
+                    .build();
         AuthResponse authResponse = generateTokenPair(user);
+        authResponse.setUserResponse(userResponse);
+
         log.info("[AUTH] Đăng nhập thành công. email={}, user_id={}", loginRequest.getEmail(), user.getId());
 
         return authResponse;
@@ -155,7 +170,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
             throw new BusinessException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
@@ -165,5 +180,9 @@ public class UserService {
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public void logout(String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
     }
 }

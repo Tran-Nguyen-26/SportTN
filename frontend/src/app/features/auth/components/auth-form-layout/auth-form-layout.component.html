@@ -1,4 +1,10 @@
 <div class="auth-container">
+  <div class="back-home">
+    <a routerLink="/" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Trang chủ</span>
+    </a>
+  </div>
   <div class="auth-card">
     <div class="auth-header">
       <div class="logo-section">
@@ -12,8 +18,7 @@
       <ng-content select="[form-content]"></ng-content>
     </div>
 
-    <mat-divider></mat-divider>
-
+<!--    <mat-divider></mat-divider>-->
     <div class="social-login">
       <p class="social-title">Or continue with</p>
       <div class="social-buttons">
@@ -36,6 +41,7 @@
       <ng-content select="[footer-link]"></ng-content>
     </div>
 
+    <ng-container *ngIf="showExtraFeatures">
     <mat-divider></mat-divider>
 
     <div class="benefits">
@@ -44,16 +50,17 @@
         <li><mat-icon>check_circle</mat-icon> Earn points on every purchase</li>
         <li><mat-icon>check_circle</mat-icon> Exclusive member-only deals</li>
         <li><mat-icon>check_circle</mat-icon> 365-day easy return policy</li>
-        <li><mat-icon>check_circle</mat-icon> Extended 2-year warranty</li>
       </ul>
     </div>
+    </ng-container>
   </div>
+
 
   <footer class="auth-footer">
     <div class="footer-links">
-      <a href="#">Help Center</a> | 
-      <a href="#">Privacy Policy</a> | 
-      <a href="#">Terms of Service</a> | 
+      <a href="#">Help Center</a> |
+      <a href="#">Privacy Policy</a> |
+      <a href="#">Terms of Service</a> |
       <a href="#">Contact Us</a>
     </div>
     <p class="copyright">&copy; 2024 SportTN. All rights reserved.</p>

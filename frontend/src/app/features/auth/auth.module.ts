@@ -16,6 +16,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import {SharedModule} from "../../shared/shared.module";
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatCardModule,
     MatCheckboxModule,
     MatProgressSpinnerModule,
-    MatDividerModule
+    MatDividerModule,
+    SharedModule
   ]
 })
 export class AuthModule { }

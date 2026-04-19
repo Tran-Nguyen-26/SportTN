@@ -1,1 +1,12 @@
-<p>color-filter works!</p>
+<div class="color-filter">
+  <h4>CHỌN MÀU</h4>
+  <div class="color-grid">
+    <div class="color-item" *ngFor="let color of visibleColors">
+      <div class="color-circle" [style.background]="color.code"></div>
+      <span class="color-count">{{ color.count }}</span>
+    </div>
+  </div>
+  <button (click)="toggleShowAll()">
+    {{ showAll ? 'Thu gọn' : 'Xem thêm' }}
+  </button>
+</div>

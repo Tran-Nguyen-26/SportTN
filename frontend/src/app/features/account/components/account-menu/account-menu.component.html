@@ -1,10 +1,10 @@
 <mat-card class="account-menu">
-  <div class="account-header">
+  <div class="account-header" *ngIf="user$ | async as user">
     <div class="avatar-circle">
-      {{ getInitials() }}
+      {{ getInitials(user.username) }}
     </div>
     <div class="user-info">
-      <h3 *ngIf="user">{{ user.firstName }} {{ user.lastName }}</h3>
+      <h3 *ngIf="user">{{ user.username }}</h3>
       <p class="email" *ngIf="user">{{ user.email }}</p>
     </div>
   </div>
@@ -12,7 +12,12 @@
   <mat-divider></mat-divider>
 
   <mat-nav-list class="menu-list">
-    <mat-list-item *ngFor="let item of menuItems" [routerLink]="item.routerLink" routerLinkActive="active">
+    <mat-list-item
+      disableRipple
+      *ngFor="let item of menuItems"
+      [routerLink]="item.routerLink"
+      routerLinkActive="active"
+    >
       <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
       <span matListItemTitle>{{ item.label }}</span>
     </mat-list-item>

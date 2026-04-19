@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from "../../../../core/services/auth/auth.service";
 
 @Component({
   selector: 'app-login-page',
@@ -14,7 +15,12 @@ export class LoginPageComponent implements OnInit {
   errorMessage = '';
   rememberMe = false;
 
-  constructor(private router: Router, private fb: FormBuilder) {
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private route: ActivatedRoute
+  ) {
     this.initForm();
   }
 
@@ -38,24 +44,31 @@ export class LoginPageComponent implements OnInit {
   login(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
+      this.loginForm.disable();
       this.errorMessage = '';
 
-      // Mock login - Replace with AuthService.login()
-      setTimeout(() => {
-        // Store remember me preference
-        if (this.loginForm.get('rememberMe')?.value) {
-          localStorage.setItem('rememberEmail', this.loginForm.get('email')?.value);
-        } else {
-          localStorage.removeItem('rememberEmail');
+      const credenitals = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password
+      };
+
+      this.authService.login(credenitals).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (this.loginForm.get('rememberMe')?.value) {
+            localStorage.setItem('rememberEmail', this.loginForm.value.email);
+          } else {
+            localStorage.removeItem('remerberEmail');
+          }
+
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'home';
+          this.router.navigateByUrl(returnUrl);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = err.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!';
         }
-
-        // Store auth token (mock)
-        localStorage.setItem('authToken', 'mock-jwt-token-' + Date.now());
-
-        // Navigate to home
-        this.router.navigate(['/home']);
-        this.isLoading = false;
-      }, 1000);
+      });
     }
   }
 

@@ -1,5 +1,6 @@
 package com.ttn.sporttn.modules.category.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -17,8 +18,19 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      */
     Optional<Category> findByName(String name);
 
+    List<Category> findTop10ByParentSlugAndActiveTrueOrderByDisplayOrderAsc(
+            String parentSlug
+    );
+
     /**
      * Find all active categories with pagination
      */
     Page<Category> findByActiveTrue(Pageable pageable);
+
+    List<Category> findByParentIsNullAndActiveTrueOrderByDisplayOrderAsc();
+
+    // Category cha — hiện sections trên home
+    List<Category> findByParentIsNullAndShowOnHomeTrueAndActiveTrueOrderByDisplayOrderAsc();
+
+    List<Category> findByParentIdAndActiveTrueOrderByDisplayOrderAsc(Long parentId);
 }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from 'src/app/core/models/user/user.model';
+import {AuthService} from "../../../../core/services/auth/auth.service";
+import {map} from "rxjs";
 
 @Component({
   selector: 'app-account-menu',
@@ -8,44 +10,32 @@ import { User } from 'src/app/core/models/user/user.model';
   styleUrls: ['./account-menu.component.css']
 })
 export class AccountMenuComponent implements OnInit {
-  user: User | null = null;
 
   menuItems = [
-    { label: 'My Account', icon: 'person', routerLink: '/account/my-account' },
-    { label: 'My Addresses', icon: 'location_on', routerLink: '/account/address' },
-    { label: 'Order History', icon: 'history', routerLink: '/account/order-history' },
-    { label: 'Wallet', icon: 'account_balance_wallet', routerLink: '/account/wallet' },
-    { label: 'My Wishlists', icon: 'favorite', routerLink: '/account/wishlists' },
-    { label: 'Notifications', icon: 'notifications', routerLink: '/account/notifications' },
-    { label: 'Help Center', icon: 'help', routerLink: '/account/help' }
+    { label: 'Tài khoản', icon: 'person', routerLink: '/account/my-account' },
+    { label: 'Địa chỉ của tôi', icon: 'location_on', routerLink: '/account/address' },
+    { label: 'Lịch sử mua hàng', icon: 'history', routerLink: '/account/order-history' },
+    { label: 'Thẻ thành viên', icon: 'account_balance_wallet', routerLink: '/account/wallet' },
+    { label: 'Yêu thích', icon: 'favorite', routerLink: '/account/wishlists' },
+    { label: 'Thông báo', icon: 'notifications', routerLink: '/account/notifications' },
+    { label: 'Trung tâm hỗ trợ', icon: 'help', routerLink: '/account/help' }
   ];
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
+
+  user$ = this.authService.currentUser$.pipe(
+    map(auth => auth?.userResponse || null)
+  );
 
   ngOnInit(): void {
-    this.loadUserProfile();
-  }
-
-  loadUserProfile(): void {
-    // Mock user data - Replace with UserService.getProfile()
-    this.user = {
-      id: '1',
-      email: 'user@example.com',
-      firstName: 'Nguyễn',
-      lastName: 'Trần'
-    };
   }
 
   logout(): void {
-    // Clear local storage and navigate to login
-    localStorage.removeItem('authToken');
-    this.router.navigate(['/auth/login']);
+    this.authService.logout();
   }
 
-  getInitials(): string {
-    if (this.user) {
-      return (this.user.firstName.charAt(0) + this.user.lastName.charAt(0)).toUpperCase();
-    }
-    return 'NT';
+  getInitials(username: string | undefined): string {
+    if (!username) return 'TN';
+    return username.substring(0, 2).toUpperCase();
   }
 }
