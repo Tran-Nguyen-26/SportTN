@@ -10,37 +10,45 @@
   <app-category-circles></app-category-circles>
 
   <!-- Most searched -->
-  <app-most-searched></app-most-searched>
+  <app-most-searched [products]="mostSearched"></app-most-searched>
 
   <!-- Sports popular -->
-  <app-sports-popular></app-sports-popular>
+  <app-sports-popular [categories]="sportsPopular"></app-sports-popular>
 
   <!-- Best seller -->
-  <app-best-seller></app-best-seller>
+  <app-best-seller [products]="bestSellers"></app-best-seller>
 
   <!-- Cheap quality -->
-  <app-cheap-quality></app-cheap-quality>
+  <app-cheap-quality [products]="cheapQuality"></app-cheap-quality>
 
   <!-- Section: Bơi lội -->
-  <app-section
-    [title]="'Tự tin bơi lội'"
-    [banners]="swimBanners"
-    [products]="swimProducts">
-  </app-section>
+<!--  <app-section-->
+<!--    [title]="'Tự tin bơi lội'"-->
+<!--    [banners]="swimBanners"-->
+<!--    [products]="swimProducts">-->
+<!--  </app-section>-->
 
-  <!-- Section: Chạy bộ -->
-  <app-section
-    [title]="'Bền bỉ mọi chặng đường'"
-    [banners]="runBanners"
-    [products]="runProducts">
-  </app-section>
+<!--  &lt;!&ndash; Section: Chạy bộ &ndash;&gt;-->
+<!--  <app-section-->
+<!--    [title]="'Bền bỉ mọi chặng đường'"-->
+<!--    [banners]="runBanners"-->
+<!--    [products]="runProducts">-->
+<!--  </app-section>-->
 
-  <!-- Section: Chống nắng -->
-  <app-section
-    [title]="'Thoải mái dưới nắng'"
-    [banners]="sunBanners"
-    [products]="sunProducts">
-  </app-section>
+<!--  &lt;!&ndash; Section: Chống nắng &ndash;&gt;-->
+<!--  <app-section-->
+<!--    [title]="'Thoải mái dưới nắng'"-->
+<!--    [banners]="sunBanners"-->
+<!--    [products]="sunProducts">-->
+<!--  </app-section>-->
+
+  <ng-container *ngFor="let categorySection of categorySections">
+    <app-section
+      [title]="categorySection.title"
+      [banners]="categorySection.banners"
+      [products]="categorySection.products">
+    </app-section>
+  </ng-container>
 
   <!-- Promo banner -->
   <app-promo-banner></app-promo-banner>

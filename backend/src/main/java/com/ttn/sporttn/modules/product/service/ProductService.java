@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ttn.sporttn.modules.product.dto.response.*;
+import com.ttn.sporttn.modules.product.mapper.ProductMapper;
+import com.ttn.sporttn.modules.product.repository.ProductVariantRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +17,6 @@ import com.ttn.sporttn.modules.category.repository.CategoryRepository;
 import com.ttn.sporttn.modules.product.dto.request.ImageRequest;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
 import com.ttn.sporttn.modules.product.dto.request.VariantRequest;
-import com.ttn.sporttn.modules.product.dto.response.ImageResponse;
-import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
-import com.ttn.sporttn.modules.product.dto.response.VariantResponse;
 import com.ttn.sporttn.modules.product.entity.Brand;
 import com.ttn.sporttn.modules.product.entity.Product;
 import com.ttn.sporttn.modules.product.entity.ProductImage;
@@ -33,8 +33,37 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
+    private final ProductMapper productMapper;
+
+    public ProductPageResponse getProductPage(String slug) {
+        Product product = productRepository.findBySlug(slug)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        ProductCardResponse productCardResponse = productMapper.toProductCartResponse(product);
+
+        List<ImageResponse> imageResponse = product.getImages()
+                .stream()
+                .map(ImageResponse::buildImageResponse)
+                .collect(Collectors.toList());
+
+
+        List<ProductVariant> productVariants = productVariantRepository.findByProductId(product.getId());
+
+        List<VariantResponse> variantResponses = productVariants
+                .stream()
+                .map(VariantResponse::buildVariantResponse)
+                .collect(Collectors.toList());
+
+        return ProductPageResponse.builder()
+                .productCardResponse(productCardResponse)
+                .productImageResponses(imageResponse)
+                .variantResponses(variantResponses)
+                .build();
+
+    }
 
     @Transactional
     public ProductDetailResponse createProduct(ProductRequest productRequest) {

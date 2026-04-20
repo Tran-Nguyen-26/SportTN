@@ -33,6 +33,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatRadioModule } from '@angular/material/radio';
 import { CategoryModule } from './features/category/category.module';
+import {FeatureAdminModule} from "./feature-admin/feature-admin.module";
 
 @NgModule({
   declarations: [
@@ -68,7 +69,8 @@ import { CategoryModule } from './features/category/category.module';
     MatDatepickerModule,
     MatNativeDateModule,
     MatStepperModule,
-    MatRadioModule
+    MatRadioModule,
+    FeatureAdminModule
   ],
   providers: [
     {

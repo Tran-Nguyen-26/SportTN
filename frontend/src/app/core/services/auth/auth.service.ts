@@ -49,6 +49,11 @@ export class AuthService {
     return this.currentUserSubject.value?.userResponse || null;
   }
 
+  public hasRole(role: string): boolean {
+    const user = this.currentUserValue;
+    return user ? user.role === role : false;
+  }
+
   logout(): void {
     const authData = this.currentUserSubject.value;
     const refreshToken = authData?.refreshToken;

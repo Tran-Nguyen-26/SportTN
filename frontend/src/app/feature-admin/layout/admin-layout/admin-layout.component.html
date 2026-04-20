@@ -1,0 +1,17 @@
+<div class="admin-layout">
+
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <app-sidebar
+      [collapsed]="sidebarCollapsed"
+      (toggleSidebar)="toggleSidebar()">
+    </app-sidebar>
+  </aside>
+
+  <div class="main-content">
+    <app-topbar (toggleSidebar)="toggleSidebar()"></app-topbar>
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+</div>

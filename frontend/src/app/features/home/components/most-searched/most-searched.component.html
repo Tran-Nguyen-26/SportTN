@@ -3,7 +3,7 @@
   <div class="circle-list">
     <div class="circle-item" *ngFor="let product of products">
       <div class="circle">
-        <img [src]="product.image" alt="{{ product.name }}">
+        <img [src]="product.mainImageUrl" alt="{{ product.name }}">
       </div>
       <span class="product-name">{{ product.name }}</span>
     </div>

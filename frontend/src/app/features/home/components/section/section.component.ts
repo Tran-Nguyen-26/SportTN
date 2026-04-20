@@ -1,20 +1,21 @@
 import { Component, Input } from '@angular/core';
+import {BannerResponse, ProductCardResponse} from "../../../../core/models/home-response/home-response";
 
-interface Banner {
-  title: string;
-  image: string;
-}
-
-interface Product {
-  name: string;
-  brand: string;
-  newPrice: number;
-  oldPrice?: number | null;
-  rating?: number;
-  reviews?: number;
-  label?: string;
-  image: string;
-}
+// interface Banner {
+//   title: string;
+//   image: string;
+// }
+//
+// interface Product {
+//   name: string;
+//   brand: string;
+//   newPrice: number;
+//   oldPrice?: number | null;
+//   rating?: number;
+//   reviews?: number;
+//   label?: string;
+//   image: string;
+// }
 
 @Component({
   selector: 'app-section',
@@ -23,6 +24,6 @@ interface Product {
 })
 export class SectionComponent {
   @Input() title!: string;
-  @Input() banners: Banner[] = [];
-  @Input() products: Product[] = [];
+  @Input() banners: BannerResponse[] = [];
+  @Input() products: ProductCardResponse[] = [];
 }

@@ -10,6 +10,7 @@ import {DomSanitizer} from "@angular/platform-browser";
 })
 export class AppComponent {
   isAuthPage = false;
+  isAdminPage = false;
 
   constructor(
     private router: Router,
@@ -19,6 +20,7 @@ export class AppComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.isAuthPage = event.url.includes('/auth');
+        this.isAdminPage = event.url.includes('/admin');
       }
     });
 

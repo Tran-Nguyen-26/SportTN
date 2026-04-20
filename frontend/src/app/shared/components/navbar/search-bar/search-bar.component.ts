@@ -9,15 +9,22 @@ export class SearchBarComponent {
   // Biến kiểm soát việc hiển thị Mega Menu Search
   isSearchFocus: boolean = false;
 
-  swimProduct = {
+  sampleProduct = {
+    id: 101,
     name: 'Kính bơi Ready xám',
-    newPrice: 69000,
-    oldPrice: null,
-    brand: 'DECATHLON',
+    slug: '',
+    mainImageUrl: 'assets/kinhboi.jpg', // Tên trường mới
+    brandName: 'DECATHLON',             // Tên trường mới
     rating: 4.5,
-    reviews: 115,
-    label: 'MỚI',
-    image: 'assets/kinhboi.jpg'
+    reviewCount: 115,                   // Tên trường mới
+    soldCount: 500,                     // Thêm trường số lượng đã bán
+    originalPrice: 100000,              // Giá gốc (số)
+    salePrice: 69000,                   // Giá đang giảm
+    effectivePrice: 69000,              // Giá thực tế cuối cùng
+    discountPercent: 31,                // % giảm giá
+    isOnSale: true,                     // Trạng thái giảm giá
+    isNew: true,                        // Trạng thái hàng mới
+    isBestSeller: false                 // Trạng thái bán chạy
   };
 
   // Nếu bạn muốn báo cho Navbar biết để làm mờ Header, có thể dùng Output

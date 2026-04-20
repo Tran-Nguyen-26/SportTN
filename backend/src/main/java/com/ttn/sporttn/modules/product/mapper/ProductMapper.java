@@ -1,6 +1,9 @@
 package com.ttn.sporttn.modules.product.mapper;
 
+import com.ttn.sporttn.modules.product.dto.response.ImageResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductCardResponse;
+import com.ttn.sporttn.modules.product.dto.response.ProductPageResponse;
+import com.ttn.sporttn.modules.product.dto.response.VariantResponse;
 import com.ttn.sporttn.modules.product.entity.Product;
 import com.ttn.sporttn.modules.product.entity.ProductVariant;
 import lombok.Getter;
@@ -44,6 +47,7 @@ public class ProductMapper {
         return ProductCardResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .slug(product.getSlug())
                 .mainImageUrl(product.getMainImageUrl())
                 .brandName(product.getBrand() != null ? product.getBrand().getName() : null)
                 .rating(product.getRating())
@@ -53,6 +57,23 @@ public class ProductMapper {
                 .salePrice(minSalePrice)
                 .discountPercent(discountPercent)
                 .isOnSale(isOnSale)
+                .build();
+    }
+
+    public ProductPageResponse toProductPageResponse(Product product) {
+        ProductCardResponse productCardResponse = this.toProductCartResponse(product);
+        List<ImageResponse> imageUrls = product.getImages()
+                .stream()
+                .map(ImageResponse::buildImageResponse)
+                .collect(Collectors.toList());
+        List<VariantResponse> variantResponses = product.getVariants()
+                .stream()
+                .map(VariantResponse::buildVariantResponse)
+                .collect(Collectors.toList());
+        return ProductPageResponse.builder()
+                .productCardResponse(productCardResponse)
+                .productImageResponses(imageUrls)
+                .variantResponses(variantResponses)
                 .build();
     }
 }

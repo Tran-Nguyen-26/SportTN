@@ -1,4 +1,6 @@
 import { Category } from "../category/category.model";
+import {ProductCardResponse} from "../home-response/home-response";
+import {ImageResponse} from "../image";
 
 export interface Product {
   id: string;
@@ -28,4 +30,23 @@ export interface ProductResponse {
   stock: number;
   brand: string;
   category: Category;
+}
+
+export interface VariantResponse {
+  id: number;
+  sku: string;
+  color: string;
+  size: string;
+  originalPrice: number;
+  salePrice: number;
+  effectivePrice: number;
+  stockQuantity: number;
+  weightGram: number;
+  variantImages?: ImageResponse[]; // Có thể null hoặc rỗng
+}
+
+export interface ProductPageResponse {
+  productCardResponse: ProductCardResponse;
+  productImageResponses: ImageResponse[];
+  variantResponses: VariantResponse[];
 }

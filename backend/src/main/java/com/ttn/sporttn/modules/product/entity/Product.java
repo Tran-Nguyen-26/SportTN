@@ -24,6 +24,9 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(unique = true, length = 100)
+    private String slug;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

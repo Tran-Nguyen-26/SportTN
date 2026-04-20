@@ -12,4 +12,6 @@ public interface BannerRepository extends JpaRepository<Banner, Long> {
 
 
     List<Banner> findByPositionAndCategoryIdAndActiveTrueOrderByDisplayOrderAsc(String position, Long categoryId);
+
+    List<Banner> findByCategoryIdAndActiveTrueOrderByDisplayOrderAsc(Long categoryId);
 }

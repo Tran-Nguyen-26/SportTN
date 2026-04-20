@@ -34,6 +34,7 @@ public class HomeService {
         return HomeResponse.builder()
                 .heroBanners(getHeroBanners())
                 .mostSearched(getMostSearched())
+                .sportsPopular(getSportsPopular())
                 .categories(getCategories())
                 .bestSellers(getBestSellers())
                 .cheapQuality(getCheapQuality())
@@ -97,10 +98,7 @@ public class HomeService {
     private CategorySectionResponse toCategorySection(Category category) {
         //banner của section
         List<BannerResponse> banners = bannerRepository
-                .findByPositionAndCategoryIdAndActiveTrueOrderByDisplayOrderAsc(
-                        "CATEGORY",
-                        category.getId()
-                )
+                .findByCategoryIdAndActiveTrueOrderByDisplayOrderAsc(category.getId())
                 .stream()
                 .map(this::toBannerResponse)
                 .collect(Collectors.toList());

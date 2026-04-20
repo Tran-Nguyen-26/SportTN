@@ -1,9 +1,9 @@
 <div class="category-circles">
-  <h2>Featured Collections</h2>
+  <h2>Bộ sưu tập HOT</h2>
   <div class="circle-list">
-    <div 
-      *ngFor="let category of categories" 
-      class="circle-item" 
+    <div
+      *ngFor="let category of categories"
+      class="circle-item"
       [style.background-color]="category.color"
       (click)="openCategory(category)"
       matTooltip="{{ category.label }}">

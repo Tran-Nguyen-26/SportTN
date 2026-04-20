@@ -61,8 +61,16 @@ export class LoginPageComponent implements OnInit {
             localStorage.removeItem('remerberEmail');
           }
 
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'home';
-          this.router.navigateByUrl(returnUrl);
+          const role = response.data?.userResponse.role;
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+          // this.router.navigateByUrl(returnUrl);
+          if (returnUrl) {
+            this.router.navigate(returnUrl);
+          } else if (role === 'ADMIN') {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/home']);
+          }
         },
         error: (err) => {
           this.isLoading = false;

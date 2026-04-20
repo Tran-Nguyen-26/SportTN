@@ -10,6 +10,7 @@ export interface BannerResponse {
 export interface ProductCardResponse {
   id: number;
   name: string;
+  slug: string;
   mainImageUrl: string;
   brandName: string;
   rating: number;
@@ -35,8 +36,11 @@ export interface CategoryResponse {
 }
 
 export interface CategorySectionResponse {
-  categoryName: string;
+  categoryId: number;
+  title: string;
+  categorySlug: string;
   banners: BannerResponse[];
+  subCategories: CategoryResponse[];
   products: ProductCardResponse[];
 }
 

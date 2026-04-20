@@ -31,6 +31,10 @@ const routes: Routes = [
     path: 'account',
     loadChildren: () => import('./features/account/account.module').then(m => m.AccountModule)
   },
+  {
+    path: 'admin',
+    loadChildren: () => import('./feature-admin/feature-admin.module').then(m => m.FeatureAdminModule)
+  },
   { path: '', redirectTo: '/home', pathMatch: 'full'},
   { path: '**', redirectTo: '/home' }
 ];

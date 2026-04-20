@@ -1,45 +1,59 @@
-<div class="product-detail">
+<div class="product-detail" *ngIf="productDetail">
   <div class="product-header">
-    <h2>Áo thun tennis/pickleball nam - Dry nâu</h2>
-    <p>Mã sản phẩm: 8903376</p>
-    <div class="rating">⭐ 4.8 (2020 đánh giá)</div>
+    <h2>{{ productDetail.productCardResponse.name }}</h2>
+    <p>Mã sản phẩm: {{ productDetail.variantResponses[0]?.sku || 'N/A' }}</p>
+    <div class="rating">
+      ⭐ {{ productDetail.productCardResponse.rating }}
+      ({{ productDetail.productCardResponse.reviewCount }} đánh giá)
+    </div>
   </div>
 
   <div class="product-price">
-    <span class="old-price">259,000₫</span>
-    <span class="current-price">299,000₫</span>
-    <div class="promo-banner">Miễn phí vận chuyển từ 299,000₫</div>
+    <span class="old-price" *ngIf="productDetail.productCardResponse.isOnSale">
+      {{ productDetail.productCardResponse.originalPrice | number:'1.0-0' }}₫
+    </span>
+    <span class="current-price">
+      {{ productDetail.productCardResponse.effectivePrice | number:'1.0-0' }}₫
+    </span>
+    <div class="promo-banner" *ngIf="productDetail.productCardResponse.effectivePrice >= 299000">
+      Miễn phí vận chuyển từ 299,000₫
+    </div>
   </div>
 
   <div class="product-variant">
-    <div class="colors">
-      <!-- thumbnail màu -->
+    <div class="colors" *ngIf="productDetail.variantResponses.length > 0">
+      <p>Màu sắc:</p>
+      <div class="color-options">
+        <button *ngFor="let v of getUniqueColors()" class="color-thumb">
+          {{ v }}
+        </button>
+      </div>
     </div>
+
     <div class="size">
-      <select>
-        <option>Vui lòng chọn cỡ</option>
+      <select (change)="onSizeChange($event)">
+        <option value="">Vui lòng chọn cỡ</option>
+        <option *ngFor="let v of productDetail.variantResponses" [value]="v.id">
+          {{ v.size }} (Còn {{ v.stockQuantity }} sản phẩm)
+        </option>
       </select>
     </div>
+
     <div class="quantity">
-      <button>-</button>
-      <input type="number" value="1">
-      <button>+</button>
+      <button (click)="updateQty(-1)">-</button>
+      <input type="number" [value]="selectedQty" readonly>
+      <button (click)="updateQty(1)">+</button>
     </div>
   </div>
 
   <div class="product-action">
-    <button class="add-to-cart">THÊM VÀO GIỎ</button>
-  </div>
-
-  <div class="product-delivery">
-    <h4>Thông tin giao hàng & lấy hàng</h4>
-    <p>Giao hàng tại nhà / Click & Collect</p>
+    <button class="add-to-cart" [disabled]="!selectedVariantId">
+      THÊM VÀO GIỎ
+    </button>
   </div>
 
   <div class="product-policy">
     <ul>
-      <li>Xem tại cửa hàng</li>
-      <li>Tích điểm</li>
       <li>Đổi trả 365 ngày</li>
       <li>Bảo hành 2 năm</li>
       <li>Miễn phí vận chuyển từ 499,000₫</li>

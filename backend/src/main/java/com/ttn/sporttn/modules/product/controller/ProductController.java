@@ -3,6 +3,7 @@ package com.ttn.sporttn.modules.product.controller;
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
 import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
+import com.ttn.sporttn.modules.product.dto.response.ProductPageResponse;
 import com.ttn.sporttn.modules.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +30,18 @@ public class ProductController {
      * Get product by ID
      * GET /api/v1/products/{id}
      */
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<ApiResponse<ProductDetailResponse>> getProduct(
         @PathVariable Long id
     ) {
         ProductDetailResponse product = productService.getProduct(id);
         return ResponseEntity.ok(ApiResponse.ok(product, "Lấy sản phẩm thành công"));
+    }
+
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<ApiResponse<ProductPageResponse>> getProductPage(@PathVariable String slug) {
+        ProductPageResponse product = productService.getProductPage(slug);
+        return ResponseEntity.ok(ApiResponse.ok(product, "Lấy sản phẩm theo slug"));
     }
 
     /**

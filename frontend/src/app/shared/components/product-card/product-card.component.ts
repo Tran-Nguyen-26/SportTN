@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Product } from 'src/app/core/models/product/product.model';
 import {Router} from "@angular/router";
+import {ProductCardResponse} from "../../../core/models/home-response/home-response";
 
 interface Spec {
   icon: string;
@@ -13,12 +14,18 @@ interface Spec {
   styleUrls: ['./product-card.component.css']
 })
 export class ProductCardComponent {
-  @Input() product!: any;
+  @Input() product!: ProductCardResponse;
   @Input() specs: Spec[] = [];
   @Output() addToCart = new EventEmitter<any>();
   @Output() addToWishlist = new EventEmitter<any>();
 
   constructor(private router: Router) {
+  }
+
+  goToProduct(): void{
+    if (this.product.slug) {
+      this.router.navigate(['/product', this.product.slug]);
+    }
   }
 
   onAddToCart(): void {
@@ -34,21 +41,17 @@ export class ProductCardComponent {
   }
 
   get brand(): string {
-    return this.product?.brand || '';
+    return this.product?.brandName || '';
   }
 
   get newPrice(): number {
     // Support both Product model (discountPrice) and simple data (newPrice)
-    return this.product?.newPrice || this.product?.discountPrice || this.product?.price || 0;
+    return this.product?.effectivePrice || this.product?.salePrice || 0;
   }
 
   get oldPrice(): number | null {
     // Support both Product model and simple data (oldPrice)
-    if (this.product?.oldPrice) return this.product.oldPrice;
-    if (this.product?.price && this.product?.discountPrice) {
-      return this.product.price;
-    }
-    return null;
+    return (this.product?.isOnSale) ? this.product.originalPrice : null;
   }
 
   get rating(): number | undefined {
@@ -56,22 +59,29 @@ export class ProductCardComponent {
   }
 
   get reviews(): number | undefined {
-    return this.product?.reviews;
+    return this.product?.reviewCount;
   }
 
   get label(): string {
-    // Support explicit label or compute from prices
-    if (this.product?.label) return this.product.label;
-    if (!this.product?.discountPrice || !this.product?.price) return '';
-    const discount = Math.round(((this.product.price - this.product.discountPrice) / this.product.price) * 100);
-    return `-${discount}%`;
+    // 1. Ưu tiên số % giảm giá nếu sản phẩm đang sale
+    if (this.product?.isOnSale && this.product?.discountPercent > 0) {
+      return `-${this.product.discountPercent}%`;
+    }
+
+    // 2. Nếu không sale thì check xem có phải hàng mới không
+    if (this.product?.isNew) {
+      return 'MỚI';
+    }
+
+    // 3. Cuối cùng là nhãn bán chạy
+    if (this.product?.isBestSeller) {
+      return 'BÁN CHẠY';
+    }
+
+    return ''; // Không có nhãn nào thì để trống
   }
 
   get image(): string {
-    return this.product?.image || '';
-  }
-
-  goToProduct() {
-    this.router.navigate(['/product'])
+    return this.product?.mainImageUrl || '';
   }
 }

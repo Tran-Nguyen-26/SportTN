@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class ProductCardResponse {
     private Long id;
     private String name;
+    private String slug;
     private String mainImageUrl;
     private String brandName;
     private Double rating;
