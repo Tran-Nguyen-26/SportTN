@@ -28,6 +28,8 @@ import { StatusBadgeComponent } from './components/status-badge/status-badge.com
 import { MatIconModule} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
 import { FlashSaleComponent } from './pages/flash-sale/flash-sale.component';
+import { AddProductComponent } from './components/add-product/add-product.component';
+import { AddCategoryDrawerComponent } from './components/add-category-drawer/add-category-drawer.component';
 
 
 @NgModule({
@@ -56,6 +58,8 @@ import { FlashSaleComponent } from './pages/flash-sale/flash-sale.component';
     ConfirmDialogComponent,
     StatusBadgeComponent,
     FlashSaleComponent,
+    AddProductComponent,
+    AddCategoryDrawerComponent,
   ],
   imports: [
     CommonModule,

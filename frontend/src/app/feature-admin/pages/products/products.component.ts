@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, signal} from '@angular/core';
+import {Router} from "@angular/router";
 
 export interface AdminProduct {
   id: number;
@@ -21,9 +22,16 @@ export interface AdminProduct {
 })
 export class ProductsComponent {
 
+  constructor(private router: Router) {
+  }
+
   searchQuery = '';
   selectedCategory = '';
   viewMode: 'table' | 'grid' = 'table';
+
+  openDropdownId: number | null = null;
+
+  isAddPanelOpen = signal(false);
 
   categories = [
     { value: '',           label: 'Tất cả danh mục' },
@@ -56,4 +64,49 @@ export class ProductsComponent {
   formatPrice(price: number): string {
     return price.toLocaleString('vi-VN') + 'đ';
   }
+
+  openAddProduct() {
+    this.isAddPanelOpen.set(true);
+  }
+
+  // 3. Hàm đóng Panel
+  closePanel() {
+    this.isAddPanelOpen.set(false);
+  }
+
+  goToAdd(): void {
+    this.router.navigate(['/admin/products/add']);
+  }
+
+  goToEdit(id: number): void {
+    this.router.navigate(['/admin/products/edit', id]);
+    this.closeDropdown();
+  }
+
+  goToDetail(id: number): void {
+    this.router.navigate(['/admin/products', id]);
+    this.closeDropdown();
+  }
+
+  toggleDropdown(id: number, event: Event): void {
+    event.stopPropagation();
+    this.openDropdownId = this.openDropdownId === id ? null : id;
+  }
+
+  closeDropdown(): void {
+    this.openDropdownId = null;
+  }
+
+  onDeleteProduct(id: number): void {
+    this.openDropdownId = null;
+    // TODO: mở confirm dialog
+    console.log('Delete product:', id);
+  }
+
+  onToggleStatus(product: any): void {
+    product.status = product.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    this.openDropdownId = null;
+  }
+
+  protected readonly close = close;
 }

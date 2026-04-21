@@ -1,49 +1,77 @@
 <div class="product-review">
-  <h3>Đánh giá</h3>
+  <div class="review-header">
+    <h3>Đánh giá từ khách hàng</h3>
+    <div class="review-stats">
+      <div class="main-score">
+        <span class="score-number">4.8</span>
+        <div class="stars-wrap">
+          <mat-icon>star</mat-icon><mat-icon>star</mat-icon><mat-icon>star</mat-icon><mat-icon>star</mat-icon><mat-icon>star_half</mat-icon>
+        </div>
+        <p class="total-count">2,020 đánh giá</p>
+      </div>
 
-  <!-- Tổng quan điểm -->
-  <div class="review-summary">
-    <div class="average-rating">
-      ⭐ 4.8 / 5 (2020 đánh giá)
-    </div>
-    <p>48% khách hàng gợi ý sản phẩm này</p>
-    <div class="rating-bars">
-      <div>5★ – 14</div>
-      <div>4★ – 6</div>
-      <div>3★ – 30</div>
-      <div>2★ – 201</div>
-      <div>1★ – 1769</div>
+      <div class="rating-bars">
+        <div class="bar-item">
+          <span>5★</span>
+          <div class="progress-bg"><div class="progress-fill" style="width: 85%"></div></div>
+          <span>1,769</span>
+        </div>
+        <div class="bar-item">
+          <span>4★</span>
+          <div class="progress-bg"><div class="progress-fill" style="width: 10%"></div></div>
+          <span>201</span>
+        </div>
+        <div class="bar-item">
+          <span>3★</span>
+          <div class="progress-bg"><div class="progress-fill" style="width: 3%"></div></div>
+          <span>30</span>
+        </div>
+        <div class="bar-item">
+          <span>2★</span>
+          <div class="progress-bg"><div class="progress-fill" style="width: 1%"></div></div>
+          <span>14</span>
+        </div>
+        <div class="bar-item">
+          <span>1★</span>
+          <div class="progress-bg"><div class="progress-fill" style="width: 1%"></div></div>
+          <span>6</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Khuyến khích đánh giá -->
   <div class="review-reward">
-    <p>Đánh giá sản phẩm - Nhận ngay điểm thưởng</p>
-    <p>1 đánh giá hợp lệ = 50.000 điểm</p>
-    <button class="join-btn">THAM GIA NGAY</button>
+    <div class="reward-icon">
+      <mat-icon>card_giftcard</mat-icon>
+    </div>
+    <div class="reward-text">
+      <p class="reward-title">Đánh giá sản phẩm - Nhận ngay điểm thưởng</p>
+      <p class="reward-desc">Nhận <strong>50.000 điểm</strong> cho mỗi đánh giá kèm hình ảnh hợp lệ.</p>
+    </div>
+    <button class="join-btn">VIẾT ĐÁNH GIÁ</button>
   </div>
 
-  <!-- Một vài review -->
   <div class="review-list">
-    <div class="review-item">
-      <strong>Duy</strong> - Việt Nam | 21/03/2023
-      <div>⭐ 5</div>
-      <p>Thiết kế đẹp</p>
-    </div>
-    <div class="review-item">
-      <strong>An</strong> - Việt Nam | 11/02/2020
-      <div>⭐ 5</div>
-      <p>Áo đẹp, chất thoáng mát mau khô</p>
-    </div>
-    <div class="review-item">
-      <strong>Trần Quốc Việt</strong> - Việt Nam | 10/11/2025
-      <div>⭐ 5</div>
-      <p>Áo tennis, áo quá mát</p>
+    <div class="review-item" *ngFor="let item of [1,2,3]">
+      <div class="user-info">
+        <div class="user-avatar">D</div>
+        <div class="user-meta">
+          <strong>Trần Quốc Việt</strong>
+          <span class="verify-badge"><mat-icon>check_circle</mat-icon> Đã mua hàng</span>
+        </div>
+        <span class="review-date">21/03/2026</span>
+      </div>
+      <div class="item-rating">
+        <mat-icon *ngFor="let s of [1,2,3,4,5]">star</mat-icon>
+      </div>
+      <p class="review-content">Áo tennis dòng này mặc rất mát, thoát mồ hôi nhanh. Form ôm vừa vặn, rất phù hợp cho anh em chơi cường độ cao.</p>
     </div>
   </div>
 
-  <!-- Link xem tất cả -->
   <div class="see-all">
-    <a routerLink="/review">Xem tất cả đánh giá</a>
+    <a routerLink="/review" class="btn-more">
+      Xem tất cả 2,020 đánh giá
+      <mat-icon>chevron_right</mat-icon>
+    </a>
   </div>
 </div>

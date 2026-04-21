@@ -1,5 +1,9 @@
 import { Component, Input } from '@angular/core';
-import {BannerResponse, ProductCardResponse} from "../../../../core/models/home-response/home-response";
+import {
+  BannerResponse,
+  CategoryResponse,
+  ProductCardResponse
+} from "../../../../core/models/home-response/home-response";
 
 // interface Banner {
 //   title: string;
@@ -25,5 +29,6 @@ import {BannerResponse, ProductCardResponse} from "../../../../core/models/home-
 export class SectionComponent {
   @Input() title!: string;
   @Input() banners: BannerResponse[] = [];
+  @Input() childrenCategories: CategoryResponse[] = [];
   @Input() products: ProductCardResponse[] = [];
 }

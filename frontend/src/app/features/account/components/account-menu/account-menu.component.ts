@@ -16,8 +16,8 @@ export class AccountMenuComponent implements OnInit {
     { label: 'Địa chỉ của tôi', icon: 'location_on', routerLink: '/account/address' },
     { label: 'Lịch sử mua hàng', icon: 'history', routerLink: '/account/order-history' },
     { label: 'Thẻ thành viên', icon: 'account_balance_wallet', routerLink: '/account/wallet' },
-    { label: 'Yêu thích', icon: 'favorite', routerLink: '/account/wishlists' },
-    { label: 'Thông báo', icon: 'notifications', routerLink: '/account/notifications' },
+    { label: 'Yêu thích', icon: 'favorite', routerLink: '/account/wishlist' },
+    { label: 'Thông báo', icon: 'notifications', routerLink: '/account/notification' },
     { label: 'Trung tâm hỗ trợ', icon: 'help', routerLink: '/account/help' }
   ];
 

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import {Component, Output, EventEmitter, Input} from '@angular/core';
 
 @Component({
   selector: 'app-topbar',
@@ -7,6 +7,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 })
 export class TopbarComponent {
 
+  @Input() currentLabel: string = 'Dashboard';
   @Output() toggleSidebar = new EventEmitter<void>();
 
   searchQuery = '';

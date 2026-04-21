@@ -1,4 +1,6 @@
-.categories-page { max-width: 1200px; }
+.categories-page {
+  width: 100%;
+}
 
 .stats-row {
   display: grid;

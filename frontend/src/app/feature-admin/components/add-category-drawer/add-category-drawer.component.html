@@ -1,0 +1,128 @@
+<div class="overlay" *ngIf="visible" (click)="onOverlayClick($event)">
+  <div class="drawer" #drawerRef>
+    <!-- Header -->
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">{{ editMode ? 'Sửa danh mục' : 'Thêm danh mục' }}</div>
+        <div class="drawer-sub">{{ editMode ? 'Cập nhật thông tin' : 'Tạo danh mục sản phẩm mới' }}</div>
+      </div>
+      <button class="close-btn" (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body">
+      <!-- Thông tin cơ bản -->
+      <div class="section">
+        <div class="section-label">Thông tin cơ bản</div>
+
+        <div class="field full">
+          <label>Tên danh mục <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.name"
+                 (ngModelChange)="onNameChange($event)"
+                 placeholder="VD: Bơi lội, Chạy bộ...">
+        </div>
+
+        <div class="field full">
+          <label>Slug <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.slug"
+                 placeholder="boi-loi" class="slug-input">
+          <span class="hint">Tự động tạo từ tên · Chỉ dùng chữ thường, số và dấu gạch ngang</span>
+        </div>
+
+        <div class="field full">
+          <label>Danh mục cha</label>
+          <select [(ngModel)]="form.parentId">
+            <option [value]="null">— Không có (danh mục cha) —</option>
+            <option *ngFor="let p of parentCategories" [value]="p.id">{{ p.name }}</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label>Mô tả</label>
+          <textarea [(ngModel)]="form.description"
+                    placeholder="Mô tả ngắn về danh mục này..." rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Dành cho danh mục cha -->
+      <div class="section" *ngIf="!form.parentId">
+        <div class="section-label">Dành cho danh mục cha</div>
+
+        <div class="field full">
+          <label>Tiêu đề section</label>
+          <input type="text" [(ngModel)]="form.sectionTitle"
+                 placeholder='VD: "Tự tin bơi lội"'>
+          <span class="hint">Hiển thị trên trang chủ</span>
+        </div>
+
+        <div class="field full">
+          <label>Link URL</label>
+          <input type="text" [(ngModel)]="form.linkUrl"
+                 placeholder="/the-thao/boi-loi">
+        </div>
+      </div>
+
+      <!-- Hình ảnh -->
+      <div class="section">
+        <div class="section-label">Hình ảnh</div>
+        <div class="img-upload" (click)="fileInput.click()">
+          <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">
+          <mat-icon class="upload-icon">image</mat-icon>
+          <span class="upload-text"><strong>Chọn ảnh</strong> hoặc kéo thả</span>
+          <span class="upload-sub">PNG, JPG · Tối đa 2MB</span>
+        </div>
+        <div class="preview-wrap" *ngIf="previewUrl">
+          <img [src]="previewUrl" class="img-preview">
+          <button class="remove-img" (click)="removeImage()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hiển thị & thứ tự -->
+      <div class="section">
+        <div class="section-label">Hiển thị & thứ tự</div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Hiện trên trang chủ</span>
+            <span class="t-desc">Hiển thị trong section homepage</span>
+          </div>
+          <div class="toggle" [class.on]="form.showOnHome" (click)="form.showOnHome = !form.showOnHome">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Kích hoạt</span>
+            <span class="t-desc">Danh mục hiển thị trên website</span>
+          </div>
+          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <div class="field order-field">
+          <label>Thứ tự hiển thị</label>
+          <div class="order-wrap">
+            <button class="order-btn" (click)="changeOrder(-1)">−</button>
+            <input type="number" [(ngModel)]="form.displayOrder" min="1" max="99">
+            <button class="order-btn" (click)="changeOrder(1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="drawer-footer">
+      <button class="btn-cancel" (click)="close()">Hủy</button>
+      <button class="btn-save" (click)="save()">
+        <mat-icon>save</mat-icon>
+        Lưu danh mục
+      </button>
+    </div>
+  </div>
+</div>

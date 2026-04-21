@@ -6,6 +6,7 @@ import { ProductPageComponent } from './pages/product-page/product-page.componen
 import { ProductDetailComponent } from './components/product-detail/product-detail.component';
 import { ProductReviewComponent } from './components/product-review/product-review.component';
 import { ProductDescriptionComponent } from './components/product-description/product-description.component';
+import {MatIconModule} from "@angular/material/icon";
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { ProductDescriptionComponent } from './components/product-description/pr
   ],
   imports: [
     CommonModule,
-    ProductRoutingModule
+    ProductRoutingModule,
+    MatIconModule
   ]
 })
 export class ProductModule { }

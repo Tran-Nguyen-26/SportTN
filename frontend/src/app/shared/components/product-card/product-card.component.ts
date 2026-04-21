@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Product } from 'src/app/core/models/product/product.model';
 import {Router} from "@angular/router";
 import {ProductCardResponse} from "../../../core/models/home-response/home-response";
 

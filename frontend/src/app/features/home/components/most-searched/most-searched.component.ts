@@ -7,5 +7,6 @@ import {ProductCardResponse} from "../../../../core/models/home-response/home-re
   styleUrls: ['./most-searched.component.css']
 })
 export class MostSearchedComponent {
+  @Input() title: string = '';
   @Input() products: ProductCardResponse[] = [];
 }

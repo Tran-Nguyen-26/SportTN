@@ -1,52 +1,76 @@
 .category-circles {
-  padding: 20px;
+  padding: 24px 16px;
   background-color: #fff;
 }
 
-.category-circles h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 16px;
-  text-align: start;
-  color: #222;
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .circle-list {
   display: flex;
   justify-content: space-evenly;
-  flex-wrap: nowrap;           
-  overflow-x: auto;          
-  gap: 20px;
-  padding: 10px 0;
+  overflow-x: auto;
+  gap: 24px;
+  padding: 4px 0 12px;
+  scrollbar-width: none;
+}
+
+.circle-list::-webkit-scrollbar {
+  display: none;
+}
+
+.category-wrapper {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 80px; /* Cố định độ rộng để căn chữ */
 }
 
 .circle-item {
-  flex: 0 0 auto;
-  width: 70px;               
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;              
-  font-weight: 600;
   color: #fff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.circle-item mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.category-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #444;
   text-align: center;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
-.circle-item:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+/* Hiệu ứng khi tương tác */
+.category-wrapper:hover .circle-item {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Màu sắc cho từng loại */
-.red { background-color: #e74c3c; }
-.yellow { background-color: #f1c40f; color: #333; }
-.green { background-color: #2ecc71; }
-.blue { background-color: #3498db; }
-.orange { background-color: #e67e22; }
-.navy { background-color: #34495e; }
-.pink { background-color: #e84393; }
-.teal { background-color: #1abc9c; }
+.category-wrapper:hover .category-label {
+  color: #3643ba; /* Màu thương hiệu SportTN */
+  font-weight: 600;
+}

@@ -5,13 +5,11 @@
   <div class="banner-list">
     <div class="banner-card" *ngFor="let banner of banners">
       <img [src]="banner.imageUrl" alt="{{ banner.title }}">
-<!--      <h3>{{ banner.title }}</h3>-->
-<!--      <button>Khám phá ngay</button>-->
     </div>
   </div>
 
   <div>
-    <app-most-searched></app-most-searched>
+    <app-category-children [childrenCategories]="childrenCategories"></app-category-children>
   </div>
 
   <!-- Product list -->

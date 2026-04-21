@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
   selector: 'app-page-header',
@@ -10,4 +10,10 @@ export class PageHeaderComponent {
   @Input() subtitle: string = '';
   @Input() btnLabel: string = '';
   @Input() btnIcon: string = 'add';
+
+  @Output() btnClick = new EventEmitter<void>();
+
+  onCLick() {
+    this.btnClick.emit();
+  }
 }

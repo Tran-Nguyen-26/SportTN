@@ -22,6 +22,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CategoryChildrenComponent } from './components/category-children/category-children.component';
+import { CompanyInfoComponent } from './components/company-info/company-info.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     CheapQualityComponent,
     SectionComponent,
     ServicesComponent,
+    CategoryChildrenComponent,
+    CompanyInfoComponent,
   ],
   imports: [
     CommonModule,

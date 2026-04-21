@@ -1,219 +1,168 @@
-.cart-item {
-  display: grid;
-  grid-template-columns: 100px 1fr 150px 150px 50px;
-  gap: 20px;
-  align-items: center;
-  padding: 16px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
-  position: relative;
+:host {
+  --stn-primary: #2563eb;
+  --stn-slate-900: #0f172a;
+  --stn-slate-600: #475569;
+  --stn-slate-400: #94a3b8;
+  --stn-border: #e2e8f0;
+  --stn-bg-light: #f8fafc;
 }
 
-.cart-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #e0e0e0;
+.stn-cart-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 140px 160px 48px;
+  gap: 24px;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid var(--stn-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 16px;
+}
+
+.stn-cart-item:hover {
+  border-color: var(--stn-primary);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.04);
   transform: translateY(-2px);
 }
 
-.item-image {
+/* Image */
+.stn-item-image {
   width: 100px;
   height: 100px;
-  border-radius: 6px;
+  border-radius: 14px;
+  background: var(--stn-bg-light);
+  padding: 8px;
   overflow: hidden;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.item-image img {
+.stn-item-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.item-details {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.item-details h3 {
+/* Details */
+.stn-brand {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  line-height: 1.4;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.item-details .brand {
-  margin: 0;
-  font-size: 13px;
-  color: #999;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--stn-primary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
+  letter-spacing: 1px;
 }
 
-.rating {
+.stn-product-name {
+  margin: 4px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--stn-slate-900);
+}
+
+.stn-rating {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
-.rating .stars {
-  color: #ff9800;
-  font-weight: 600;
-}
-
-.rating .reviews {
-  color: #999;
-}
-
-.quantity-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 0 8px;
-  background: #f9f9f9;
-  height: fit-content;
-}
-
-.quantity-section button {
-  padding: 4px;
-  height: auto;
-}
-
-.quantity-section input {
-  width: 40px;
-  border: 0;
-  text-align: center;
-  font-weight: 600;
-  color: #333;
-  background: transparent;
-  font-size: 14px;
-  padding: 4px 0;
-}
-
-.quantity-section input::-webkit-outer-spin-button,
-.quantity-section input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.quantity-section input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.price-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-.prices {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
+  font-size: 13px;
 }
 
-.unit-price {
+.stn-rating mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #fbbf24; /* Giữ màu vàng cho sao để dễ nhận biết */
+}
+
+.stn-rating .score { font-weight: 700; color: var(--stn-slate-900); }
+.stn-rating .count { color: var(--stn-slate-400); }
+
+/* Quantity Control - Style Modern */
+.stn-quantity-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--stn-bg-light);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid var(--stn-border);
+}
+
+.stn-quantity-ctrl button {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  color: var(--stn-primary);
+}
+
+.qty-number {
+  font-weight: 700;
+  color: var(--stn-slate-900);
+  min-width: 30px;
+  text-align: center;
+}
+
+/* Price Section */
+.stn-price-section {
+  text-align: right;
+}
+
+.stn-total-price {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--stn-primary);
+}
+
+.stn-price-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.stn-unit-price {
   font-size: 13px;
-  color: #999;
+  color: var(--stn-slate-400);
   text-decoration: line-through;
 }
 
-.total-price {
-  font-size: 16px;
-  font-weight: 600;
-  color: #ff6b6b;
+.stn-savings-tag {
+  background: #ecfdf5;
+  color: #059669;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.savings {
-  background: #fff3cd;
-  color: #856404;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
+/* Remove Button */
+.stn-remove-btn {
+  color: var(--stn-slate-400) !important;
+  transition: all 0.2s;
 }
 
-.cart-item > button {
-  justify-self: end;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+.stn-remove-btn:hover {
+  color: #ef4444 !important;
+  background: #fef2f2 !important;
 }
 
-.cart-item > button:hover {
-  opacity: 1;
-}
-
-@media (max-width: 1024px) {
-  .cart-item {
-    grid-template-columns: 80px 1fr 120px 40px;
-    gap: 12px;
+/* Responsive */
+@media (max-width: 900px) {
+  .stn-cart-item {
+    grid-template-columns: 80px 1fr 120px;
+    grid-template-rows: auto auto;
+    gap: 16px;
   }
 
-  .item-image {
-    width: 80px;
-    height: 80px;
+  .stn-price-section {
+    grid-column: span 1;
+    text-align: left;
   }
 
-  .price-section {
-    order: -1;
+  .stn-remove-btn {
     position: absolute;
-    top: 12px;
-    right: 50px;
-    width: auto;
-  }
-}
-
-@media (max-width: 768px) {
-  .cart-item {
-    grid-template-columns: 70px 1fr 35px;
-    gap: 12px;
-    padding: 12px;
-  }
-
-  .item-image {
-    width: 70px;
-    height: 70px;
-  }
-
-  .item-details h3 {
-    font-size: 14px;
-  }
-
-  .quantity-section {
-    order: -1;
-    margin-top: 12px;
-    width: 100%;
-    grid-column: 1 / -1;
-  }
-
-  .price-section {
-    order: -1;
-    text-align: right;
-    position: absolute;
-    top: 12px;
-    right: 40px;
-  }
-
-  .total-price {
-    font-size: 14px;
-  }
-
-  .unit-price {
-    display: none;
+    top: 10px;
+    right: 10px;
   }
 }

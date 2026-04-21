@@ -1,4 +1,6 @@
-.brands-page { max-width: 1200px; }
+.brands-page {
+  width: 100%;
+}
 
 .toolbar {
   margin-bottom: 20px;

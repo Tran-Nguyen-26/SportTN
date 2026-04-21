@@ -1,111 +1,133 @@
 <div class="my-account-container">
-  <h2>Hồ sơ của tôi</h2>
-  <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+  <header class="page-header-alt">
+    <div class="title-group">
+      <h2>Hồ sơ của tôi</h2>
+      <p>Quản lý thông tin cá nhân và bảo mật tài khoản SportTN</p>
+    </div>
+  </header>
 
-  <div class="success-message" *ngIf="successMessage">
-    <mat-icon>check_circle</mat-icon>
+  <div class="success-message-toast" *ngIf="successMessage" [@fadeInOut]>
+    <mat-icon>verified</mat-icon>
     <span>{{ successMessage }}</span>
   </div>
 
   <ng-container *ngIf="user$ | async as user">
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>Thông tin cá nhân</mat-card-title>
-        <div class="header-actions" *ngIf="!isEditing">
-          <button mat-icon-button (click)="editProfile()">
-            <mat-icon style="color: white;">edit</mat-icon>
-          </button>
-        </div>
-      </mat-card-header>
+    <div class="account-grid">
 
-      <mat-card-content>
-        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Tên đăng nhập</mat-label>
-              <input matInput formControlName="username" readonly>
-              <mat-icon matPrefix>account_circle</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="email">
-              <mat-icon matPrefix>email</mat-icon>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Số điện thoại</mat-label>
-              <input matInput formControlName="phone">
-              <mat-icon matPrefix>phone</mat-icon>
-            </mat-form-field>
-
-            <div class="points-display-box">
-              <div class="points-label">Điểm tích lũy</div>
-              <div class="points-value">
-                <mat-icon>stars</mat-icon>
-                <span>{{ user.totalPoints }} điểm</span>
-              </div>
+      <mat-card class="section-card profile-main">
+        <mat-card-header>
+          <div class="title-with-icon">
+            <div class="header-icon-wrap primary">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="header-text-group">
+              <mat-card-title>Thông tin cá nhân</mat-card-title>
+              <mat-card-subtitle>Cập nhật thông tin để chúng tôi hỗ trợ bạn tốt hơn</mat-card-subtitle>
             </div>
           </div>
+          <button mat-flat-button class="edit-pill-btn" (click)="editProfile()" *ngIf="!isEditing">
+            <mat-icon>edit_note</mat-icon> Chỉnh sửa
+          </button>
+        </mat-card-header>
 
-          <div class="action-buttons" *ngIf="isEditing">
-            <button type="button" mat-stroked-button class="btn-cancel" (click)="cancelEdit()">Hủy</button>
-            <button type="submit" mat-raised-button class="btn-save" [disabled]="isLoading">Lưu thay đổi</button>
+        <mat-card-content>
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <div class="form-grid">
+              <div class="field-container">
+                <label>Tên đăng nhập</label>
+                <mat-form-field appearance="outline" class="readonly-field">
+                  <input matInput formControlName="username" readonly>
+                  <mat-icon matPrefix>alternate_email</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="field-container">
+                <label>Địa chỉ Email</label>
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="email" placeholder="nguyen@example.com">
+                  <mat-icon matPrefix>mail_outline</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="field-container">
+                <label>Số điện thoại</label>
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="phone" placeholder="090x xxx xxx">
+                  <mat-icon matPrefix>phone_iphone</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="membership-card-glass">
+                <div class="rank-badge">
+                  <mat-icon>workspace_premium</mat-icon>
+                  <span>Hạng Bạc</span>
+                </div>
+                <div class="points-display">
+                  <span class="point-value">{{ user.totalPoints | number }}</span>
+                  <span class="point-unit">điểm tích lũy</span>
+                </div>
+                <div class="progress-bar-mini">
+                  <div class="progress-fill" style="width: 65%"></div>
+                </div>
+                <p class="next-rank-info">Còn 150 điểm nữa để lên hạng Vàng</p>
+              </div>
+            </div>
+
+            <div class="action-footer-modern" *ngIf="isEditing">
+              <button type="button" mat-button class="btn-cancel-link" (click)="cancelEdit()">Hủy bỏ</button>
+              <button type="submit" mat-raised-button class="btn-save-glow" [disabled]="isLoading">
+                <mat-icon *ngIf="!isLoading">save</mat-icon>
+                <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+                Lưu thay đổi
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="section-card security-card">
+        <mat-card-header>
+          <div class="title-with-icon">
+            <div class="header-icon-wrap warning">
+              <mat-icon>security</mat-icon>
+            </div>
+            <div class="header-text-group">
+              <mat-card-title>Bảo mật & Mật khẩu</mat-card-title>
+              <mat-card-subtitle>Đảm bảo an toàn cho tài khoản của bạn</mat-card-subtitle>
+            </div>
           </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form-modern">
+            <div class="security-intro">
+              <mat-icon>info_outline</mat-icon>
+              <span>Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm cả chữ và số.</span>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mật khẩu hiện tại</mat-label>
+              <input matInput [type]="hideOld ? 'password' : 'text'" formControlName="oldPassword">
+              <button type="button" mat-icon-button matSuffix (click)="hideOld = !hideOld">
+                <mat-icon>{{hideOld ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mật khẩu mới</mat-label>
+              <input matInput [type]="hideNew ? 'password' : 'text'" formControlName="newPassword">
+              <button type="button" mat-icon-button matSuffix (click)="hideNew = !hideNew">
+                <mat-icon>{{hideNew ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <button mat-flat-button class="btn-update-dark" [disabled]="passwordForm.invalid">
+              Cập nhật mật khẩu mới
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
   </ng-container>
-
-  <mat-card class="section-card change-password-card">
-    <mat-card-header>
-      <mat-card-title>Đổi mật khẩu</mat-card-title>
-      <mat-icon>lock</mat-icon>
-    </mat-card-header>
-
-    <mat-card-content>
-      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
-        <p class="form-instruction">Để bảo mật, vui lòng không chia sẻ mật khẩu với người khác.</p>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Mật khẩu hiện tại</mat-label>
-            <input matInput [type]="hideOld ? 'password' : 'text'" formControlName="oldPassword">
-            <button type="button" mat-icon-button matSuffix (click)="hideOld = !hideOld">
-              <mat-icon>{{hideOld ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Mật khẩu mới</mat-label>
-            <input matInput [type]="hideNew ? 'password' : 'text'" formControlName="newPassword">
-            <button type="button" mat-icon-button matSuffix (click)="hideNew = !hideNew">
-              <mat-icon>{{hideNew ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Xác nhận mật khẩu mới</mat-label>
-            <input matInput [type]="hideConfirm ? 'password' : 'text'" formControlName="confirmPassword">
-            <button type="button" mat-icon-button matSuffix (click)="hideConfirm = !hideConfirm">
-              <mat-icon>{{hideConfirm ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">Mật khẩu không khớp</mat-error>
-          </mat-form-field>
-
-          <div class="password-actions">
-            <button type="submit" mat-raised-button class="btn-save" [disabled]="passwordForm.invalid || isLoading">
-              <mat-icon *ngIf="!isLoading">vpn_key</mat-icon>
-              <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
-              Cập nhật mật khẩu
-            </button>
-          </div>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
 </div>

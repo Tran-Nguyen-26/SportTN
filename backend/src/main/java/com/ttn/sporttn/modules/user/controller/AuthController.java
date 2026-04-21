@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -57,11 +54,11 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<ApiResponse<UserDetailResponse>> register(
+    public ResponseEntity<ApiResponse<Void>> register(
                 @Valid @RequestBody RegisterRequest request) {
-        UserDetailResponse userDetailResponse = userService.register(request);
+        userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok(userDetailResponse, "Đăng ký thành công"));
+                .body(ApiResponse.ok("Đăng ký thành công"));
     }
 
     @PostMapping("/logout")
@@ -69,4 +66,14 @@ public class AuthController {
         userService.logout(request.getRefreshToken());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<ApiResponse<Boolean>> checkEmail(@RequestParam String email) {
+        log.info("[AUTH] Kiểm tra sự tồn tại của email: {}", email);
+        boolean exists = userService.existsByEmail(email);
+
+        return ResponseEntity.ok(ApiResponse.ok(exists, exists ? "Email đã tồn tại" : "Email khả dụng"));
+    }
+
+
 }

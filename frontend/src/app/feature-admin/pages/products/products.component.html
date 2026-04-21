@@ -1,10 +1,11 @@
-<div class="products-page">
+<div class="products-page" (click)="closeDropdown()">
 
   <app-page-header
     title="Sản phẩm"
     subtitle="Quản lý danh sách sản phẩm"
     btnLabel="Thêm sản phẩm"
-    btnIcon="add">
+    btnIcon="add"
+    (btnClick)="goToAdd()">
   </app-page-header>
 
   <div class="table-card">
@@ -88,19 +89,62 @@
           <td>
             <app-status-badge [status]="p.status"></app-status-badge>
           </td>
+<!--          <td>-->
+<!--            <div class="action-btns">-->
+<!--              <button class="action-btn view" title="Xem">-->
+<!--                <mat-icon>visibility</mat-icon>-->
+<!--              </button>-->
+<!--              <button class="action-btn edit" title="Sửa">-->
+<!--                <mat-icon>edit</mat-icon>-->
+<!--              </button>-->
+<!--              <button class="action-btn delete" title="Xóa">-->
+<!--                <mat-icon>delete</mat-icon>-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </td>-->
           <td>
-            <div class="action-btns">
-              <button class="action-btn view" title="Xem">
-                <mat-icon>visibility</mat-icon>
+            <div class="action-wrap">
+
+              <!-- Nút 3 chấm -->
+              <button
+                class="action-more-btn"
+                (click)="toggleDropdown(p.id, $event)"
+                [class.active]="openDropdownId === p.id">
+                <mat-icon>more_horiz</mat-icon>
               </button>
-              <button class="action-btn edit" title="Sửa">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button class="action-btn delete" title="Xóa">
-                <mat-icon>delete</mat-icon>
-              </button>
+
+              <!-- Dropdown menu -->
+              <div
+                class="action-dropdown"
+                *ngIf="openDropdownId === p.id"
+                (click)="$event.stopPropagation()">
+
+                <button class="dropdown-item" (click)="goToDetail(p.id)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Xem chi tiết</span>
+                </button>
+
+                <button class="dropdown-item" (click)="goToEdit(p.id)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Chỉnh sửa</span>
+                </button>
+
+                <button class="dropdown-item" (click)="onToggleStatus(p)">
+                  <mat-icon>{{ p.status === 'ACTIVE' ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  <span>{{ p.status === 'ACTIVE' ? 'Ẩn sản phẩm' : 'Hiện sản phẩm' }}</span>
+                </button>
+
+                <div class="dropdown-divider"></div>
+
+                <button class="dropdown-item danger" (click)="onDeleteProduct(p.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Xóa sản phẩm</span>
+                </button>
+
+              </div>
             </div>
           </td>
+
         </tr>
         </tbody>
       </table>
@@ -118,13 +162,50 @@
             <span class="old-price" *ngIf="p.salePrice">{{ formatPrice(p.price) }}</span>
             <span class="new-price" *ngIf="!p.salePrice">{{ formatPrice(p.price) }}</span>
           </div>
+<!--          <div class="grid-footer">-->
+<!--            <app-status-badge [status]="p.status"></app-status-badge>-->
+<!--            <div class="grid-actions">-->
+<!--              <button class="action-btn edit"><mat-icon>edit</mat-icon></button>-->
+<!--              <button class="action-btn delete"><mat-icon>delete</mat-icon></button>-->
+<!--            </div>-->
+<!--          </div>-->
           <div class="grid-footer">
             <app-status-badge [status]="p.status"></app-status-badge>
-            <div class="grid-actions">
-              <button class="action-btn edit"><mat-icon>edit</mat-icon></button>
-              <button class="action-btn delete"><mat-icon>delete</mat-icon></button>
+            <div class="grid-action-wrap">
+
+              <button
+                class="action-more-btn"
+                (click)="toggleDropdown(p.id, $event)"
+                [class.active]="openDropdownId === p.id">
+                <mat-icon>more_horiz</mat-icon>
+              </button>
+
+              <div
+                class="action-dropdown dropdown-up"
+                *ngIf="openDropdownId === p.id"
+                (click)="$event.stopPropagation()">
+
+                <button class="dropdown-item" (click)="goToDetail(p.id)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Xem chi tiết</span>
+                </button>
+
+                <button class="dropdown-item" (click)="goToEdit(p.id)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Chỉnh sửa</span>
+                </button>
+
+                <div class="dropdown-divider"></div>
+
+                <button class="dropdown-item danger" (click)="onDeleteProduct(p.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Xóa</span>
+                </button>
+
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -143,4 +224,6 @@
     </div>
 
   </div>
+
+
 </div>

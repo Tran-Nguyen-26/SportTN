@@ -65,6 +65,13 @@ public class ProductService {
 
     }
 
+    public List<ProductCardResponse> getPopularProducts() {
+        List<Product> products = productRepository.findTop10ByActiveTrueOrderBySoldCountDesc();
+        return products.stream()
+                .map(productMapper::toProductCartResponse)
+                .toList();
+    }
+
     @Transactional
     public ProductDetailResponse createProduct(ProductRequest productRequest) {
         log.info("[PRODUCT] Tạo sản phẩm mới. name={}", productRequest.getName());

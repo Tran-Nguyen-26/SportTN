@@ -10,7 +10,7 @@
   <app-category-circles></app-category-circles>
 
   <!-- Most searched -->
-  <app-most-searched [products]="mostSearched"></app-most-searched>
+  <app-most-searched [products]="mostSearched" title="Sản phẩm được tìm kiếm nhiều nhất"></app-most-searched>
 
   <!-- Sports popular -->
   <app-sports-popular [categories]="sportsPopular"></app-sports-popular>
@@ -21,31 +21,11 @@
   <!-- Cheap quality -->
   <app-cheap-quality [products]="cheapQuality"></app-cheap-quality>
 
-  <!-- Section: Bơi lội -->
-<!--  <app-section-->
-<!--    [title]="'Tự tin bơi lội'"-->
-<!--    [banners]="swimBanners"-->
-<!--    [products]="swimProducts">-->
-<!--  </app-section>-->
-
-<!--  &lt;!&ndash; Section: Chạy bộ &ndash;&gt;-->
-<!--  <app-section-->
-<!--    [title]="'Bền bỉ mọi chặng đường'"-->
-<!--    [banners]="runBanners"-->
-<!--    [products]="runProducts">-->
-<!--  </app-section>-->
-
-<!--  &lt;!&ndash; Section: Chống nắng &ndash;&gt;-->
-<!--  <app-section-->
-<!--    [title]="'Thoải mái dưới nắng'"-->
-<!--    [banners]="sunBanners"-->
-<!--    [products]="sunProducts">-->
-<!--  </app-section>-->
-
   <ng-container *ngFor="let categorySection of categorySections">
     <app-section
       [title]="categorySection.title"
       [banners]="categorySection.banners"
+      [childrenCategories]="categorySection.subCategories"
       [products]="categorySection.products">
     </app-section>
   </ng-container>
@@ -54,5 +34,7 @@
   <app-promo-banner></app-promo-banner>
 
   <app-services></app-services>
+
+  <app-company-info></app-company-info>
 
 </div>

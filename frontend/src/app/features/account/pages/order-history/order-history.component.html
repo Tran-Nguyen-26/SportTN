@@ -1,138 +1,140 @@
 <div class="order-history-container">
-  <h2>Order History</h2>
+  <header class="page-header">
+    <div class="header-text">
+      <h2>Lịch sử đơn hàng</h2>
+      <p>Theo dõi quá trình vận chuyển và quản lý các đơn hàng của bạn tại SportTN</p>
+    </div>
+  </header>
 
-  <mat-progress-spinner *ngIf="isLoading" diameter="50" mode="indeterminate"></mat-progress-spinner>
+  <div class="loader-container" *ngIf="isLoading">
+    <mat-progress-spinner diameter="45" mode="indeterminate" color="primary"></mat-progress-spinner>
+  </div>
 
-  <div *ngIf="!isLoading && dataSource.data.length > 0" class="orders-list">
-    <div *ngFor="let order of dataSource.data" class="order-card" [@expandCollapse]>
-      <div class="order-header">
-        <div class="order-info">
-          <h3>{{ order.id }}</h3>
-          <p class="order-date">{{ order.createdAt | date:'MMM dd, yyyy' }}</p>
+  <div *ngIf="!isLoading && dataSource.data.length > 0" class="orders-wrapper">
+    <div *ngFor="let order of dataSource.data" class="modern-order-card" (click)="viewOrderDetails(order)">
+      <div class="card-main-info">
+        <div class="order-id-section">
+          <div class="icon-wrap">
+            <mat-icon>package_2</mat-icon>
+          </div>
+          <div class="id-details">
+            <span class="id-label">Mã đơn hàng</span>
+            <span class="id-value">#{{ order.id }}</span>
+          </div>
         </div>
 
-        <div class="order-status" [ngClass]="statusColors[order.status]">
-          <mat-icon>{{ getStatusIcon(order.status) }}</mat-icon>
-          <span>{{ order.status }}</span>
+        <div class="order-date-section">
+          <span class="label">Ngày đặt</span>
+          <span class="value">{{ order.createdAt | date:'dd/MM/yyyy' }}</span>
         </div>
 
-        <div class="order-total">
-          <span class="label">Total:</span>
-          <span class="amount">{{ order.totalPrice | currency:'VND' }}</span>
+        <div class="order-status-section">
+          <span class="status-pill" [ngClass]="order.status.toLowerCase()">
+            <mat-icon>{{ getStatusIcon(order.status) }}</mat-icon>
+            {{ order.status }}
+          </span>
         </div>
 
-        <div class="order-actions">
-          <button mat-icon-button (click)="viewOrderDetails(order)" matTooltip="View Details">
-            <mat-icon>expand_more</mat-icon>
+        <div class="order-total-section">
+          <span class="label">Tổng thanh toán</span>
+          <span class="amount">{{ order.totalPrice | currency:'VND':'symbol':'1.0-0' }}</span>
+        </div>
+
+        <div class="order-action-section">
+          <button mat-icon-button class="btn-expand">
+            <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
       </div>
-
-      <mat-divider *ngIf="order === dataSource.data[dataSource.data.length - 1] ? false : true"></mat-divider>
     </div>
 
-    <mat-paginator 
-      #paginator 
-      [pageSizeOptions]="[5, 10, 25]" 
-      showFirstLastButtons>
-    </mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons class="custom-paginator"></mat-paginator>
   </div>
 
-  <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
-    <mat-icon>receipt_long</mat-icon>
-    <p>No orders found. Start shopping!</p>
-  </div>
-
-  <!-- Order Details Dialog -->
-  <div *ngIf="showDetails && selectedOrder" class="order-details-overlay" [@fadeIn]>
-    <mat-card class="order-details-card">
-      <div class="details-header">
-        <h2>Order Details - {{ selectedOrder.id }}</h2>
-        <button mat-icon-button (click)="closeDetails()">
-          <mat-icon>close</mat-icon>
-        </button>
+  <div *ngIf="showDetails && selectedOrder()" class="details-overlay" (click)="closeDetails()">
+    <div class="details-modal" (click)="$event.stopPropagation()" [@fadeIn]>
+      <div class="modal-header">
+        <div class="title-group">
+          <h3>Chi tiết đơn hàng #{{ selectedOrder()?.id }}</h3>
+          <span class="order-timestamp">Ngày đặt: {{ selectedOrder()?.createdAt | date:'HH:mm - dd/MM/yyyy' }}</span>
+        </div>
+        <button mat-icon-button (click)="closeDetails()"><mat-icon>close</mat-icon></button>
       </div>
 
-      <mat-divider></mat-divider>
-
-      <mat-card-content>
-        <!-- Order Status Timeline -->
-        <div class="status-timeline">
-          <h3>Order Status</h3>
-          <div class="timeline">
-            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status !== 'PENDING' }">
-              <mat-icon>shopping_cart</mat-icon>
-              <span>Ordered</span>
-            </div>
-            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status !== 'PENDING' && selectedOrder.status !== 'CONFIRMED' }">
-              <mat-icon>check_circle</mat-icon>
-              <span>Confirmed</span>
-            </div>
-            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status === 'SHIPPED' || selectedOrder.status === 'DELIVERED' }">
-              <mat-icon>local_shipping</mat-icon>
-              <span>Shipped</span>
-            </div>
-            <div class="timeline-item" [ngClass]="{ active: selectedOrder.status === 'DELIVERED' }">
-              <mat-icon>home</mat-icon>
-              <span>Delivered</span>
-            </div>
+      <div class="modal-body">
+        <div class="order-timeline-horizontal">
+          <div class="step" [class.completed]="true">
+            <div class="node"><mat-icon>shopping_cart</mat-icon></div>
+            <span>Đã đặt</span>
+          </div>
+          <div class="step" [class.completed]="selectedOrder()?.status !== 'PENDING'">
+            <div class="node"><mat-icon>verified</mat-icon></div>
+            <span>Xác nhận</span>
+          </div>
+          <div class="step" [class.completed]="['SHIPPED', 'DELIVERED'].includes(selectedOrder()?.status)">
+            <div class="node"><mat-icon>local_shipping</mat-icon></div>
+            <span>Đang giao</span>
+          </div>
+          <div class="step" [class.completed]="selectedOrder()?.status === 'DELIVERED'">
+            <div class="node"><mat-icon>inventory_2</mat-icon></div>
+            <span>Hoàn tất</span>
           </div>
         </div>
 
-        <!-- Order Items -->
-        <div class="order-items">
-          <h3>Items</h3>
-          <div *ngFor="let item of selectedOrder.items" class="item-row">
-            <div class="item-image">
-              <img [src]="item.product.image" [alt]="item.product.name">
+        <div class="details-grid">
+          <div class="items-list">
+            <h4>Sản phẩm ({{ selectedOrder()?.items.length }})</h4>
+            <div *ngFor="let item of selectedOrder()?.items" class="product-item">
+              <div class="p-image-wrap">
+                <img [src]="item.product.mainImageUrl" [alt]="item.product.name">
+              </div>
+              <div class="p-info">
+                <span class="p-brand">{{ item.product.brandName }}</span>
+                <span class="p-name">{{ item.product.name }}</span>
+                <span class="p-qty">Số lượng: {{ item.quantity }}</span>
+              </div>
+              <div class="p-pricing">
+                <span class="p-price">{{ item.price | currency:'VND':'':'1.0-0' }}đ</span>
+              </div>
             </div>
-            <div class="item-details">
-              <h4>{{ item.product.name }}</h4>
-              <p>Qty: {{ item.quantity }}</p>
+          </div>
+
+          <div class="shipping-summary">
+            <div class="info-card">
+              <h4>Thông tin giao hàng</h4>
+              <div class="info-content">
+                <p class="user-name">{{ selectedOrder()?.deliveryAddress.name }}</p>
+                <p class="user-phone"><mat-icon>phone</mat-icon> {{ selectedOrder()?.deliveryAddress.phoneNumber }}</p>
+                <p class="user-address"><mat-icon>location_on</mat-icon> {{ selectedOrder()?.deliveryAddress.address }}, {{ selectedOrder()?.deliveryAddress.city }}</p>
+              </div>
             </div>
-            <div class="item-price">
-              ₹{{ item.price * item.quantity | number:'1.2-2' }}
+
+            <div class="summary-card">
+              <h4>Chi tiết thanh toán</h4>
+              <div class="s-row">
+                <span>Tạm tính</span>
+                <span>{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+              </div>
+              <div class="s-row">
+                <span>Phí vận chuyển</span>
+                <span class="free-ship">Miễn phí</span>
+              </div>
+              <mat-divider></mat-divider>
+              <div class="s-row total">
+                <span>Tổng cộng</span>
+                <span class="total-amount">{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Delivery Address -->
-        <div class="delivery-section">
-          <h3>Delivery Address</h3>
-          <p>{{ selectedOrder.deliveryAddress.name }}</p>
-          <p>{{ selectedOrder.deliveryAddress.address }}</p>
-          <p>{{ selectedOrder.deliveryAddress.city }}, {{ selectedOrder.deliveryAddress.state }} {{ selectedOrder.deliveryAddress.postalCode }}</p>
-          <p>{{ selectedOrder.deliveryAddress.country }}</p>
-          <p><strong>Phone:</strong> {{ selectedOrder.deliveryAddress.phoneNumber }}</p>
-        </div>
-
-        <!-- Order Summary -->
-        <div class="order-summary">
-          <h3>Order Summary</h3>
-          <div class="summary-row">
-            <span>Subtotal:</span>
-            <span>₹{{ selectedOrder.totalPrice | number:'1.2-2' }}</span>
-          </div>
-          <div class="summary-row">
-            <span>Tax:</span>
-            <span>₹{{ (selectedOrder.totalPrice * 0.18) | number:'1.2-2' }}</span>
-          </div>
-          <div class="summary-row total">
-            <span>Total:</span>
-            <span>₹{{ (selectedOrder.totalPrice * 1.18) | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-
-      <mat-divider></mat-divider>
-
-      <div class="action-buttons">
-        <button mat-raised-button color="primary" (click)="downloadInvoice()">
-          <mat-icon>download</mat-icon>
-          Download Invoice
-        </button>
-        <button mat-stroked-button (click)="closeDetails()">Close</button>
       </div>
-    </mat-card>
+
+      <div class="modal-footer">
+        <button mat-stroked-button color="primary" (click)="downloadInvoice()">
+          <mat-icon>download_for_offline</mat-icon> Xuất hóa đơn (PDF)
+        </button>
+        <button mat-raised-button color="accent" (click)="closeDetails()">Đóng cửa sổ</button>
+      </div>
+    </div>
   </div>
 </div>

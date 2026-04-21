@@ -1,4 +1,4 @@
-.products-page { max-width: 1400px; }
+.products-page { width: 100%; }
 
 .table-card {
   background: #fff;
@@ -282,3 +282,146 @@
 .page-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
 .page-btn:disabled { color: #cbd5e1; cursor: not-allowed; }
 .page-btn mat-icon { font-size: 16px; }
+
+
+
+/* ── ACTION DROPDOWN ──────────────────────────── */
+.action-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.grid-action-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Nút 3 chấm */
+.action-more-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.action-more-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.action-more-btn.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.action-more-btn mat-icon { font-size: 18px; }
+
+/* Dropdown */
+.action-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+  min-width: 180px;
+  z-index: 999;
+  padding: 4px;
+  animation: dropIn 0.12s ease;
+}
+
+/* Dropdown mở lên — dùng cho grid */
+.dropdown-up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Arrow chỉ xuống */
+.action-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  transform: rotate(45deg);
+}
+
+.dropdown-up::before {
+  top: auto;
+  bottom: -5px;
+  transform: rotate(225deg);
+}
+
+/* Dropdown items */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+  font-family: inherit;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.dropdown-item mat-icon {
+  font-size: 17px;
+  color: #64748b;
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+
+.dropdown-item:hover mat-icon { color: #374151; }
+
+/* Item nguy hiểm — xóa */
+.dropdown-item.danger { color: #dc2626; }
+.dropdown-item.danger mat-icon { color: #dc2626; }
+.dropdown-item.danger:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.dropdown-item.danger:hover mat-icon { color: #b91c1c; }
+
+/* Divider */
+.dropdown-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 0;
+}

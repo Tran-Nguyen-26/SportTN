@@ -1,249 +1,421 @@
-/* Container chính */
+/* ==========================================================
+   SPORTTN - MY ACCOUNT PAGE (PROFESSIONAL UI)
+========================================================== */
+
+:host {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --success: #059669;
+  --warning: #f97316;
+
+  --text-main: #0f172a;
+  --text-sub: #64748b;
+
+  --border: #e2e8f0;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+
+  display: block;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, #eff6ff 0%, transparent 35%),
+    radial-gradient(circle at bottom left, #f8fafc 0%, transparent 30%),
+    #f8fafc;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* ==========================================================
+   LAYOUT
+========================================================== */
+
 .my-account-container {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 0 16px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 56px 24px;
 }
 
-.my-account-container h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
+.account-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 28px;
 }
 
-.my-account-container p {
-  color: #666;
-  margin-bottom: 24px;
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.page-header-alt {
+  margin-bottom: 34px;
 }
 
-/* Thông báo trạng thái (Success/Error) */
-.success-message, .error-message {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 14px;
+.page-header-alt h2 {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 850;
+  letter-spacing: -1px;
+  color: var(--text-main);
+}
+
+.page-header-alt p {
+  margin: 8px 0 0;
+  color: var(--text-sub);
+  font-size: 15px;
   font-weight: 500;
-  border-left: 4px solid;
-  animation: slideDown 0.3s ease;
 }
 
-.success-message {
-  background: #ecf8f3;
-  border-color: #10b981;
-  color: #065f46;
-}
+/* ==========================================================
+   CARD
+========================================================== */
 
-.error-message {
-  background: #fce4e4;
-  border-color: #d32f2f;
-  color: #b71c1c;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Card thiết kế theo phong cách hiện đại */
 .section-card {
-  border-radius: 12px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid #f0f0f0 !important;
-  margin-bottom: 30px;
+  background: var(--surface) !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 10px 25px rgba(15, 23, 42, 0.04) !important;
   overflow: hidden;
+  transition: all 0.25s ease;
 }
 
-.section-card mat-card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 16px 24px !important;
+.section-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px rgba(15, 23, 42, 0.06),
+    0 24px 40px rgba(15, 23, 42, 0.05) !important;
+}
+
+::ng-deep .section-card .mat-mdc-card-header {
+  padding: 26px 28px 14px !important;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+}
+
+::ng-deep .section-card .mat-mdc-card-content {
+  padding: 0 28px 28px !important;
+}
+
+/* ==========================================================
+   HEADER CONTENT
+========================================================== */
+
+.title-with-icon {
+  display: flex;
+  gap: 14px;
   align-items: center;
 }
 
-.section-card mat-card-title {
+.header-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon-wrap mat-icon {
+  font-size: 22px;
+}
+
+.header-icon-wrap.primary {
+  background: #eff6ff;
+  color: var(--primary);
+}
+
+.header-icon-wrap.warning {
+  background: #fff7ed;
+  color: var(--warning);
+}
+
+.header-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+::ng-deep .mat-mdc-card-title {
   font-size: 18px !important;
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+}
+
+::ng-deep .mat-mdc-card-subtitle {
+  font-size: 13px !important;
+  color: var(--text-sub) !important;
   margin: 0 !important;
-  font-weight: 600;
-  color: white !important;
 }
 
-.header-actions button {
-  color: white !important;
-}
+/* ==========================================================
+   FORM GRID
+========================================================== */
 
-.section-card mat-card-content {
-  padding: 32px 24px !important;
-}
-
-/* Bố cục Form */
-.form-row {
+.form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 18px;
+}
+
+.field-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-container label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
   margin-bottom: 8px;
 }
 
-.form-field {
+/* ==========================================================
+   MATERIAL INPUT
+========================================================== */
+
+mat-form-field {
   width: 100%;
 }
 
-/* Custom ô hiển thị điểm tích lũy */
-.points-display-box {
-  background: #f8faff;
-  border: 2px dashed #e0e7ff;
-  border-radius: 8px;
+::ng-deep .mat-mdc-text-field-wrapper {
+  height: 54px !important;
+  border-radius: 14px !important;
+  background: var(--surface-soft) !important;
+}
+
+::ng-deep .mat-mdc-form-field-focus-overlay {
+  opacity: 0 !important;
+}
+
+::ng-deep .mdc-notched-outline__leading,
+::ng-deep .mdc-notched-outline__notch,
+::ng-deep .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--primary) !important;
+  border-width: 2px !important;
+}
+
+::ng-deep .mat-mdc-form-field-icon-prefix {
+  color: #94a3b8 !important;
+  padding-right: 10px !important;
+}
+
+::ng-deep .mat-mdc-input-element {
+  font-size: 15px !important;
+  color: var(--text-main) !important;
+}
+
+/* readonly */
+.readonly-field ::ng-deep .mat-mdc-text-field-wrapper {
+  background: #f1f5f9 !important;
+}
+
+/* ==========================================================
+   MEMBERSHIP CARD
+========================================================== */
+
+.membership-card-glass {
+  grid-column: span 2;
+  margin-top: 4px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 24px;
+  padding: 28px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.18);
+}
+
+.membership-card-glass::after {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -50px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.18), transparent 70%);
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.08);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.points-display {
+  margin-top: 18px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  height: 56px; /* Khớp chiều cao với mat-form-field */
 }
 
-.points-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #764ba2;
-  font-weight: 600;
-  margin-bottom: 2px;
+.point-value {
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 900;
 }
 
-.points-value {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #333;
-  font-weight: 700;
-  font-size: 16px;
+.point-unit {
+  margin-top: 6px;
+  font-size: 14px;
+  color: rgba(255,255,255,.75);
 }
 
-.points-value mat-icon {
-  color: #f59e0b;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+.progress-bar-mini {
+  margin-top: 18px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  overflow: hidden;
 }
 
-/* Nhóm nút bấm điều khiển */
-.action-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
 }
 
-.action-buttons button {
-  min-width: 130px;
-  height: 45px;
-  font-weight: 600;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-/* Nút Lưu thay đổi với Gradient */
-.btn-save {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  color: white !important;
-  border: none !important;
-}
-
-.btn-save:hover:not(:disabled) {
-  box-shadow: 0 8px 20px rgba(118, 75, 162, 0.3);
-  transform: translateY(-2px);
-}
-
-.btn-cancel {
-  border: 2px solid #e0e0e0 !important;
-  color: #666 !important;
-}
-
-.btn-cancel:hover {
-  background: #f5f5f5 !important;
-  border-color: #bdbdbd !important;
-}
-
-/* Định dạng các Icon trong Input */
-mat-icon[matPrefix] {
-  margin-right: 12px;
-  color: #764ba2;
-  opacity: 0.7;
-}
-
-/* Loading Spinner trong button */
-mat-spinner {
-  display: inline-block;
-  margin-right: 10px;
-  vertical-align: middle;
-}
-
-/* Responsive cho Mobile */
-@media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .action-buttons {
-    flex-direction: column-reverse;
-  }
-
-  .action-buttons button {
-    width: 100%;
-    min-width: unset;
-  }
-
-  .section-card mat-card-content {
-    padding: 20px 16px !important;
-  }
-}
-
-/* Tùy chỉnh màu sắc khi Focus vào Input của Angular Material */
-::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
-  color: #667eea !important;
-}
-
-::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-label {
-  color: #667eea !important;
-}
-
-.change-password-card {
-  margin-top: 20px;
-}
-
-.form-instruction {
+.next-rank-info {
+  margin: 10px 0 0;
   font-size: 13px;
-  color: #888;
-  margin-bottom: 20px;
-  font-style: italic;
+  color: rgba(255,255,255,.72);
 }
 
-.password-actions {
+/* ==========================================================
+   SECURITY FORM
+========================================================== */
+
+.password-form-modern {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.security-intro {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   ACTIONS
+========================================================== */
+
+.action-footer-modern {
+  margin-top: 20px;
+  display: flex;
   justify-content: flex-end;
+  gap: 12px;
 }
 
-.password-actions button {
-  height: 56px; /* Khớp với chiều cao của form field để nhìn cân đối */
-  width: 100%;
-  max-width: 300px;
+.btn-save-glow {
+  height: 48px !important;
+  padding: 0 26px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  box-shadow: 0 10px 22px rgba(37,99,235,.18);
 }
 
-/* Hiệu ứng khi mật khẩu không khớp */
-mat-error {
-  font-size: 11px;
+.btn-save-glow:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
-/* Đảm bảo icon lock trong header trắng giống các icon khác */
-.change-password-card mat-card-header mat-icon {
+.btn-update-dark {
+  height: 48px !important;
+  border-radius: 14px !important;
+  background: #0f172a !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+
+.btn-cancel-link {
+  color: var(--text-sub) !important;
+  font-weight: 700 !important;
+}
+
+.edit-pill-btn {
+  height: 42px !important;
+  border-radius: 999px !important;
+  background: #eff6ff !important;
+  color: var(--primary) !important;
+  padding: 0 18px !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================
+   SUCCESS TOAST
+========================================================== */
+
+.success-message-toast {
+  margin-bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--success);
   color: white;
-  opacity: 0.8;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  box-shadow: 0 14px 30px rgba(5,150,105,.18);
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 960px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .membership-card-glass {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .my-account-container {
+    padding: 28px 16px;
+  }
+
+  .page-header-alt h2 {
+    font-size: 28px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .membership-card-glass {
+    grid-column: span 1;
+  }
+
+  .action-footer-modern {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btn-save-glow,
+  .btn-update-dark {
+    width: 100%;
+  }
 }

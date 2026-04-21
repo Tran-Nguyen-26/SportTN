@@ -1,0 +1,429 @@
+<div class="add-product-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="onCancel()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="page-title">Thêm sản phẩm mới</h1>
+        <p class="page-sub">Điền đầy đủ thông tin để thêm sản phẩm</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-cancel" (click)="onCancel()">Hủy</button>
+      <button
+        class="btn-save"
+        [disabled]="!isFormValid()"
+        (click)="onSubmit()">
+        <mat-icon>save</mat-icon>
+        Lưu sản phẩm
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'info'"
+      (click)="activeTab = 'info'">
+      <mat-icon>info</mat-icon>
+      Thông tin cơ bản
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'variants'"
+      (click)="activeTab = 'variants'">
+      <mat-icon>style</mat-icon>
+      Variants
+      <span class="tab-badge" *ngIf="form.variants.length > 0">
+        {{ form.variants.length }}
+      </span>
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'images'"
+      (click)="activeTab = 'images'">
+      <mat-icon>photo_library</mat-icon>
+      Hình ảnh
+    </button>
+  </div>
+
+  <!-- ── TAB: THÔNG TIN CƠ BẢN ─────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'info'">
+    <div class="form-grid">
+
+      <!-- Cột trái -->
+      <div class="form-col-main">
+
+        <!-- Tên sản phẩm -->
+        <div class="form-card">
+          <div class="form-card-title">Thông tin cơ bản</div>
+
+          <div class="form-group">
+            <label class="form-label required">Tên sản phẩm</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="VD: Áo thun chạy bộ nam thoáng khí - Run Dry"
+              [(ngModel)]="form.name">
+            <span class="form-hint">{{ form.name.length }}/200 ký tự</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Mô tả sản phẩm</label>
+            <textarea
+              class="form-textarea"
+              rows="5"
+              placeholder="Mô tả chi tiết về sản phẩm, chất liệu, công dụng..."
+              [(ngModel)]="form.description">
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Phân loại -->
+        <div class="form-card">
+          <div class="form-card-title">Phân loại</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label required">Danh mục</label>
+              <select class="form-select" [(ngModel)]="form.categoryId">
+                <option [ngValue]="null" disabled>Chọn danh mục</option>
+                <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required">Thương hiệu</label>
+              <select class="form-select" [(ngModel)]="form.brandId">
+                <option [ngValue]="null" disabled>Chọn thương hiệu</option>
+                <option *ngFor="let brand of brands" [ngValue]="brand.id">
+                  {{ brand.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Cột phải -->
+      <div class="form-col-side">
+
+        <!-- Trạng thái -->
+        <div class="form-card">
+          <div class="form-card-title">Trạng thái</div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Đang kinh doanh</span>
+              <span class="toggle-sub">Sản phẩm hiển thị trên cửa hàng</span>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="form.active"
+              (click)="form.active = !form.active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tóm tắt -->
+        <div class="form-card summary-card">
+          <div class="form-card-title">Tóm tắt</div>
+          <div class="summary-list">
+            <div class="summary-item">
+              <span class="summary-key">Tên SP</span>
+              <span class="summary-val">
+                {{ form.name || '—' }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Danh mục</span>
+              <span class="summary-val">
+                {{ getCategoryName(form.categoryId) }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Thương hiệu</span>
+              <span class="summary-val">
+                {{ getBrandName(form.brandId) }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Variants</span>
+              <span class="summary-val">{{ form.variants.length }} variants</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Trạng thái</span>
+              <span class="summary-val" [class.active-text]="form.active">
+                {{ form.active ? 'Đang bán' : 'Ẩn' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: VARIANTS ──────────────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'variants'">
+
+    <div class="form-card">
+      <div class="variant-header">
+        <div>
+          <div class="form-card-title">Danh sách variants</div>
+          <p class="form-card-sub">
+            Mỗi variant là 1 tổ hợp màu + size có giá và tồn kho riêng
+          </p>
+        </div>
+        <button class="btn-add-variant" (click)="addVariant()">
+          <mat-icon>add</mat-icon>
+          Thêm variant
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      <div class="variant-empty" *ngIf="form.variants.length === 0">
+        <mat-icon>style</mat-icon>
+        <p>Chưa có variant nào</p>
+        <button class="btn-add-variant" (click)="addVariant()">
+          <mat-icon>add</mat-icon>
+          Thêm variant đầu tiên
+        </button>
+      </div>
+
+      <!-- Variant list -->
+      <div class="variant-list" *ngIf="form.variants.length > 0">
+
+        <!-- Variant item -->
+        <div
+          class="variant-item"
+          *ngFor="let variant of form.variants; let i = index">
+
+          <div class="variant-index">{{ i + 1 }}</div>
+
+          <div class="variant-fields">
+
+            <!-- Row 1: SKU, màu, size -->
+            <div class="variant-row">
+              <div class="form-group">
+                <label class="form-label">SKU</label>
+                <div class="sku-wrap">
+                  <input
+                    type="text"
+                    class="form-input"
+                    placeholder="VD: RUN-SHIRT-M-BLUE"
+                    [(ngModel)]="variant.sku">
+                  <button
+                    class="btn-gen-sku"
+                    (click)="generateSku(variant, i)"
+                    title="Tự động tạo SKU">
+                    <mat-icon>auto_fix_high</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Màu sắc</label>
+                <select class="form-select" [(ngModel)]="variant.color">
+                  <option value="" disabled>Chọn màu</option>
+                  <option *ngFor="let c of colors" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Size</label>
+                <select class="form-select" [(ngModel)]="variant.size">
+                  <option value="" disabled>Chọn size</option>
+                  <option *ngFor="let s of sizes" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Row 2: giá, tồn kho, cân nặng -->
+            <div class="variant-row">
+              <div class="form-group">
+                <label class="form-label required">Giá gốc (đ)</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  placeholder="VD: 299000"
+                  [(ngModel)]="variant.originalPrice"
+                  min="0">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  Giá sale (đ)
+                  <span
+                    class="discount-badge"
+                    *ngIf="getDiscountPercent(variant) > 0">
+                    -{{ getDiscountPercent(variant) }}%
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  class="form-input"
+                  placeholder="Để trống nếu không sale"
+                  [(ngModel)]="variant.salePrice"
+                  min="0">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required">Tồn kho</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  placeholder="VD: 100"
+                  [(ngModel)]="variant.stockQuantity"
+                  min="0">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Cân nặng (gram)</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  placeholder="VD: 250"
+                  [(ngModel)]="variant.weightGram"
+                  min="0">
+              </div>
+            </div>
+
+          </div>
+
+          <button
+            class="btn-remove-variant"
+            (click)="removeVariant(i)"
+            title="Xóa variant">
+            <mat-icon>delete</mat-icon>
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- Tổng tồn kho -->
+      <div class="variant-summary" *ngIf="form.variants.length > 0">
+        <span class="vs-item">
+          <mat-icon>inventory</mat-icon>
+          Tổng tồn kho:
+          <strong>
+            {{ totalStock }}
+          </strong>
+        </span>
+        <span class="vs-item">
+          <mat-icon>style</mat-icon>
+          Số variants:
+          <strong>{{ form.variants.length }}</strong>
+        </span>
+        <span class="vs-item" *ngIf="form.variants[0]?.originalPrice">
+          <mat-icon>payments</mat-icon>
+          Giá từ:
+          <strong>
+            {{ minVariantPrice | number: '1.0-0' }}đ
+          </strong>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── TAB: HÌNH ẢNH ──────────────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'images'">
+
+    <div class="images-grid">
+
+      <!-- Ảnh chính -->
+      <div class="form-card">
+        <div class="form-card-title">Ảnh chính</div>
+        <p class="form-card-sub">Ảnh hiển thị trong danh sách sản phẩm</p>
+
+        <div class="main-image-wrap">
+
+          <!-- Preview -->
+          <div class="image-preview main-preview" *ngIf="mainImagePreview">
+            <img [src]="mainImagePreview" alt="Main image">
+            <button class="remove-img-btn" (click)="removeMainImage()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <!-- Upload zone -->
+          <label class="upload-zone main-upload" *ngIf="!mainImagePreview">
+            <mat-icon class="upload-icon">cloud_upload</mat-icon>
+            <span class="upload-title">Kéo thả hoặc click để chọn ảnh</span>
+            <span class="upload-sub">PNG, JPG tối đa 5MB</span>
+            <input
+              type="file"
+              accept="image/*"
+              class="file-input"
+              (change)="onMainImageChange($event)">
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Ảnh phụ -->
+      <div class="form-card">
+        <div class="form-card-title">Ảnh phụ</div>
+        <p class="form-card-sub">Tối đa 6 ảnh, hiển thị trong trang chi tiết</p>
+
+        <div class="extra-images-grid">
+
+          <!-- Ảnh đã chọn -->
+          <div
+            class="image-preview extra-preview"
+            *ngFor="let img of extraImagePreviews; let i = index">
+            <img [src]="img" alt="Extra image">
+            <button class="remove-img-btn" (click)="removeExtraImage(i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <!-- Upload thêm -->
+          <label
+            class="upload-zone extra-upload"
+            *ngIf="extraImagePreviews.length < 6">
+            <mat-icon class="upload-icon-sm">add_photo_alternate</mat-icon>
+            <span class="upload-sub">Thêm ảnh</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              class="file-input"
+              (change)="onExtraImagesChange($event)">
+          </label>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <span class="bottom-hint" *ngIf="!isFormValid()">
+      <mat-icon>info</mat-icon>
+      Cần điền: Tên sản phẩm, Danh mục, Thương hiệu và ít nhất 1 variant
+    </span>
+    <div class="bottom-actions">
+      <button class="btn-cancel" (click)="onCancel()">Hủy</button>
+      <button
+        class="btn-save"
+        [disabled]="!isFormValid()"
+        (click)="onSubmit()">
+        <mat-icon>save</mat-icon>
+        Lưu sản phẩm
+      </button>
+    </div>
+  </div>
+
+</div>

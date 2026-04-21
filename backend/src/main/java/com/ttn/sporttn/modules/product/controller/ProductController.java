@@ -2,6 +2,7 @@ package com.ttn.sporttn.modules.product.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
+import com.ttn.sporttn.modules.product.dto.response.ProductCardResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductPageResponse;
 import com.ttn.sporttn.modules.product.service.ProductService;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -83,5 +86,11 @@ public class ProductController {
     ) {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.ok("Xóa sản phẩm thành công"));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<ApiResponse<List<ProductCardResponse>>> getPopular() {
+        List<ProductCardResponse> popularProducts = productService.getPopularProducts();
+        return ResponseEntity.ok(ApiResponse.ok(popularProducts));
     }
 }

@@ -4,8 +4,15 @@
     title="Danh mục"
     subtitle="Quản lý danh mục sản phẩm"
     btnLabel="Thêm danh mục"
-    btnIcon="add">
+    btnIcon="add"
+    (btnClick)="showDrawer = true">
   </app-page-header>
+
+  <app-add-category-drawer
+    [(visible)]="showDrawer"
+    [parentCategories]="parentList()"
+    (saved)="onCategorySaved($event)">
+  </app-add-category-drawer>
 
   <!-- Stats -->
   <div class="stats-row">

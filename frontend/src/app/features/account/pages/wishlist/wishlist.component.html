@@ -1,0 +1,68 @@
+<div class="wishlist-container">
+  <header class="page-header">
+    <div class="header-text">
+      <h2>Danh sách yêu thích</h2>
+      <p>Lưu giữ những món đồ thể thao bạn ưng ý nhất</p>
+    </div>
+    <div class="wishlist-stats">
+      <mat-icon>favorite</mat-icon>
+      <span>{{ itemCount() }} Sản phẩm</span>
+    </div>
+  </header>
+
+  <div *ngIf="successMessage()" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    <span>{{ successMessage() }}</span>
+  </div>
+
+  <div *ngIf="itemCount() === 0" class="empty-wishlist">
+    <div class="empty-icon-wrap">
+      <mat-icon>favorite_border</mat-icon>
+    </div>
+    <h3>Danh sách trống</h3>
+    <p>Hãy dạo quanh cửa hàng và chọn những sản phẩm bạn yêu thích nhé!</p>
+    <button mat-raised-button color="primary" routerLink="/products">Tiếp tục mua sắm</button>
+  </div>
+
+  <div class="wishlist-grid" *ngIf="itemCount() > 0">
+    <mat-card class="product-wish-card" *ngFor="let item of wishlistItems()">
+      <div class="image-wrapper">
+        <div class="product-badges">
+          <span class="badge new" *ngIf="item.isNew">Mới</span>
+          <span class="badge sale" *ngIf="item.isOnSale">-{{ item.discountPercent }}%</span>
+        </div>
+
+        <img [src]="item.mainImageUrl" [alt]="item.name" [routerLink]="['/product', item.slug]">
+
+        <button mat-icon-button class="remove-btn" (click)="removeFromWishlist(item.id)" matTooltip="Xóa khỏi danh sách">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <mat-card-content [routerLink]="['/product', item.slug]" style="cursor: pointer;">
+        <div class="product-category">{{ item.brandName }}</div>
+        <h3 class="product-name" [matTooltip]="item.name">{{ item.name }}</h3>
+
+        <div class="product-rating" *ngIf="item.rating > 0">
+          <mat-icon class="star-icon">star</mat-icon>
+          <span>{{ item.rating }}</span>
+          <span class="review-count">({{ item.reviewCount }})</span>
+        </div>
+
+        <div class="product-price">
+          <span class="current-price">{{ item.effectivePrice | currency:'VND':'symbol':'1.0-0' }}</span>
+          <span class="old-price" *ngIf="item.isOnSale">
+            {{ item.originalPrice | currency:'VND':'symbol':'1.0-0' }}
+          </span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-raised-button class="btn-add-to-cart" (click)="addToCart(item)">
+          <mat-icon>shopping_cart</mat-icon>
+          Thêm vào giỏ
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

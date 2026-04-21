@@ -23,6 +23,7 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH    ("USER_004", "Mật khẩu xác nhận không khớp",    HttpStatus.BAD_REQUEST),
     SAME_PASSWORD         ("USER_005", "Mật khẩu mới không được giống cũ", HttpStatus.BAD_REQUEST),
     USERNAME_ALREADY_EXISTS("USER_006", "Tên người dùng đã được sử dụng", HttpStatus.CONFLICT),
+    PHONE_ALREADY_EXISTS("USER_007", "Số điện thoại đã được sử dụng", HttpStatus.CONFLICT),
 
     // ── Product ───────────────────────────────────
     CATEGORY_NOT_FOUND    ("PRODUCT_001", "Không tìm thấy danh mục",       HttpStatus.NOT_FOUND),

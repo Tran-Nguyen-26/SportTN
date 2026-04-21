@@ -1,85 +1,273 @@
-.register-form {
-  padding: 10px 5px;
-}
+/* ==========================================================
+   SPORTTN REGISTER FORM - CLEAN FULL CSS
+   Angular Material MDC Fixed Version
+========================================================== */
 
-.step-content h3 {
-  margin-bottom: 8px;
-  font-weight: 700;
-  color: #333;
-  text-align: center;
-}
-
-.step-subtitle {
-  color: #666;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.full-width {
-  width: 100%;
-  margin-bottom: 12px;
-}
-
-/* Đảm bảo các thông báo lỗi hiển thị gọn gàng */
-mat-error {
-  font-size: 12px;
-}
-
-.terms-checkbox {
-  margin: 10px 0 20px 0;
+:host {
+  --stn-indigo: #2563eb;
+  --stn-slate: #1e293b;
+  --stn-gray: #64748b;
+  --stn-border: #e2e8f0;
+  --stn-bg: #f8fafc;
   display: block;
 }
 
-.terms-checkbox a {
-  color: #0066CC;
+/* ==========================================================
+   1. FORM FIELD
+========================================================== */
+
+::ng-deep .stn-field {
+  width: 100%;
+  margin-bottom: 22px !important;
+}
+
+/* wrapper */
+::ng-deep .stn-field .mat-mdc-text-field-wrapper {
+  height: 56px !important;
+  border-radius: 14px !important;
+  background: var(--stn-bg) !important;
+  overflow: visible !important;
+  transition: all 0.2s ease;
+}
+
+/* focus */
+::ng-deep .stn-field.mat-focused .mat-mdc-text-field-wrapper {
+  background: white !important;
+  box-shadow: 0 0 0 4px #eff6ff;
+}
+
+/* flex */
+::ng-deep .stn-field .mat-mdc-form-field-flex {
+  align-items: center !important;
+  overflow: visible !important;
+}
+
+/* infix */
+::ng-deep .stn-field .mat-mdc-form-field-infix {
+  min-height: 56px !important;
+  padding-top: 16px !important;
+  padding-bottom: 8px !important;
+}
+
+/* input */
+::ng-deep .stn-field input.mat-mdc-input-element {
+  font-size: 15px !important;
+  line-height: normal !important;
+}
+
+/* ==========================================================
+   2. LABEL FIX PERFECT
+========================================================== */
+
+/* default label */
+::ng-deep .stn-field .mdc-floating-label {
+  transform-origin: left top !important;
+  transition: transform 150ms ease, color 150ms ease !important;
+  font-size: 15px !important;
+}
+
+ /*floating label*/
+::ng-deep .stn-field .mdc-floating-label--float-above {
+  transform: translateY(-158%) scale(0.75) !important;
+  background: #fff !important;
+  padding: 0 6px !important;
+  color: var(--stn-indigo) !important;
+  z-index: 5;
+}
+
+
+/* focused */
+::ng-deep .stn-field.mat-focused .mdc-floating-label {
+  color: var(--stn-indigo) !important;
+}
+
+/* ==========================================================
+   3. ICONS
+========================================================== */
+
+::ng-deep .stn-field .mat-mdc-form-field-icon-prefix {
+  padding-left: 8px !important;
+  padding-right: 10px !important;
+  color: var(--stn-gray);
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .stn-field .mat-mdc-form-field-icon-suffix {
+  padding-right: 8px !important;
+  color: var(--stn-gray);
+  display: flex;
+  align-items: center;
+}
+
+/* ==========================================================
+   4. ERROR MESSAGE
+========================================================== */
+
+::ng-deep .stn-field .mat-mdc-form-field-subscript-wrapper {
+  margin-top: 4px !important;
+  padding: 0 4px !important;
+}
+
+::ng-deep .stn-field mat-error {
+  font-size: 13px !important;
+  font-weight: 500;
+  color: red;
+}
+
+/* ==========================================================
+   5. STEP INDICATOR
+========================================================== */
+
+.stn-step-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.step-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: var(--stn-gray);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.step-dot.active {
+  background: white;
+  color: var(--stn-indigo);
+  box-shadow: 0 0 0 4px #eff6ff;
+}
+
+.step-dot.completed {
+  background: var(--stn-indigo);
+  color: white;
+}
+
+.step-line {
+  width: 48px;
+  height: 2px;
+  background: #e2e8f0;
+}
+
+.step-line.active {
+  background: var(--stn-indigo);
+}
+
+/* ==========================================================
+   6. FORM LAYOUT
+========================================================== */
+
+.stn-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stn-input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stn-checkbox {
+  margin-top: -2px;
+}
+
+.error-text {
+  color: #f44336; /* Màu đỏ của Material */
+  font-size: 12px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* ==========================================================
+   7. BUTTONS
+========================================================== */
+
+.stn-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.stn-btn-primary {
+  width: 100% !important;
+  height: 52px !important;
+  border-radius: 14px !important;
+  background: var(--stn-indigo) !important;
+  color: white !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.18);
+  transition: all 0.2s ease;
+}
+
+.stn-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25);
+}
+
+.stn-btn-primary:disabled {
+  opacity: 0.7;
+}
+
+.stn-btn-back {
+  color: var(--stn-gray) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================
+   8. FOOTER
+========================================================== */
+
+.stn-footer {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--stn-gray);
+}
+
+.stn-link,
+.stn-link-bold {
+  color: var(--stn-indigo);
   text-decoration: none;
   font-weight: 600;
 }
 
-.form-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
+.stn-link:hover,
+.stn-link-bold:hover {
+  text-decoration: underline;
 }
 
-.form-actions button {
-  height: 48px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 15px;
+/* ==========================================================
+   9. RESPONSIVE
+========================================================== */
+
+@media (max-width: 500px) {
+  .stn-input-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .stn-btn-primary {
+    height: 48px !important;
+    font-size: 15px !important;
+  }
+
+  .stn-footer {
+    font-size: 13px;
+  }
 }
 
-/* Alert messages */
-.error-message, .success-message {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.error-message {
-  background-color: #ffebee;
-  color: #d32f2f;
-  border: 1px solid #ffcdd2;
-}
-
-.success-message {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
-}
-
-/* Hiệu ứng mượt mà khi đổi step */
-.step-content {
-  animation: fadeIn 0.4s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}

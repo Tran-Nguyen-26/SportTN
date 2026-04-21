@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {AuthService} from "../../../../core/services/auth/auth.service";
+import {RegisterRequest} from "../../../../core/models/auth/auth.model";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-register',
@@ -8,14 +11,14 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
 })
 export class RegisterPageComponent implements OnInit {
   registerForm!: FormGroup;
-  currentStep = 2;
+  currentStep = 1;
   isLoading = false;
   hidePassword = true;
   hideConfirmPassword = true;
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
@@ -34,15 +37,37 @@ export class RegisterPageComponent implements OnInit {
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
+    } else if (confirmPassword?.hasError('passwordMismatch')) {
+      confirmPassword.setErrors(null);
     }
     return null;
   }
 
-  nextStep(): void {
-    if (this.currentStep === 1 && this.registerForm.get('email')?.valid) {
-      this.currentStep = 2;
+  nextStep() {
+    const emailControl = this.registerForm.get('email');
+
+    if (emailControl?.valid) {
+      this.isLoading = true;
+
+      this.authService.checkEmailExists(emailControl.value).subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          if (res.data === true) {
+            // Gán lỗi thủ công cho ô input email
+            emailControl.setErrors({ 'alreadyExists': true });
+          } else {
+            this.currentStep = 2;
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = 'Lỗi kết nối server.';
+        }
+      });
     }
   }
 
@@ -61,16 +86,34 @@ export class RegisterPageComponent implements OnInit {
   }
 
   register(): void {
+
+    this.registerForm.markAsTouched();
+
     if (this.registerForm.valid) {
       this.isLoading = true;
-      this.errorMessage = '';
 
-      // Giả lập gọi API Backend (Spring Boot)
-      setTimeout(() => {
-        console.log('Dữ liệu đăng ký:', this.registerForm.value);
-        this.isLoading = false;
-        this.successMessage = 'Đăng ký thành công! Đang chuyển hướng...';
-      }, 2000);
+      const formValues = this.registerForm.value;
+
+      const requestData: RegisterRequest = {
+        email: this.registerForm.value.email,
+        username: this.registerForm.value.username,
+        password: this.registerForm.value.password,
+        phone: this.registerForm.value.phoneNumber,
+      }
+
+      this.authService.register(requestData).subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          this.successMessage = res.message || 'Đăng ký thành công';
+          window.alert(this.successMessage);
+          this.router.navigate(['/auth/login']);
+
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = err.error?.message || 'Đăng ký thất bại, vui lòng thử lại';
+        }
+      })
     }
   }
 }

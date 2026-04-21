@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../../../../enviroments/enviroment";
 import {HttpClient} from "@angular/common/http";
-import {ApiResponse} from "../../models/home-response/home-response";
+import {ApiResponse, ProductCardResponse} from "../../models/home-response/home-response";
 import {Observable} from "rxjs";
 import {ProductPageResponse} from "../../models/product/product.model";
+import {ListRange} from "@angular/cdk/collections";
 
 @Injectable({
   providedIn: 'root'
@@ -21,5 +22,9 @@ export class ProductService {
 
   getProductById(id: number): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/id/${id}`);
+  }
+
+  getPopularProducts(): Observable<ApiResponse<ProductCardResponse[]>> {
+    return this.http.get<ApiResponse<ProductCardResponse[]>>(`${this.apiUrl}/popular`);
   }
 }

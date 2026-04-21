@@ -1,136 +1,111 @@
 <div class="address-container">
-  <div class="header">
-    <h2>My Addresses</h2>
-    <button mat-raised-button color="primary" (click)="showAddForm()" *ngIf="!showForm">
-      <mat-icon>add</mat-icon>
-      Add New Address
+  <header class="page-header">
+    <div class="header-text">
+      <h2>Sổ địa chỉ</h2>
+      <p>Quản lý các địa điểm nhận hàng của bạn</p>
+    </div>
+    <button mat-raised-button class="btn-add-new" (click)="showAddForm()" *ngIf="!showForm">
+      <mat-icon>add_location_alt</mat-icon>
+      Thêm địa chỉ mới
     </button>
-  </div>
+  </header>
 
   <div *ngIf="successMessage" class="success-message">
     <mat-icon>check_circle</mat-icon>
-    {{ successMessage }}
+    <span>{{ successMessage }}</span>
   </div>
 
-  <!-- Add/Edit Form -->
   <mat-card *ngIf="showForm" class="form-card">
     <mat-card-header>
-      <mat-card-title>{{ editingId ? 'Edit Address' : 'Add New Address' }}</mat-card-title>
+      <mat-icon class="header-icon">{{ editingId ? 'edit_location' : 'add_location' }}</mat-icon>
+      <mat-card-title>{{ editingId ? 'Cập nhật địa chỉ' : 'Thêm địa chỉ mới' }}</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
       <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Address Label (e.g., Home, Office)</mat-label>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Tên gợi nhớ (Ví dụ: Nhà riêng, Công ty)</mat-label>
             <input matInput formControlName="name">
-            <mat-error *ngIf="addressForm.get('name')?.hasError('required')">Name is required</mat-error>
+            <mat-icon matPrefix>label</mat-icon>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Phone Number</mat-label>
+          <mat-form-field appearance="outline">
+            <mat-label>Số điện thoại nhận hàng</mat-label>
             <input matInput formControlName="phoneNumber" type="tel">
-            <mat-error *ngIf="addressForm.get('phoneNumber')?.hasError('required')">Phone is required</mat-error>
-            <mat-error *ngIf="addressForm.get('phoneNumber')?.hasError('pattern')">Invalid phone format</mat-error>
+            <mat-icon matPrefix>phone</mat-icon>
           </mat-form-field>
-        </div>
 
-        <div class="form-row full-width">
-          <mat-form-field appearance="outline" class="form-field full-width">
-            <mat-label>Street Address</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Địa chỉ chi tiết (Số nhà, tên đường...)</mat-label>
             <input matInput formControlName="address">
-            <mat-error *ngIf="addressForm.get('address')?.hasError('required')">Address is required</mat-error>
+            <mat-icon matPrefix>home</mat-icon>
           </mat-form-field>
-        </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>City</mat-label>
+          <mat-form-field appearance="outline">
+            <mat-label>Tỉnh / Thành phố</mat-label>
             <input matInput formControlName="city">
-            <mat-error *ngIf="addressForm.get('city')?.hasError('required')">City is required</mat-error>
+            <mat-icon matPrefix>location_city</mat-icon>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>State</mat-label>
+          <mat-form-field appearance="outline">
+            <mat-label>Quận / Huyện</mat-label>
             <mat-select formControlName="state">
-              <mat-option *ngFor="let state of getStateOptions()" [value]="state">
-                {{ state }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="addressForm.get('state')?.hasError('required')">State is required</mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Postal Code</mat-label>
-            <input matInput formControlName="postalCode">
-            <mat-error *ngIf="addressForm.get('postalCode')?.hasError('required')">Postal code is required</mat-error>
-            <mat-error *ngIf="addressForm.get('postalCode')?.hasError('pattern')">Postal code must be 5-6 digits</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Country</mat-label>
-            <mat-select formControlName="country">
-              <mat-option *ngFor="let country of countries" [value]="country">
-                {{ country }}
-              </mat-option>
+              <mat-option *ngFor="let state of getStateOptions()" [value]="state">{{ state }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
 
-        <div class="checkbox-row">
-          <mat-checkbox formControlName="isDefault">Set as default address</mat-checkbox>
+        <div class="checkbox-wrapper">
+          <mat-checkbox formControlName="isDefault">Đặt làm địa chỉ mặc định</mat-checkbox>
         </div>
 
-        <div class="action-buttons">
-          <button mat-raised-button color="primary" type="submit" [disabled]="!addressForm.valid || isLoading">
-            <span *ngIf="!isLoading">{{ editingId ? 'Update' : 'Add' }} Address</span>
-            <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <div class="form-actions">
+          <button mat-button class="btn-cancel" type="button" (click)="cancelForm()">Hủy bỏ</button>
+          <button mat-raised-button class="btn-save-address" type="submit" [disabled]="!addressForm.valid || isLoading">
+            <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+            <span>{{ editingId ? 'Lưu cập nhật' : 'Tạo địa chỉ' }}</span>
           </button>
-          <button mat-stroked-button type="button" (click)="cancelForm()">Cancel</button>
         </div>
       </form>
     </mat-card-content>
   </mat-card>
 
-  <!-- Address List -->
-  <div class="address-list">
-    <mat-card *ngFor="let address of addresses" class="address-card">
-      <div class="address-header">
-        <div>
-          <h3>{{ address.name }}</h3>
-          <p *ngIf="address.isDefault" class="default-badge">
-            <mat-icon>verified</mat-icon> Default Address
-          </p>
+  <div class="address-grid">
+    <div *ngFor="let address of addresses" class="address-item-card" [class.is-default]="address.isDefault">
+      <div class="address-content">
+        <div class="address-info-header">
+          <span class="label-tag">{{ address.name }}</span>
+          <span *ngIf="address.isDefault" class="default-pill">Mặc định</span>
         </div>
-        <div class="actions">
-          <button mat-icon-button (click)="editAddress(address)" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteAddress(address.id)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
+
+        <div class="contact-info">
+          <p class="user-name"><strong>Nguyên Trần</strong></p> <p class="phone-text">{{ address.phoneNumber }}</p>
+        </div>
+
+        <div class="location-info">
+          <p>{{ address.address }}</p>
+          <p>{{ address.city }}, {{ address.state }}</p>
         </div>
       </div>
 
-      <div class="address-details">
-        <p><strong>Phone:</strong> {{ address.phoneNumber }}</p>
-        <p><strong>Address:</strong> {{ address.address }}</p>
-        <p><strong>City:</strong> {{ address.city }}, {{ address.state }} {{ address.postalCode }}</p>
-        <p><strong>Country:</strong> {{ address.country }}</p>
-      </div>
-
-      <div class="address-footer" *ngIf="!address.isDefault">
-        <button mat-stroked-button (click)="setDefaultAddress(address.id)">
-          Make Default
+      <div class="address-actions-sidebar">
+        <button mat-icon-button class="edit-btn" (click)="editAddress(address)" matTooltip="Sửa">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button class="delete-btn" (click)="deleteAddress(address.id)" matTooltip="Xóa">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+        <button mat-icon-button class="set-default-btn" *ngIf="!address.isDefault"
+                (click)="setDefaultAddress(address.id)" matTooltip="Đặt làm mặc định">
+          <mat-icon>bookmark_border</mat-icon>
         </button>
       </div>
-    </mat-card>
+    </div>
   </div>
 
   <div *ngIf="addresses.length === 0 && !showForm" class="empty-state">
     <mat-icon>location_off</mat-icon>
-    <p>No addresses found. Add one to get started!</p>
+    <p>Bạn chưa có địa chỉ nào. Hãy thêm một cái để đặt hàng nhanh hơn nhé!</p>
   </div>
 </div>

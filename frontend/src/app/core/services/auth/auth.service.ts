@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {AuthResponse, LoginRequest, UserResponse} from "../../models/auth/auth.model";
+import {AuthResponse, LoginRequest, RegisterRequest, UserResponse} from "../../models/auth/auth.model";
 import {BehaviorSubject, delay, map, Observable, tap} from "rxjs";
 import { environment } from "../../../../enviroments/enviroment";
 import {Router} from "@angular/router";
@@ -39,6 +39,14 @@ export class AuthService {
           this.currentUserSubject.next(authData);
         }
       }));
+  }
+
+  register(registerRequest: RegisterRequest): Observable<any> {
+    return this.http.post(`${this.API_URL}/sign-up`, registerRequest);
+  }
+
+  checkEmailExists(email: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/check-email`, { params: { email }});
   }
 
   getAccessToken(): string | null {

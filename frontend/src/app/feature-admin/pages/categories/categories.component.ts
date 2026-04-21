@@ -1,4 +1,5 @@
 import {Component, computed, signal} from '@angular/core';
+import {CategoryForm} from "../../components/add-category-drawer/add-category-drawer.component";
 
 export interface AdminCategory {
   id: number;
@@ -20,6 +21,8 @@ export class CategoriesComponent {
 
   searchQuery = signal('');
   selectedType = signal('');
+
+  showDrawer = false;
 
   typeOptions = [
     { value: '',       label: 'Tất cả' },
@@ -71,4 +74,8 @@ export class CategoriesComponent {
       return matchType && matchSearch;
     });
   }
+
+  parentList = computed(() => this.categories().filter(c => !c.parent));
+
+  onCategorySaved(form: CategoryForm) {}
 }

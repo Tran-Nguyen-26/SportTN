@@ -17,6 +17,9 @@ public class RegisterRequest {
     @NotBlank(message = "username không được để trống")
     private String username;
 
+    @NotBlank(message = "phone không được để trống")
+    private String phone;
+
     @NotBlank
     @Size(min = 8, message = "Mật khẩu phải có tối thiểu 8 ký tự")
     private String password;

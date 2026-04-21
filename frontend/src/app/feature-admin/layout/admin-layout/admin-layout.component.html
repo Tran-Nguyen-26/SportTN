@@ -2,13 +2,14 @@
 
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <app-sidebar
+      #sb
       [collapsed]="sidebarCollapsed"
       (toggleSidebar)="toggleSidebar()">
     </app-sidebar>
   </aside>
 
-  <div class="main-content">
-    <app-topbar (toggleSidebar)="toggleSidebar()"></app-topbar>
+  <div class="main-content" [class.expanded]="sidebarCollapsed">
+    <app-topbar (toggleSidebar)="toggleSidebar()" [currentLabel]="sb.activeLabel"></app-topbar>
     <main class="page-content">
       <router-outlet></router-outlet>
     </main>

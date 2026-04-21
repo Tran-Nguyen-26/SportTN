@@ -1,30 +1,37 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, signal } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { Order, OrderStatus } from 'src/app/core/models/order/order.model';
+import {ProductCardResponse} from "../../../../core/models/home-response/home-response";
+
+
+export interface OrderItem {
+  id: string;
+  product: ProductCardResponse;
+  quantity: number;
+  price: number; // Giá tại thời điểm mua
+}
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+  RETURNED = 'RETURNED'
+}
 
 @Component({
   selector: 'app-order-history',
   templateUrl: './order-history.component.html',
   styleUrls: ['./order-history.component.css']
 })
-export class OrderHistoryComponent implements OnInit {
+export class OrderHistoryComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['orderId', 'date', 'items', 'totalPrice', 'status', 'actions'];
-  dataSource = new MatTableDataSource<Order>();
+  dataSource = new MatTableDataSource<any>();
   isLoading = false;
-  selectedOrder: Order | null = null;
   showDetails = false;
-
-  statusColors: { [key in OrderStatus]: string } = {
-    PENDING: 'pending',
-    CONFIRMED: 'confirmed',
-    SHIPPED: 'shipped',
-    DELIVERED: 'delivered',
-    CANCELLED: 'cancelled',
-    RETURNED: 'returned'
-  };
+  selectedOrder = signal<any | null>(null); // Dùng Signal cho selectedOrder để tối ưu UI
 
   constructor() { }
 
@@ -38,129 +45,67 @@ export class OrderHistoryComponent implements OnInit {
 
   loadOrders(): void {
     this.isLoading = true;
-    // Mock data - Replace with OrderService.getOrders()
+
+    // Mock data chuẩn hóa theo ProductCardResponse
     setTimeout(() => {
-      const mockOrders: Order[] = [
+      const mockOrders = [
         {
-          id: 'ORD-001',
-          userId: '1',
+          id: 'ORD-STN-2026-001',
           items: [
             {
-              id: '1',
+              id: 'ITM-01',
               product: {
-                id: '1',
-                name: 'Nike Sports Shoes',
-                description: 'High-quality sports shoes',
-                price: 120,
-                image: 'assets/images/products/shoes.jpg',
-                rating: 4.5,
-                reviews: 120,
-                stock: 10,
-                brand: 'Nike',
-                category: { id: 1, name: 'Shoes', image: 'assets/images/shoes.jpg' }
+                id: 101,
+                name: 'Giày Tennis Adidas Barricade 13',
+                slug: 'giay-tennis-adidas-barricade-13',
+                mainImageUrl: 'assets/images/adidas-barricade.jpg',
+                brandName: 'Adidas',
+                effectivePrice: 3200000,
+                // ... các trường khác từ ProductCardResponse
               },
               quantity: 1,
-              price: 120
+              price: 3200000
             }
           ],
-          totalPrice: 220,
+          totalPrice: 3200000,
           status: OrderStatus.DELIVERED,
           deliveryAddress: {
-            id: '1',
-            name: 'Home',
-            phoneNumber: '+84905123456',
-            address: '123 Main Street',
-            city: 'Bangalore',
-            state: 'Karnataka',
-            postalCode: '560001',
-            country: 'India'
+            name: 'Trần Thành Nguyên',
+            phoneNumber: '0905123456',
+            address: 'Đại học Bách Khoa',
+            city: 'TP. Hồ Chí Minh'
           },
-          paymentMethod: 'Credit Card',
-          createdAt: '2024-01-15'
-        },
-        {
-          id: 'ORD-002',
-          userId: '1',
-          items: [
-            {
-              id: '2',
-              product: {
-                id: '2',
-                name: 'Adidas Sports Shirt',
-                description: 'Comfortable sports shirt',
-                price: 50,
-                image: 'assets/images/products/shirt.jpg',
-                rating: 4.2,
-                reviews: 85,
-                stock: 15,
-                brand: 'Adidas',
-                category: { id: 2, name: 'Shirts', image: 'assets/images/shirts.jpg' }
-              },
-              quantity: 2,
-              price: 100
-            }
-          ],
-          totalPrice: 118,
-          status: OrderStatus.SHIPPED,
-          deliveryAddress: {
-            id: '1',
-            name: 'Home',
-            phoneNumber: '+84905123456',
-            address: '123 Main Street',
-            city: 'Bangalore',
-            state: 'Karnataka',
-            postalCode: '560001',
-            country: 'India'
-          },
-          paymentMethod: 'Debit Card',
-          createdAt: '2024-01-20'
+          createdAt: new Date('2026-04-10T10:00:00')
         }
       ];
       this.dataSource.data = mockOrders;
       this.isLoading = false;
-    }, 500);
+    }, 800);
   }
 
-  viewOrderDetails(order: Order): void {
-    this.selectedOrder = order;
+  viewOrderDetails(order: any): void {
+    this.selectedOrder.set(order);
     this.showDetails = true;
   }
 
   closeDetails(): void {
     this.showDetails = false;
-    this.selectedOrder = null;
+    this.selectedOrder.set(null);
   }
 
-  cancelOrder(order: Order): void {
-    if (order.status === OrderStatus.PENDING || order.status === OrderStatus.CONFIRMED) {
-      order.status = OrderStatus.CANCELLED;
-    }
-  }
-
-  getStatusIcon(status: OrderStatus): string {
-    switch (status) {
-      case OrderStatus.DELIVERED:
-        return 'check_circle';
-      case OrderStatus.SHIPPED:
-        return 'local_shipping';
-      case OrderStatus.CONFIRMED:
-        return 'shopping_cart';
-      case OrderStatus.PENDING:
-        return 'schedule';
-      case OrderStatus.CANCELLED:
-        return 'cancel';
-      case OrderStatus.RETURNED:
-        return 'assignment_return';
-      default:
-        return 'info';
-    }
-  }
-
-  retryPayment(): void {
-    // Implement retry payment logic
+  getStatusIcon(status: string): string {
+    const icons: any = {
+      [OrderStatus.DELIVERED]: 'inventory_2',
+      [OrderStatus.SHIPPED]: 'local_shipping',
+      [OrderStatus.CONFIRMED]: 'verified',
+      [OrderStatus.PENDING]: 'schedule',
+      [OrderStatus.CANCELLED]: 'cancel',
+      [OrderStatus.RETURNED]: 'assignment_return'
+    };
+    return icons[status] || 'info';
   }
 
   downloadInvoice(): void {
-    // Implement download invoice logic
+    console.log('Đang xuất hóa đơn cho đơn hàng:', this.selectedOrder()?.id);
   }
 }

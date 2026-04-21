@@ -1,5 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {ProductPageResponse} from "../../../../core/models/product/product.model";
+import { Component, Input, signal } from '@angular/core';
+import { ProductPageResponse, VariantResponse } from "../../../../core/models/product/product.model";
 
 @Component({
   selector: 'app-product-detail',
@@ -9,8 +9,11 @@ import {ProductPageResponse} from "../../../../core/models/product/product.model
 export class ProductDetailComponent {
   @Input() productDetail?: ProductPageResponse;
 
-  selectedQty: number = 1;
+  // Sử dụng biến thường hoặc Signal tùy theo thói quen của Nguyên
+  selectedColor: string | null = null;
+  selectedSizeName: string | null = null;
   selectedVariantId: number | null = null;
+  selectedQty: number = 1;
 
   // Lấy danh sách màu không trùng lặp
   getUniqueColors(): string[] {
@@ -19,15 +22,37 @@ export class ProductDetailComponent {
     return [...new Set(colors)];
   }
 
+  // Khi người dùng click chọn Màu sắc
+  selectColor(color: string) {
+    this.selectedColor = color;
+    // Reset size và variant khi đổi màu để tránh xung đột
+    this.selectedSizeName = null;
+    this.selectedVariantId = null;
+  }
+
+  // Khi người dùng click chọn Kích cỡ
+  selectVariant(variant: VariantResponse) {
+    if (variant.stockQuantity > 0) {
+      this.selectedVariantId = variant.id;
+      this.selectedSizeName = variant.size;
+    }
+  }
+
+  // Cập nhật số lượng
   updateQty(val: number) {
     const newQty = this.selectedQty + val;
-    if (newQty >= 1 && newQty <= 10) { // Giả sử giới hạn 10 sản phẩm
+    // Kiểm tra tồn kho của variant đang chọn (nếu có)
+    const currentVariant = this.productDetail?.variantResponses.find(v => v.id === this.selectedVariantId);
+    const maxStock = currentVariant ? currentVariant.stockQuantity : 10;
+
+    if (newQty >= 1 && newQty <= maxStock) {
       this.selectedQty = newQty;
     }
   }
 
-  onSizeChange(event: any) {
-    this.selectedVariantId = event.target.value;
-    console.log('Đã chọn Variant ID:', this.selectedVariantId);
+  // Logic hỗ trợ hiển thị: Lấy các biến thể theo màu đã chọn
+  getAvailableVariantsByColor(): VariantResponse[] {
+    if (!this.productDetail || !this.selectedColor) return [];
+    return this.productDetail.variantResponses.filter(v => v.color === this.selectedColor);
   }
 }

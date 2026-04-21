@@ -1,101 +1,121 @@
-<app-auth-form-layout title="Create Your Account" [showExtraFeatures]="false">
-  <div form-content class="register-form">
-    <div *ngIf="errorMessage" class="error-message">
-      <mat-icon>error</mat-icon>
-      {{ errorMessage }}
+<app-auth-form-layout title="Đăng ký tài khoản SportTN" [showExtraFeatures]="false">
+  <div form-content class="stn-register-container">
+
+    <div class="stn-step-indicator">
+      <div class="step-dot" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <mat-icon *ngIf="currentStep > 1">check</mat-icon>
+        <span *ngIf="currentStep <= 1">1</span>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 1"></div>
+      <div class="step-dot" [class.active]="currentStep === 2">
+        <span>2</span>
+      </div>
     </div>
 
-    <div *ngIf="successMessage" class="success-message">
-      <mat-icon>check_circle</mat-icon>
-      {{ successMessage }}
+    <div *ngIf="errorMessage" class="stn-alert error" [@fadeIn]>
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
     </div>
 
-    <div *ngIf="currentStep === 1" class="step-content">
-      <h3>Bắt đầu đăng ký</h3>
-      <p class="step-subtitle">Nhập địa chỉ email của bạn để tiếp tục</p>
+    <div *ngIf="currentStep === 1" class="stn-step-content" [@fadeIn]>
+      <div class="stn-step-header">
+        <h3>Chào mừng bạn!</h3>
+        <p>Nhập email để bắt đầu hành trình cùng SportTN</p>
+      </div>
 
-      <form [formGroup]="registerForm">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email Address</mat-label>
-          <input matInput formControlName="email" type="email" placeholder="your.email@example.com">
+      <form [formGroup]="registerForm" class="stn-form-grid">
+        <mat-form-field appearance="outline" class="stn-field" floatLabel="auto">
+          <mat-label>Địa chỉ Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="email@gmail.com">
+          <mat-icon matPrefix>mail_outline</mat-icon>
           <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email là bắt buộc</mat-error>
-          <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Email không đúng định dạng</mat-error>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Email không hợp lệ</mat-error>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('alreadyExists')">
+            Email này đã được sử dụng
+          </mat-error>
         </mat-form-field>
 
-        <button
-          mat-raised-button
-          color="primary"
-          type="button"
-          (click)="nextStep()"
-          [disabled]="!registerForm.get('email')?.valid || isLoading"
-          class="full-width">
-          <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <button mat-flat-button class="stn-btn-primary" (click)="nextStep()" [disabled]="!registerForm.get('email')?.valid || isLoading">
           <span *ngIf="!isLoading">Tiếp tục</span>
+          <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+          <mat-icon *ngIf="!isLoading">arrow_forward</mat-icon>
         </button>
       </form>
     </div>
 
-    <div *ngIf="currentStep === 2" class="step-content">
-      <h3>Hoàn thiện thông tin</h3>
-      <p class="step-subtitle">Thiết lập tài khoản SportTN của bạn</p>
+    <div *ngIf="currentStep === 2" class="stn-step-content" [@fadeIn]>
+      <div class="stn-step-header">
+        <h3>Thông tin cá nhân</h3>
+      </div>
 
-      <form [formGroup]="registerForm">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" placeholder="Tên đăng nhập">
-<!--          <mat-icon matPrefix>person</mat-icon>-->
-          <mat-error *ngIf="registerForm.get('username')?.hasError('required')">Tên đăng nhập là bắt buộc</mat-error>
-        </mat-form-field>
+      <form [formGroup]="registerForm" class="stn-form-grid">
+        <div class="stn-input-row">
+          <mat-form-field appearance="outline" class="stn-field" floatLabel="auto">
+            <mat-label>Tên đăng nhập</mat-label>
+            <input matInput formControlName="username">
+            <mat-icon matPrefix>account_circle</mat-icon>
+            <mat-error *ngIf="registerForm.get('username')?.hasError('required')">
+              Tên đăng nhập không được để trống
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('username')?.hasError('minlength')">
+              Phải có ít nhất 3 ký tự
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Phone Number</mat-label>
-          <input matInput formControlName="phoneNumber" type="tel" placeholder="0xxx xxx xxx">
-<!--          <mat-icon matPrefix>phone</mat-icon>-->
-          <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('required')">Số điện thoại là bắt buộc</mat-error>
-          <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('pattern')">Số điện thoại không hợp lệ</mat-error>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="stn-field" floatLabel="auto">
+            <mat-label>Số điện thoại</mat-label>
+            <input matInput formControlName="phoneNumber" type="tel">
+            <mat-icon matPrefix>smartphone</mat-icon>
+            <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('required')">
+              Số điện thoại là bắt buộc
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('pattern')">
+              Số điện thoại không đúng định dạng
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
+        <mat-form-field appearance="outline" class="stn-field" floatLabel="auto">
+          <mat-label>Mật khẩu</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
             <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
-          <mat-error *ngIf="registerForm.get('password')?.hasError('required')">Mật khẩu là bắt buộc</mat-error>
-          <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">Mật khẩu phải từ 8 ký tự</mat-error>
+          <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+            Mật khẩu không được để trống
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+            Mật khẩu phải từ 8 ký tự trở lên
+          </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Confirm Password</mat-label>
+        <mat-form-field appearance="outline" class="stn-field" floatLabel="auto">
+          <mat-label>Xác nhận mật khẩu</mat-label>
           <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword">
-          <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPasswordVisibility()">
+          <mat-icon matPrefix>enhanced_encryption</mat-icon>
+          <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
             <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
-          <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required')">Vui lòng xác nhận mật khẩu</mat-error>
-          <mat-error *ngIf="registerForm.hasError('passwordMismatch')">Mật khẩu xác nhận không khớp</mat-error>
+          <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required')">
+            Vui lòng xác nhận lại mật khẩu
+          </mat-error>
+          <mat-error *ngIf="registerForm.hasError('passwordMismatch')">
+            Mật khẩu xác nhận không khớp
+          </mat-error>
         </mat-form-field>
 
-        <mat-checkbox formControlName="agreeTerms" class="terms-checkbox">
-          Tôi đồng ý với <a href="#" target="_blank">Điều khoản</a> & <a href="#" target="_blank">Chính sách</a>
+        <mat-checkbox formControlName="agreeTerms" color="primary" class="stn-checkbox">
+          Tôi đồng ý với <a href="#" class="stn-link">Điều khoản & Chính sách</a>
         </mat-checkbox>
 
-        <div class="form-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            type="button"
-            (click)="register()"
-            [disabled]="!registerForm.valid || isLoading"
-            class="full-width">
-            <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <div class="stn-action-group">
+          <button mat-flat-button class="stn-btn-primary" (click)="register()" [disabled]="!registerForm.valid || isLoading">
             <span *ngIf="!isLoading">Đăng ký ngay</span>
+            <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
           </button>
 
-          <button
-            mat-stroked-button
-            type="button"
-            (click)="previousStep()"
-            class="full-width">
+          <button mat-button class="stn-btn-back" (click)="previousStep()">
             Quay lại
           </button>
         </div>
@@ -103,7 +123,8 @@
     </div>
   </div>
 
-  <div footer-link>
-    <p>Đã có tài khoản? <a routerLink="/auth/login">Đăng nhập tại đây</a></p>
+  <div footer-link class="stn-footer">
+    <span>Đã có tài khoản? </span>
+    <a routerLink="/auth/login" class="stn-link-bold">Đăng nhập ngay</a>
   </div>
 </app-auth-form-layout>

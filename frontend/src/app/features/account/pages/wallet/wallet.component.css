@@ -1,300 +1,195 @@
+:host {
+  display: block;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
 .wallet-container {
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto;
+  padding: 40px 20px;
 }
 
-.wallet-container h2 {
+.page-header h2 {
   font-size: 28px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 24px 0;
-}
-
-.success-message {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #ecf8f3;
-  border-left: 4px solid #10b981;
-  color: #065f46;
-  padding: 14px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
-}
-
-.success-message mat-icon {
-  color: #10b981;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-.error-message {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #fce4e4;
-  border-left: 4px solid #d32f2f;
-  color: #b71c1c;
-  padding: 14px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
-}
-
-.error-message mat-icon {
-  color: #d32f2f;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Balance Card */
-.balance-card {
-  border-radius: 12px !important;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid #f0f0f0 !important;
-  margin-bottom: 24px;
-  overflow: hidden;
-}
-
-.balance-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  align-items: center;
-}
-
-.balance-info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.balance-info h3 {
+  font-weight: 800;
+  color: #0f172a;
   margin: 0;
-  font-size: 16px;
-  opacity: 0.9;
-  font-weight: 500;
+}
+
+.page-header p {
+  color: #64748b;
+  margin: 4px 0 32px 0;
+}
+
+/* Balance Card Modern */
+.main-balance-card {
+  position: relative;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  color: white;
+  padding: 40px !important;
+  overflow: hidden;
+  border: none !important;
+  margin-bottom: 32px;
+}
+
+.card-bg-overlay {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  filter: blur(40px);
+}
+
+.balance-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+
+.balance-left .label {
+  font-size: 14px;
+  color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.balance-amount {
-  margin: 0;
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1;
+.balance-left .amount {
+  font-size: 42px;
+  font-weight: 800;
+  margin: 8px 0;
+  letter-spacing: -1px;
 }
 
-.balance-actions {
+.wallet-status {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #a5f3fc;
 }
 
-.balance-actions button {
-  height: 48px !important;
+.wallet-status mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+.btn-recharge {
+  background: #3b82f6 !important;
+  color: white !important;
   padding: 0 24px !important;
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  border: 2px solid rgba(255, 255, 255, 0.5) !important;
-  font-weight: 600 !important;
-  border-radius: 8px !important;
-  transition: all 0.3s ease;
-  display: flex;
-  gap: 8px;
-}
-
-.balance-actions button:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
-  border-color: white !important;
-  transform: translateY(-2px);
-}
-
-/* Recharge Card */
-.recharge-card {
-  border-radius: 12px !important;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid #f0f0f0 !important;
-  margin-bottom: 24px;
-  animation: slideDown 0.3s ease;
-}
-
-.recharge-card mat-card-header {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-  padding: 20px 24px !important;
-  margin: 0 !important;
-}
-
-.recharge-card mat-card-title {
-  font-size: 18px !important;
-  margin: 0 !important;
-  font-weight: 600;
-}
-
-.recharge-card mat-card-content {
-  padding: 24px !important;
-}
-
-.quick-amounts {
-  margin-bottom: 28px;
-}
-
-.quick-amounts label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.amount-buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-.amount-buttons button {
   height: 50px !important;
-  font-size: 14px !important;
+  border-radius: 12px !important;
   font-weight: 600 !important;
-  border-radius: 8px !important;
-  background: #f5f5f5 !important;
-  color: #333 !important;
-  transition: all 0.3s ease;
-  border: 2px solid transparent !important;
 }
 
-.amount-buttons button:hover {
-  background: #e8e8e8 !important;
-  transform: translateY(-2px);
+/* Recharge Form */
+.recharge-card-animated {
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  margin-bottom: 32px;
+  animation: slideDown 0.4s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.amount-buttons button.selected {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
-  color: white !important;
-  border-color: transparent !important;
-  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+.recharge-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 10px 0;
 }
 
-.custom-amount {
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.quick-amount-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
   margin-bottom: 24px;
 }
 
-.custom-amount label {
-  display: block;
-  font-size: 14px;
+.amount-pill {
+  border: 1px solid #e2e8f0;
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.custom-amount mat-form-field {
-  width: 100%;
+.amount-pill:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
 }
 
-.action-buttons {
+.amount-pill.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Transaction List */
+.section-header {
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h3 { font-weight: 700; color: #1e293b; margin: 0; }
+
+.history-card {
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0 !important;
+}
+
+.txn-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.txn-icon-box.is-credit {
+  background: #dcfce7;
+  color: #10b981;
+}
+
+.txn-title { font-weight: 600; color: #1e293b; }
+.txn-date { color: #94a3b8; font-size: 12px; }
+.txn-amount { font-weight: 700; font-size: 16px; color: #1e293b; }
+.txn-amount.credit { color: #10b981; }
+
+.form-actions-alt {
+  display: flex;
   justify-content: flex-end;
-  margin-top: 24px;
+  gap: 12px;
   padding-top: 20px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #f1f5f9;
 }
 
-.action-buttons button {
-  min-width: 120px;
-  height: 44px;
-  font-weight: 600;
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.action-buttons button[color="primary"] {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
-  border: 0 !important;
-  transition: all 0.3s ease;
-}
-
-.action-buttons button[color="primary"]:hover:not(:disabled) {
-  box-shadow: 0 8px 24px rgba(245, 87, 108, 0.4);
-  transform: translateY(-2px);
-}
-
-.action-buttons button[mat-stroked-button] {
-  border: 2px solid #f5576c !important;
-  color: #f5576c !important;
-  transition: all 0.3s ease;
-}
-
-.action-buttons button[mat-stroked-button]:hover {
-  background: rgba(245, 87, 108, 0.05) !important;
-}
-
-/* Transaction History */
-.transactions-section {
-  margin-top: 30px;
-}
-
-.transactions-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 16px 0;
-}
-
-@media (max-width: 768px) {
-  .balance-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 24px;
-  }
-
-  .balance-amount {
-    font-size: 36px;
-  }
-
-  .balance-actions {
-    justify-content: stretch;
-  }
-
-  .balance-actions button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .amount-buttons {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .action-buttons button {
-    width: 100%;
-  }
+@media (max-width: 640px) {
+  .balance-wrapper { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .btn-recharge { width: 100%; }
 }

@@ -5,9 +5,9 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
   email: string;
+  username: string;
+  phone: string;
   password: string;
-  firstName: string;
-  lastName: string;
 }
 
 export interface LogoutRequest {

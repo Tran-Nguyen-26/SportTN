@@ -1,14 +1,11 @@
 <div class="category-circles">
-  <h2>Bộ sưu tập HOT</h2>
+  <h2 class="section-title">Bộ sưu tập HOT</h2>
   <div class="circle-list">
-    <div
-      *ngFor="let category of categories"
-      class="circle-item"
-      [style.background-color]="category.color"
-      (click)="openCategory(category)"
-      matTooltip="{{ category.label }}">
-      <mat-icon>{{ category.icon }}</mat-icon>
-      <span>{{ category.label }}</span>
+    <div *ngFor="let category of categories" class="category-wrapper" (click)="openCategory(category)">
+      <div class="circle-item" [style.background-color]="category.color" matTooltip="{{ category.label }}">
+        <mat-icon>{{ category.icon }}</mat-icon>
+      </div>
+      <span class="category-label">{{ category.label }}</span>
     </div>
   </div>
 </div>

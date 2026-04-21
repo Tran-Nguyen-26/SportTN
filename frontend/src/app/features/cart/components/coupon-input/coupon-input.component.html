@@ -1,42 +1,44 @@
-<mat-card class="coupon-card">
-  <mat-card-header>
-    <mat-card-title>Have a coupon?</mat-card-title>
+<mat-card class="coupon-card-stn">
+  <mat-card-header class="stn-header-sm">
+    <mat-icon>local_offer</mat-icon>
+    <mat-card-title>Mã giảm giá</mat-card-title>
   </mat-card-header>
 
-  <mat-card-content>
-    <div *ngIf="!appliedCoupon" class="coupon-input-section">
-      <form [formGroup]="couponForm" (ngSubmit)="applyCoupon()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Enter coupon code</mat-label>
-          <input matInput formControlName="couponCode" placeholder="e.g., SAVE10">
-          <mat-icon matPrefix>local_offer</mat-icon>
+  <mat-card-content class="stn-content-sm">
+    <div *ngIf="!appliedCoupon" class="coupon-input-wrap">
+      <form [formGroup]="couponForm" (ngSubmit)="applyCoupon()" class="inline-form">
+        <mat-form-field appearance="outline" class="stn-input-no-margin">
+          <mat-label>Nhập mã ưu đãi</mat-label>
+          <input matInput formControlName="couponCode" placeholder="Ví dụ: SPORTTN20" (input)="errorMessage = ''">
+          <mat-icon matPrefix>confirmation_number</mat-icon>
         </mat-form-field>
 
-        <button 
-          mat-raised-button 
-          color="primary" 
-          [disabled]="!couponForm.valid || isLoading"
-          class="apply-btn">
-          <mat-icon *ngIf="!isLoading">check</mat-icon>
-          <mat-progress-spinner *ngIf="isLoading" diameter="20" mode="indeterminate"></mat-progress-spinner>
-          Apply
+        <button
+          mat-flat-button
+          class="btn-apply-stn"
+          [disabled]="!couponForm.valid || isLoading">
+          <span *ngIf="!isLoading">Áp dụng</span>
+          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
         </button>
       </form>
 
-      <div *ngIf="errorMessage" class="error-message">
-        <mat-icon>error</mat-icon>
-        {{ errorMessage }}
+      <div *ngIf="errorMessage" class="stn-error-box" [@fadeInOut]>
+        <mat-icon>info</mat-icon>
+        <span>{{ errorMessage }}</span>
       </div>
     </div>
 
-    <div *ngIf="appliedCoupon" class="applied-coupon">
-      <div class="coupon-badge">
-        <mat-icon>verified</mat-icon>
-        <span>{{ appliedCoupon }}</span>
+    <div *ngIf="appliedCoupon" class="applied-coupon-stn" [@fadeInOut]>
+      <div class="coupon-info-group">
+        <div class="stn-badge-success">
+          <mat-icon>verified</mat-icon>
+          <span>{{ appliedCoupon }}</span>
+        </div>
+        <p class="stn-success-text">Đã áp dụng mã thành công!</p>
       </div>
-      <p class="coupon-success">{{ successMessage }}</p>
-      <button mat-stroked-button color="warn" (click)="removeCoupon()">
-        Remove
+
+      <button mat-icon-button color="warn" (click)="removeCoupon()" matTooltip="Gỡ mã">
+        <mat-icon>delete_outline</mat-icon>
       </button>
     </div>
   </mat-card-content>

@@ -18,8 +18,8 @@ import {SettingsComponent} from "./pages/settings/settings.component";
 import {adminGuard} from "../core/guards/admin/admin.guard";
 import {ChartCardComponent} from "./components/chart-card/chart-card.component";
 import {FlashSaleComponent} from "./pages/flash-sale/flash-sale.component";
+import {AddProductComponent} from "./components/add-product/add-product.component";
 
-// feature-admin-routing.module.ts
 const routes: Routes = [
   {
     path: '',
@@ -32,6 +32,8 @@ const routes: Routes = [
       { path: 'charts', component: ChartCardComponent },
       { path: 'orders',       component: OrdersComponent       },
       { path: 'products',     component: ProductsComponent     },
+      { path: 'products/add', component: AddProductComponent },
+      { path: 'products/edit/:id', component: AddProductComponent },
       { path: 'customers',    component: CustomersComponent    },
       { path: 'invoices',     component: InvoicesComponent     },
       { path: 'inventory',    component: InventoryComponent    },

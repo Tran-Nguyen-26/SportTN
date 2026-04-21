@@ -26,6 +26,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 import {MatCheckboxModule} from "@angular/material/checkbox";
+import { WishlistComponent } from './pages/wishlist/wishlist.component';
+import { NotificationComponent } from './pages/notification/notification.component';
+import { SupportCenterComponent } from './pages/support-center/support-center.component';
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [
@@ -34,7 +38,10 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
     WalletComponent,
     MyAccountComponent,
     AccountMenuComponent,
-    AccountPageComponent
+    AccountPageComponent,
+    WishlistComponent,
+    NotificationComponent,
+    SupportCenterComponent
   ],
   imports: [
     CommonModule,
@@ -56,6 +63,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
     MatDialogModule,
     MatChipsModule,
     MatCheckboxModule,
+    MatTooltipModule,
   ]
 })
 export class AccountModule { }

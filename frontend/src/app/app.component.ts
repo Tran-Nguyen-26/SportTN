@@ -22,6 +22,14 @@ export class AppComponent {
         this.isAuthPage = event.url.includes('/auth');
         this.isAdminPage = event.url.includes('/admin');
       }
+
+      if (this.isAdminPage) {
+        document.body.classList.add('admin-mode');
+        document.body.classList.remove('normal-mode');
+      } else {
+        document.body.classList.add('normal-mode');
+        document.body.classList.remove('admin-mode');
+      }
     });
 
     this.iconRegistry.addSvgIcon(

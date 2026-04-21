@@ -1,0 +1,57 @@
+.company-info {
+  padding: 32px 0;
+  background-color: #fff;
+  font-family: 'Roboto', sans-serif; /* Hoặc font bạn đang dùng cho dự án */
+  color: #222;
+}
+
+.info-container {
+  width: 90%;
+  margin: 20px;
+  padding: 0 30px;
+}
+
+.brand-headline {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #303f9f; /* Màu xanh đậm SportTN */
+  margin-bottom: 12px;
+  font-style: italic;
+  letter-spacing: -0.5px;
+}
+
+.brand-text {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.legal-details {
+  border-top: none;
+}
+
+.legal-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.detail-rows p {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+/* Tinh chỉnh cho màn hình nhỏ */
+@media (max-width: 768px) {
+  .brand-headline {
+    font-size: 1.3rem;
+  }
+
+  .company-info {
+    padding: 20px 0;
+    text-align: left;
+  }
+}

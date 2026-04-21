@@ -35,6 +35,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
     //Login
     public AuthResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
@@ -115,7 +119,7 @@ public class UserService {
     }
 
     //Đăng ký
-    public UserDetailResponse register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             log.warn("[AUTH] Đăng ký thất bại. Email đã tồn tại. email={}", request.getEmail());
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -126,10 +130,16 @@ public class UserService {
             throw new BusinessException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
+        if (userRepository.existsByPhone(request.getPhone())) {
+            log.warn("[AUTH] Đăng ký thất bại. Số điện thoại đã được sử dụng. phone={}", request.getUsername());
+            throw new BusinessException(ErrorCode.PHONE_ALREADY_EXISTS);
+        }
+
         //User
         User user = new User();
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
+        user.setPhone(request.getPhone());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
         //Profile
@@ -143,14 +153,6 @@ public class UserService {
                 "[AUTH] Đăng ký thành công. email={}, username={}, userId={}",
                 user.getEmail(), user.getUsername(), user.getId()
         );
-        return UserDetailResponse.builder()
-                .email(request.getEmail())
-                .username(request.getUsername())
-                .role(UserRole.CUSTOMER.name())
-                .status(user.getStatus().name())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .build();
     }
 
     public AuthResponse refreshToken(String refreshTokenStr) {

@@ -1,60 +1,109 @@
 .footer {
-  background: #f8f9fa;
-  padding: 40px 20px;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f8f8f8;
+  padding: 40px 0;
   color: #333;
+  font-size: 14px;
 }
 
 .footer-container {
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* --- PHẦN TRÊN --- */
+.footer-top {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  max-width: 1200px;
-  margin: auto;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
 }
 
-.footer-column {
-  flex: 1 1 220px;
-  margin: 10px;
+.top-section {
+  flex: 1;
+  text-align: center;
 }
 
-.footer-column h4 {
-  margin-bottom: 12px;
-  font-size: 16px;
-  font-weight: bold;
+.section-title {
+  font-weight: 700;
+  margin-bottom: 15px;
+  font-size: 15px;
 }
 
-.footer-column ul {
+.social-icons a {
+  margin: 0 10px;
+  font-size: 22px;
+  color: #000;
+}
+
+.app-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.app-img {
+  height: 35px;
+  cursor: pointer;
+}
+
+.bct-img {
+  height: 60px;
+  object-fit: contain;
+}
+
+/* --- ĐƯỜNG KẺ --- */
+.footer-divider {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 0 0 30px 0;
+}
+
+/* --- PHẦN DƯỚI (LINKS) --- */
+.footer-main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.link-column h4 {
+  font-weight: 700;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #000;
+}
+
+.link-column ul {
   list-style: none;
   padding: 0;
 }
 
-.footer-column ul li {
+.link-column ul li {
   margin-bottom: 8px;
 }
 
-.footer-column ul li a {
+.link-column ul li a {
   text-decoration: none;
-  color: #007bff;
-}
-
-.footer-column ul li a:hover {
-  text-decoration: underline;
-}
-
-.social-icons a {
-  margin-right: 10px;
-  font-size: 20px;
   color: #333;
-}
-
-.social-icons a:hover {
-  color: #007bff;
-}
-
-.footer-bottom {
-  text-align: center;
-  margin-top: 20px;
   font-size: 13px;
-  color: #666;
+  display: block;
+  transition: 0.2s;
+}
+
+.link-column ul li a:hover {
+  color: #3643ba; /* Màu xanh thương hiệu */
+  transform: translateX(3px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .footer-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+  }
 }

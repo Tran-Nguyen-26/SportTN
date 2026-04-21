@@ -18,6 +18,7 @@
        [class.active]="isActive(item.route || '')"
        [title]="collapsed ? item.label : ''"
        routerLinkActive="active"
+       (click)="onItemClick(item.label)"
        [routerLinkActiveOptions]="{ exact: item.route === '/admin' }">
 
       <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>

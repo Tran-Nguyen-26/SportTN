@@ -5,6 +5,10 @@ import { AccountPageComponent } from './pages/account-page/account-page.componen
 import { AddressComponent } from './pages/address/address.component';
 import { OrderHistoryComponent } from './pages/order-history/order-history.component';
 import {authGuard} from "../../core/guards/auth/auth.guard";
+import {WishlistComponent} from "./pages/wishlist/wishlist.component";
+import {NotificationComponent} from "./pages/notification/notification.component";
+import {SupportCenterComponent} from "./pages/support-center/support-center.component";
+import {WalletComponent} from "./pages/wallet/wallet.component";
 
 const routes: Routes = [
   {
@@ -15,6 +19,10 @@ const routes: Routes = [
       { path: 'my-account', component: MyAccountComponent },
       { path: 'address', component: AddressComponent },
       { path: 'order-history', component: OrderHistoryComponent },
+      { path: 'wishlist', component: WishlistComponent },
+      { path: 'wallet', component: WalletComponent },
+      { path: 'notification', component: NotificationComponent },
+      { path: 'help', component: SupportCenterComponent },
       { path: '', redirectTo: 'my-account', pathMatch: 'full' }
     ]
   }

@@ -1,7 +1,8 @@
 .hero-banner {
+  margin-top: 135px;
   position: relative;
   width: 100%;
-  height: 55vh; 
+  height: 55vh;
   overflow: hidden;
 }
 
@@ -32,7 +33,7 @@
 
 .controls {
   position: absolute;
-  top: 50%;                 
+  top: 50%;
   left: 0;
   right: 0;
   display: flex;
@@ -54,9 +55,9 @@
 
 .dots {
   position: absolute;
-  bottom: 20px;             
+  bottom: 20px;
   left: 50%;
-  transform: translateX(-50%); 
+  transform: translateX(-50%);
   display: flex;
   gap: 8px;
 }

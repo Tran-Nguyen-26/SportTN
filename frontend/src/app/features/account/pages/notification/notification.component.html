@@ -1,0 +1,62 @@
+<div class="notification-container">
+  <header class="page-header">
+    <div class="header-text">
+      <h2>Thông báo</h2>
+      <p>Chào Nguyên, bạn có <span class="unread-count">{{ unreadCount() }} thông báo mới</span> chưa đọc</p>
+    </div>
+    <div class="header-actions">
+      <button mat-flat-button color="primary" class="btn-read-all" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+        <mat-icon>done_all</mat-icon>
+        Đánh dấu tất cả đã đọc
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="notifications().length === 0" class="empty-state-glass">
+    <div class="icon-circle">
+      <mat-icon>notifications_none</mat-icon>
+    </div>
+    <h3>Mọi thứ đã gọn gàng!</h3>
+    <p>Hiện tại bạn không có thông báo nào mới. Hãy quay lại sau nhé.</p>
+  </div>
+
+  <div class="notification-feed" *ngIf="notifications().length > 0">
+    <div
+      *ngFor="let notify of notifications()"
+      class="notify-card"
+      [class.unread]="!notify.isRead"
+      (click)="markAsRead(notify.id)"
+    >
+      <div class="notify-body">
+        <div class="status-indicator" [ngClass]="notify.type">
+          <mat-icon>{{ getIcon(notify.type) }}</mat-icon>
+        </div>
+
+        <div class="notify-content">
+          <div class="notify-top">
+            <h4 class="notify-title">{{ notify.title }}</h4>
+            <span class="notify-time">{{ notify.createdAt | date:'HH:mm, dd/MM' }}</span>
+          </div>
+          <p class="notify-msg">{{ notify.message }}</p>
+
+          <div class="notify-footer">
+            <span class="type-tag" [ngClass]="notify.type">#{{ notify.type }}</span>
+          </div>
+        </div>
+
+        <div class="unread-pulse" *ngIf="!notify.isRead"></div>
+      </div>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="action-btn" (click)="$event.stopPropagation()">
+        <mat-icon>more_horiz</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu" class="modern-menu">
+        <button mat-menu-item (click)="deleteNotification(notify.id)">
+          <mat-icon class="text-danger">delete_outline</mat-icon>
+          <span class="text-danger">Xóa thông báo</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</div>

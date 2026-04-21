@@ -1,62 +1,90 @@
 <div class="product-detail" *ngIf="productDetail">
   <div class="product-header">
-    <h2>{{ productDetail.productCardResponse.name }}</h2>
-    <p>Mã sản phẩm: {{ productDetail.variantResponses[0]?.sku || 'N/A' }}</p>
-    <div class="rating">
-      ⭐ {{ productDetail.productCardResponse.rating }}
-      ({{ productDetail.productCardResponse.reviewCount }} đánh giá)
+    <span class="brand-tag">{{ productDetail.productCardResponse.brandName || 'SportTN' }}</span>
+    <h1 class="product-title">{{ productDetail.productCardResponse.name }}</h1>
+    <div class="meta-info">
+      <div class="rating">
+        <mat-icon class="star-icon">star</mat-icon>
+        <span class="rating-value">{{ productDetail.productCardResponse.rating }}</span>
+        <span class="review-count">({{ productDetail.productCardResponse.reviewCount }} đánh giá)</span>
+      </div>
+      <span class="divider">|</span>
+      <span class="sku-code">SKU: {{ productDetail.variantResponses[0]?.sku || 'N/A' }}</span>
     </div>
   </div>
 
-  <div class="product-price">
-    <span class="old-price" *ngIf="productDetail.productCardResponse.isOnSale">
-      {{ productDetail.productCardResponse.originalPrice | number:'1.0-0' }}₫
-    </span>
-    <span class="current-price">
-      {{ productDetail.productCardResponse.effectivePrice | number:'1.0-0' }}₫
-    </span>
+  <div class="price-section">
+    <div class="price-group">
+      <span class="current-price">{{ productDetail.productCardResponse.effectivePrice | number:'1.0-0' }}₫</span>
+      <span class="old-price" *ngIf="productDetail.productCardResponse.isOnSale">
+        {{ productDetail.productCardResponse.originalPrice | number:'1.0-0' }}₫
+      </span>
+      <span class="discount-badge" *ngIf="productDetail.productCardResponse.isOnSale">Giảm 20%</span>
+    </div>
     <div class="promo-banner" *ngIf="productDetail.productCardResponse.effectivePrice >= 299000">
-      Miễn phí vận chuyển từ 299,000₫
+      <mat-icon>local_shipping</mat-icon>
+      <span>Miễn phí vận chuyển cho đơn hàng từ 299,000₫</span>
     </div>
   </div>
 
-  <div class="product-variant">
-    <div class="colors" *ngIf="productDetail.variantResponses.length > 0">
-      <p>Màu sắc:</p>
-      <div class="color-options">
-        <button *ngFor="let v of getUniqueColors()" class="color-thumb">
+  <div class="variant-section">
+    <div class="variant-group">
+      <p class="variant-label">Màu sắc: <strong>{{ selectedColor || 'Chưa chọn' }}</strong></p>
+      <div class="chip-options">
+        <button *ngFor="let v of getUniqueColors()"
+                class="chip-item color-chip"
+                [class.active]="selectedColor === v"
+                (click)="selectColor(v)">
           {{ v }}
         </button>
       </div>
     </div>
 
-    <div class="size">
-      <select (change)="onSizeChange($event)">
-        <option value="">Vui lòng chọn cỡ</option>
-        <option *ngFor="let v of productDetail.variantResponses" [value]="v.id">
-          {{ v.size }} (Còn {{ v.stockQuantity }} sản phẩm)
-        </option>
-      </select>
+    <div class="variant-group">
+      <p class="variant-label">Kích cỡ: <strong>{{ selectedSizeName || 'Chưa chọn' }}</strong></p>
+      <div class="chip-options">
+        <button *ngFor="let v of productDetail.variantResponses"
+                class="chip-item size-chip"
+                [disabled]="v.stockQuantity === 0"
+                [class.active]="selectedVariantId === v.id"
+                (click)="selectVariant(v)">
+          {{ v.size }}
+        </button>
+      </div>
     </div>
 
-    <div class="quantity">
-      <button (click)="updateQty(-1)">-</button>
-      <input type="number" [value]="selectedQty" readonly>
-      <button (click)="updateQty(1)">+</button>
+    <div class="quantity-group">
+      <p class="variant-label">Số lượng:</p>
+      <div class="quantity-control">
+        <button (click)="updateQty(-1)" [disabled]="selectedQty <= 1"><mat-icon>remove</mat-icon></button>
+        <input type="number" [value]="selectedQty" readonly>
+        <button (click)="updateQty(1)"><mat-icon>add</mat-icon></button>
+      </div>
     </div>
   </div>
 
   <div class="product-action">
-    <button class="add-to-cart" [disabled]="!selectedVariantId">
-      THÊM VÀO GIỎ
+    <button class="btn-add-to-cart" [disabled]="!selectedVariantId">
+      <mat-icon>shopping_cart</mat-icon>
+      THÊM VÀO GIỎ HÀNG
+    </button>
+    <button class="btn-wishlist">
+      <mat-icon>favorite_border</mat-icon>
     </button>
   </div>
 
   <div class="product-policy">
-    <ul>
-      <li>Đổi trả 365 ngày</li>
-      <li>Bảo hành 2 năm</li>
-      <li>Miễn phí vận chuyển từ 499,000₫</li>
-    </ul>
+    <div class="policy-item">
+      <mat-icon>autorenew</mat-icon>
+      <span>Đổi trả 365 ngày</span>
+    </div>
+    <div class="policy-item">
+      <mat-icon>verified_user</mat-icon>
+      <span>Bảo hành 2 năm chính hãng</span>
+    </div>
+    <div class="policy-item">
+      <mat-icon>redeem</mat-icon>
+      <span>Miễn phí vận chuyển từ 499k</span>
+    </div>
   </div>
 </div>

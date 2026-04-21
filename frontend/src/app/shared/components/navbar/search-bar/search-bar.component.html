@@ -1,7 +1,7 @@
 <div class="search-bar">
   <img src="assets/images/icons/search-icon.png" alt="">
   <input type="text" placeholder="Tìm kiếm sản phẩm, môn thể thao"
-         (focus)="isSearchFocus = true"
+         (focus)="onFocus()"
          (blur)="onBlur()">
 
   <button *ngIf="isSearchFocus" class="close-search">✕</button>
@@ -36,13 +36,16 @@
 
       <main class="search-main">
         <h4>Sản phẩm phổ biến</h4>
-        <div class="product-search-grid">
+        <div *ngIf="isLoading" class="loading-spinner">Đang tải sản phẩm hot...</div>
+        <div class="product-search-grid" *ngIf="!isLoading">
           <app-product-card
-            *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-            [product]="sampleProduct"
+            *ngFor="let p of popularProducts"
+            [product]="p"
           />
-
         </div>
+        <p *ngIf="!isLoading && popularProducts.length === 0" class="empty-msg">
+          Hiện chưa có sản phẩm gợi ý nào.
+        </p>
       </main>
 
     </div>

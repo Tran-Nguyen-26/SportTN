@@ -1,12 +1,6 @@
 <div class="product-page">
   <div class="product-top">
     <div class="product-left">
-<!--        <img src="assets/aothun.jpg" alt="">-->
-<!--        <img src="assets/aothun.jpg" alt="">-->
-<!--        <img src="assets/aothun.jpg" alt="">-->
-<!--        <img src="assets/aothun.jpg" alt="">-->
-<!--        <img src="assets/aothun.jpg" alt="">-->
-<!--        <img src="assets/aothun.jpg" alt="">-->
       <img
         *ngFor="let image of productDetail?.productImageResponses"
         [src]="image.imageUrl"

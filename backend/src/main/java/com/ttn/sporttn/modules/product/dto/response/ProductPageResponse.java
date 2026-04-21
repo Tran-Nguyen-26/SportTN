@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 @Builder
 public class ProductPageResponse {
+
     private ProductCardResponse productCardResponse;
 
     private List<ImageResponse> productImageResponses;

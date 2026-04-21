@@ -1,54 +1,58 @@
-<mat-card class="order-summary-card">
-  <mat-card-header>
-    <mat-card-title>Order Summary</mat-card-title>
+<mat-card class="order-summary-card-stn">
+  <mat-card-header class="stn-header">
+    <mat-icon class="header-icon">analytics</mat-icon>
+    <mat-card-title>Tóm tắt đơn hàng</mat-card-title>
   </mat-card-header>
 
-  <mat-card-content>
-    <div class="summary-row">
-      <span class="label">Subtotal</span>
-      <span class="value">{{ subtotal | currency:'VND' }}</span>
+  <mat-card-content class="stn-content">
+    <div class="summary-box">
+      <div class="summary-row-stn">
+        <span class="label">Tạm tính</span>
+        <span class="value">{{ subtotal | currency:'VND':'symbol':'1.0-0' }}</span>
+      </div>
+
+      <div class="summary-row-stn discount" *ngIf="discount > 0">
+        <span class="label">Giảm giá (Mã STN2026)</span>
+        <span class="value">-{{ discount | currency:'VND':'symbol':'1.0-0' }}</span>
+      </div>
+
+      <div class="summary-row-stn">
+        <span class="label">Thuế VAT (10%)</span>
+        <span class="value">{{ tax | currency:'VND':'symbol':'1.0-0' }}</span>
+      </div>
+
+      <div class="summary-row-stn">
+        <span class="label">Phí vận chuyển</span>
+        <span class="value" [class.free-ship]="shipping === 0">
+          {{ shipping === 0 ? 'Miễn phí' : (shipping | currency:'VND':'symbol':'1.0-0') }}
+        </span>
+      </div>
     </div>
 
-    <div class="summary-row" *ngIf="discount > 0">
-      <span class="label discount">Discount (5%)</span>
-      <span class="value discount">-{{ discount | currency:'VND' }}</span>
+    <div class="shipping-promo-stn" *ngIf="shipping === 0 && subtotal > 500000">
+      <mat-icon>check_circle</mat-icon>
+      <span>Đơn hàng của bạn được miễn phí giao hàng!</span>
     </div>
 
-    <div class="summary-row">
-      <span class="label">Tax (18% GST)</span>
-      <span class="value">{{ tax | currency:'VND' }}</span>
+    <mat-divider class="stn-divider"></mat-divider>
+
+    <div class="total-section-stn">
+      <div class="total-row-stn">
+        <span class="total-label">Tổng cộng</span>
+        <span class="total-amount-stn">{{ total | currency:'VND':'symbol':'1.0-0' }}</span>
+      </div>
+      <p class="tax-note-stn">(Đã bao gồm thuế và các loại phí)</p>
     </div>
 
-    <div class="summary-row" *ngIf="shipping > 0">
-      <span class="label">Shipping</span>
-      <span class="value">{{ shipping | currency:'VND' }}</span>
+    <div class="action-buttons-stn">
+      <button mat-raised-button class="checkout-btn-stn" (click)="proceedCheckout()">
+        <mat-icon>shopping_cart_checkout</mat-icon>
+        Tiến hành thanh toán
+      </button>
+
+      <button mat-stroked-button class="continue-btn-stn" routerLink="/products">
+        Tiếp tục mua sắm
+      </button>
     </div>
-
-    <div class="summary-row" *ngIf="shipping === 0 && subtotal > 500">
-      <span class="label text-success">
-        <mat-icon>local_shipping</mat-icon> Free Shipping
-      </span>
-    </div>
-
-    <mat-divider></mat-divider>
-
-    <div class="summary-row total">
-      <span class="label">Total Amount</span>
-      <span class="value total">{{ total | currency:'VND' }}</span>
-    </div>
-
-    <button 
-      mat-raised-button 
-      color="accent" 
-      class="checkout-btn"
-      (click)="proceedCheckout()">
-      Proceed to Checkout
-    </button>
-
-    <button 
-      mat-stroked-button 
-      class="continue-shopping-btn">
-      Continue Shopping
-    </button>
   </mat-card-content>
 </mat-card>

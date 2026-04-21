@@ -1,148 +1,105 @@
 <div class="wallet-container">
-  <h2>My Wallet</h2>
+  <header class="page-header">
+    <div class="header-text">
+      <h2>Ví của tôi</h2>
+      <p>Thanh toán nhanh chóng, an toàn và nhận nhiều ưu đãi</p>
+    </div>
+  </header>
 
   <div *ngIf="successMessage" class="success-message">
     <mat-icon>check_circle</mat-icon>
-    {{ successMessage }}
+    <span>{{ successMessage }}</span>
   </div>
 
-  <div *ngIf="errorMessage" class="error-message">
-    <mat-icon>error</mat-icon>
-    {{ errorMessage }}
-  </div>
-
-  <!-- Wallet Balance Card -->
-  <mat-card class="balance-card">
-    <div class="balance-content">
-      <div class="balance-info">
-        <h3>Available Balance</h3>
-        <h1 class="balance-amount">{{ balance | currency:'VND' }}</h1>
+  <mat-card class="main-balance-card">
+    <div class="card-bg-overlay"></div>
+    <div class="balance-wrapper">
+      <div class="balance-left">
+        <span class="label">Số dư khả dụng</span>
+        <h1 class="amount">{{ balance | currency:'VND':'symbol':'1.0-0' }}</h1>
+        <div class="wallet-status">
+          <mat-icon>verified_user</mat-icon>
+          <span>Tài khoản đã xác thực</span>
+        </div>
       </div>
-      <div class="balance-actions">
-        <button mat-raised-button color="primary" (click)="showRechargeForm = true">
-          <mat-icon>add</mat-icon>
-          Add Money
+      <div class="balance-right">
+        <button mat-raised-button class="btn-recharge" (click)="showRechargeForm = true" *ngIf="!showRechargeForm">
+          <mat-icon>add_circle</mat-icon>
+          Nạp tiền vào ví
         </button>
       </div>
     </div>
   </mat-card>
 
-  <!-- Recharge Form -->
-  <mat-card *ngIf="showRechargeForm" class="recharge-card">
+  <mat-card *ngIf="showRechargeForm" class="recharge-card-animated">
     <mat-card-header>
-      <mat-card-title>Recharge Wallet</mat-card-title>
+      <mat-card-title>Nạp tiền vào ví</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
       <form [formGroup]="rechargeForm" (ngSubmit)="rechargeWallet()">
-        <!-- Quick Amount Selection -->
-        <div class="quick-amounts">
-          <label>Select Amount</label>
-          <div class="amount-buttons">
-            <button 
-              *ngFor="let amount of rechargeAmounts"
-              type="button"
-              mat-mini-fab 
-              (click)="selectQuickAmount(amount)"
-              [ngClass]="{ selected: rechargeForm.get('amount')?.value === amount }">
-              {{ amount | currency:'VND':true:'1.0-0' }}
-            </button>
+        <div class="recharge-grid">
+          <div class="quick-select-section">
+            <label class="section-label">Chọn nhanh số tiền</label>
+            <div class="quick-amount-grid">
+              <button *ngFor="let amount of rechargeAmounts" type="button"
+                      class="amount-pill" [class.active]="rechargeForm.get('customAmount')?.value === amount"
+                      (click)="rechargeForm.patchValue({customAmount: amount})">
+                {{ amount | currency:'VND':'':'1.0-0' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="input-section">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nhập số tiền khác</mat-label>
+              <input matInput formControlName="customAmount" type="number" placeholder="Tối thiểu 100.000đ">
+              <span matSuffix>VND</span>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Phương thức thanh toán</mat-label>
+              <mat-select formControlName="paymentMethod">
+                <mat-option value="VNPAY">Cổng thanh toán VNPAY</mat-option>
+                <mat-option value="MOMO">Ví MoMo</mat-option>
+                <mat-option value="BANKING">Chuyển khoản ngân hàng</mat-option>
+              </mat-select>
+              <mat-icon matPrefix>payments</mat-icon>
+            </mat-form-field>
           </div>
         </div>
 
-        <!-- Custom Amount -->
-        <div class="custom-amount">
-          <label>Or enter custom amount</label>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Enter amount (minimum 100,000)</mat-label>
-            <input matInput formControlName="customAmount" type="number" min="100000">
-            <span matPrefix>₫&nbsp;</span>
-          </mat-form-field>
-        </div>
-
-        <!-- Payment Method -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Select Payment Method</mat-label>
-          <mat-select formControlName="paymentMethod">
-            <mat-option *ngFor="let method of paymentMethods" [value]="method">
-              {{ method }}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="rechargeForm.get('paymentMethod')?.hasError('required')">
-            Payment method is required
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-          <button 
-            mat-raised-button 
-            color="primary" 
-            type="submit" 
-            [disabled]="!rechargeForm.valid || isProcessing"
-            class="full-width">
-            <mat-progress-spinner *ngIf="isProcessing" diameter="20" mode="indeterminate"></mat-progress-spinner>
-            <span *ngIf="!isProcessing">Proceed to Payment</span>
-          </button>
-          <button 
-            mat-stroked-button 
-            type="button" 
-            (click)="cancelRecharge()"
-            class="full-width">
-            Cancel
+        <div class="form-actions-alt">
+          <button mat-button type="button" (click)="showRechargeForm = false">Đóng</button>
+          <button mat-raised-button color="primary" class="btn-submit-recharge" type="submit" [disabled]="!rechargeForm.valid || isProcessing">
+            <mat-spinner diameter="20" *ngIf="isProcessing"></mat-spinner>
+            <span>Tiến hành thanh toán</span>
           </button>
         </div>
       </form>
     </mat-card-content>
   </mat-card>
 
-  <!-- Transactions -->
-  <div class="transactions-section">
-    <h3>Transaction History</h3>
-    <mat-card class="transactions-card">
-      <mat-list>
-        <mat-list-item *ngFor="let txn of transactions; let last = last">
-          <mat-icon matListItemIcon [color]="getTransactionColor(txn.type)">
-            {{ getTransactionIcon(txn.type) }}
-          </mat-icon>
-          
-          <div matListItemTitle>{{ txn.description }}</div>
-          <div matListItemLine>{{ txn.date | date:'MMM dd, yyyy' }}</div>
-          
-          <span matListItemMeta [ngClass]="{ credit: txn.type === 'credit', debit: txn.type === 'debit' }">
-            {{ txn.type === 'credit' ? '+' : '-' }}₹{{ txn.amount | number:'1.2-2' }}
-          </span>
+  <div class="transactions-container">
+    <div class="section-header">
+      <h3>Lịch sử giao dịch</h3>
+      <button mat-button color="primary">Xem tất cả</button>
+    </div>
 
+    <mat-card class="history-card">
+      <mat-list class="transaction-list">
+        <mat-list-item *ngFor="let txn of transactions; let last = last">
+          <div matListItemIcon class="txn-icon-box" [class.is-credit]="txn.type === 'credit'">
+            <mat-icon>{{ txn.type === 'credit' ? 'north_east' : 'south_west' }}</mat-icon>
+          </div>
+          <div matListItemTitle class="txn-title">{{ txn.description }}</div>
+          <div matListItemLine class="txn-date">{{ txn.date | date:'dd/MM/yyyy HH:mm' }}</div>
+          <div matListItemMeta class="txn-amount" [class.credit]="txn.type === 'credit'">
+            {{ txn.type === 'credit' ? '+' : '-' }}{{ txn.amount | currency:'VND':'':'1.0-0' }}đ
+          </div>
           <mat-divider *ngIf="!last"></mat-divider>
         </mat-list-item>
       </mat-list>
     </mat-card>
   </div>
-
-  <!-- Tips Section -->
-  <mat-card class="tips-card">
-    <mat-card-header>
-      <mat-card-title>Wallet Benefits</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="benefits-list">
-        <div class="benefit-item">
-          <mat-icon>flash_on</mat-icon>
-          <span>Instant payments without entering card details</span>
-        </div>
-        <div class="benefit-item">
-          <mat-icon>trending_up</mat-icon>
-          <span>Earn cashback on every purchase</span>
-        </div>
-        <div class="benefit-item">
-          <mat-icon>card_giftcard</mat-icon>
-          <span>Exclusive wallet-only deals and offers</span>
-        </div>
-        <div class="benefit-item">
-          <mat-icon>security</mat-icon>
-          <span>Secure and safe payment method</span>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
 </div>

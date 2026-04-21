@@ -23,6 +23,8 @@ export class SidebarComponent {
   @Input() collapsed = false;
   @Output() toggleSidebar = new EventEmitter<void>();
 
+  activeLabel: string = 'Dashboard';
+
   menuGroups: SidebarGroup[] = [
     {
       groupLabel: 'Overview',
@@ -78,5 +80,9 @@ export class SidebarComponent {
 
   onToggle(): void {
     this.toggleSidebar.emit();
+  }
+
+  onItemClick(label: string) {
+    this.activeLabel = label;
   }
 }
