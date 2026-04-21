@@ -1,1 +1,332 @@
-<p>banners works!</p>
+<div class="banners-page">
+
+  <!-- Header -->
+  <app-page-header
+    title="Banners"
+    subtitle="Quản lý banner & slider trang chủ"
+    btnLabel="Thêm banner"
+    btnIcon="add"
+    (btnClick)="openDrawer()">
+  </app-page-header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>view_carousel</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ banners.length }}</span>
+        <span class="stat-label">Tổng banner</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>visibility</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ activeCount() }}</span>
+        <span class="stat-label">Đang hiển thị</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>visibility_off</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ hiddenCount() }}</span>
+        <span class="stat-label">Đang ẩn</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><mat-icon>devices</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ positionCount() }}</span>
+        <span class="stat-label">Vị trí đang dùng</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview strip -->
+  <div class="preview-strip">
+    <div class="strip-header">
+      <div class="strip-title">
+        <mat-icon>preview</mat-icon>
+        Xem trước slider trang chủ
+      </div>
+      <span class="strip-hint">{{ activeBanners().length }} banner đang hiển thị · Kéo để sắp xếp</span>
+    </div>
+    <div class="strip-banners">
+      <div
+        class="strip-thumb"
+        *ngFor="let b of activeBanners(); let i = index"
+        [class.main]="b.position === 'HERO'"
+        [title]="b.title">
+        <div class="strip-thumb-img" [style.background]="b.previewColor">
+          <mat-icon>{{ b.position === 'HERO' ? 'panorama' : 'image' }}</mat-icon>
+        </div>
+        <div class="strip-thumb-order">{{ b.displayOrder }}</div>
+        <div class="strip-thumb-label">{{ b.title }}</div>
+      </div>
+      <div class="strip-empty" *ngIf="activeBanners().length === 0">
+        <mat-icon>image_not_supported</mat-icon>
+        <span>Không có banner nào đang hiển thị</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter tabs + table -->
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+      <div class="pos-tabs">
+        <button
+          class="pos-tab"
+          *ngFor="let p of positionTabs"
+          [class.active]="selectedPosition === p.value"
+          (click)="selectedPosition = p.value">
+          {{ p.label }}
+          <span class="pos-count">{{ getPositionCount(p.value) }}</span>
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <div class="search-wrap">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Tìm tiêu đề banner..."
+            [(ngModel)]="searchQuery">
+        </div>
+        <select class="filter-select" [(ngModel)]="selectedStatus">
+          <option value="">Tất cả</option>
+          <option value="true">Đang hiển thị</option>
+          <option value="false">Đang ẩn</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Banner grid list -->
+    <div class="banner-list">
+      <div
+        class="banner-row"
+        *ngFor="let b of filteredBanners"
+        [class.inactive]="!b.active">
+
+        <!-- Thumbnail -->
+        <div class="banner-thumb" [style.background]="b.previewColor">
+          <mat-icon class="thumb-icon">{{ b.position === 'HERO' ? 'panorama' : 'image' }}</mat-icon>
+          <div class="thumb-overlay">
+            <button class="thumb-edit-btn" (click)="openDrawer(b)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="banner-info">
+          <div class="banner-title-row">
+            <span class="banner-title">{{ b.title }}</span>
+            <span class="pos-badge" [ngClass]="'pos-' + b.position.toLowerCase()">
+              {{ getPositionLabel(b.position) }}
+            </span>
+          </div>
+          <div class="banner-meta">
+            <span class="meta-item">
+              <mat-icon>link</mat-icon>
+              {{ b.linkUrl || 'Không có link' }}
+            </span>
+            <span class="meta-item" *ngIf="b.startDate">
+              <mat-icon>schedule</mat-icon>
+              {{ b.startDate }} → {{ b.endDate || 'Không hết hạn' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Order -->
+        <div class="banner-order">
+          <div class="order-label">Thứ tự</div>
+          <div class="order-controls">
+            <button class="order-btn" (click)="moveUp(b)" [disabled]="b.displayOrder <= 1">
+              <mat-icon>keyboard_arrow_up</mat-icon>
+            </button>
+            <span class="order-num">{{ b.displayOrder }}</span>
+            <button class="order-btn" (click)="moveDown(b)">
+              <mat-icon>keyboard_arrow_down</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Toggle active -->
+        <div class="banner-toggle">
+          <div class="toggle-label-sm">{{ b.active ? 'Hiển thị' : 'Ẩn' }}</div>
+          <div
+            class="toggle"
+            [class.on]="b.active"
+            (click)="b.active = !b.active">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="banner-actions">
+          <button class="action-btn edit" (click)="openDrawer(b)" title="Chỉnh sửa">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button class="action-btn delete" (click)="deleteBanner(b.id)" title="Xóa">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Empty -->
+      <div class="list-empty" *ngIf="filteredBanners.length === 0">
+        <mat-icon>image_search</mat-icon>
+        <p>Không tìm thấy banner nào</p>
+      </div>
+    </div>
+
+    <div class="table-footer">
+      <span class="result-count">Hiển thị {{ filteredBanners.length }} / {{ banners.length }} banner</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── DRAWER ─────────────────────────────────── -->
+<div class="overlay" *ngIf="drawerVisible" (click)="onOverlayClick($event)">
+  <div class="drawer">
+
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">{{ editingBanner ? 'Chỉnh sửa banner' : 'Thêm banner mới' }}</div>
+        <div class="drawer-sub">{{ editingBanner ? 'Cập nhật thông tin banner' : 'Tải ảnh và cấu hình hiển thị' }}</div>
+      </div>
+      <button class="close-btn" (click)="closeDrawer()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Hình ảnh -->
+      <div class="section">
+        <div class="section-label">Hình ảnh banner</div>
+
+        <div class="img-upload-zone" (click)="fileInput.click()" *ngIf="!form.previewUrl">
+          <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">
+          <div class="upload-icon-wrap">
+            <mat-icon>cloud_upload</mat-icon>
+          </div>
+          <div class="upload-main-text">Kéo thả hoặc click để chọn ảnh</div>
+          <div class="upload-hint-text">PNG, JPG · Khuyến nghị 1920×600px cho HERO, 800×400px cho sub-banner</div>
+        </div>
+
+        <div class="img-preview-wrap" *ngIf="form.previewUrl">
+          <img [src]="form.previewUrl" class="img-preview" alt="Banner preview">
+          <button class="remove-img-btn" (click)="removeImage()">
+            <mat-icon>close</mat-icon>
+          </button>
+          <div class="img-resolution">{{ form.imageWidth }}×{{ form.imageHeight }}px</div>
+        </div>
+
+        <!-- URL ảnh thay thế -->
+        <div class="field" style="margin-top: 10px">
+          <label>Hoặc nhập URL ảnh</label>
+          <input type="text" [(ngModel)]="form.imageUrl" placeholder="https://...">
+        </div>
+      </div>
+
+      <!-- Thông tin -->
+      <div class="section">
+        <div class="section-label">Thông tin</div>
+
+        <div class="field">
+          <label>Tiêu đề <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.title" placeholder="VD: Banner mùa hè 2025">
+        </div>
+
+        <div class="field">
+          <label>Alt text</label>
+          <input type="text" [(ngModel)]="form.altText" placeholder="Mô tả ảnh cho SEO & accessibility">
+          <span class="hint">Quan trọng cho SEO và người dùng khiếm thị</span>
+        </div>
+
+        <div class="field">
+          <label>Link URL</label>
+          <input type="text" [(ngModel)]="form.linkUrl" placeholder="VD: /the-thao/boi-loi hoặc https://...">
+          <span class="hint">Để trống nếu banner không có link</span>
+        </div>
+      </div>
+
+      <!-- Vị trí & thứ tự -->
+      <div class="section">
+        <div class="section-label">Vị trí hiển thị</div>
+
+        <div class="position-grid">
+          <div
+            class="position-option"
+            *ngFor="let p of positionOptions"
+            [class.selected]="form.position === p.value"
+            (click)="form.position = $any(p.value)">
+            <div class="pos-option-icon">
+              <mat-icon>{{ p.icon }}</mat-icon>
+            </div>
+            <div class="pos-option-info">
+              <span class="pos-option-name">{{ p.label }}</span>
+              <span class="pos-option-desc">{{ p.desc }}</span>
+            </div>
+            <mat-icon class="pos-check" *ngIf="form.position === p.value">check_circle</mat-icon>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top: 12px">
+          <label>Thứ tự hiển thị</label>
+          <div class="order-wrap">
+            <button class="order-btn-lg" (click)="changeOrder(-1)">−</button>
+            <input type="number" [(ngModel)]="form.displayOrder" min="1" max="99" class="order-input">
+            <button class="order-btn-lg" (click)="changeOrder(1)">+</button>
+          </div>
+          <span class="hint">Số nhỏ hơn hiển thị trước</span>
+        </div>
+      </div>
+
+      <!-- Thời gian (tùy chọn) -->
+      <div class="section">
+        <div class="section-label">Thời gian hiển thị (tuỳ chọn)</div>
+
+        <div class="form-row-2">
+          <div class="field">
+            <label>Ngày bắt đầu</label>
+            <input type="date" [(ngModel)]="form.startDate">
+          </div>
+          <div class="field">
+            <label>Ngày kết thúc</label>
+            <input type="date" [(ngModel)]="form.endDate">
+          </div>
+        </div>
+        <span class="hint" style="display:block; margin-top: -4px">Để trống nếu banner hiển thị vĩnh viễn</span>
+      </div>
+
+      <!-- Trạng thái -->
+      <div class="section">
+        <div class="section-label">Trạng thái</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Hiển thị banner</span>
+            <span class="t-desc">Banner xuất hiện trên trang chủ</span>
+          </div>
+          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn-cancel" (click)="closeDrawer()">Hủy</button>
+      <button class="btn-save" (click)="save()" [disabled]="!isFormValid()">
+        <mat-icon>{{ editingBanner ? 'update' : 'save' }}</mat-icon>
+        {{ editingBanner ? 'Cập nhật' : 'Lưu banner' }}
+      </button>
+    </div>
+
+  </div>
+</div>

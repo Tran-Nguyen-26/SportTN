@@ -1,1 +1,198 @@
-<p>dashboard works!</p>
+<div class="dashboard-page">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <h1 class="dash-title">Dashboard</h1>
+      <p class="dash-sub">{{ today }}</p>
+    </div>
+    <div class="header-right">
+      <div class="period-tabs">
+        <button
+          class="period-tab"
+          *ngFor="let p of periods"
+          [class.active]="selectedPeriod === p.value"
+          (click)="selectedPeriod = p.value">
+          {{ p.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card" *ngFor="let s of stats">
+      <div class="stat-top">
+        <div class="stat-icon" [ngClass]="s.color">
+          <mat-icon>{{ s.icon }}</mat-icon>
+        </div>
+        <div class="stat-trend" [class.up]="s.trend > 0" [class.down]="s.trend < 0">
+          <mat-icon>{{ s.trend > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+          {{ s.trend > 0 ? '+' : '' }}{{ s.trend }}%
+        </div>
+      </div>
+      <div class="stat-value">{{ s.value }}</div>
+      <div class="stat-label">{{ s.label }}</div>
+      <div class="stat-compare">so với {{ periodLabel }} trước</div>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="main-grid">
+
+    <!-- Biểu đồ doanh thu -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Doanh thu</div>
+          <div class="card-sub">7 ngày gần nhất</div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-dot blue"></span><span class="legend-text">Doanh thu</span>
+          <span class="legend-dot green"></span><span class="legend-text">Đơn hàng</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-bars">
+          <div class="bar-group" *ngFor="let d of revenueData">
+            <div class="bars">
+              <div
+                class="bar revenue-bar"
+                [style.height.%]="d.revenuePercent"
+                [title]="d.revenue + 'đ'">
+              </div>
+              <div
+                class="bar order-bar"
+                [style.height.%]="d.orderPercent"
+                [title]="d.orders + ' đơn'">
+              </div>
+            </div>
+            <div class="bar-label">{{ d.day }}</div>
+          </div>
+        </div>
+        <div class="chart-y-labels">
+          <span *ngFor="let l of yLabels">{{ l }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Đơn hàng theo trạng thái -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Trạng thái đơn hàng</div>
+        <a class="card-link" routerLink="/admin/orders">Xem tất cả</a>
+      </div>
+      <div class="order-status-list">
+        <div class="order-status-item" *ngFor="let s of orderStatuses">
+          <div class="os-left">
+            <div class="os-dot" [ngClass]="s.color"></div>
+            <span class="os-label">{{ s.label }}</span>
+          </div>
+          <div class="os-right">
+            <div class="os-bar-wrap">
+              <div class="os-bar" [ngClass]="s.color" [style.width.%]="s.percent"></div>
+            </div>
+            <span class="os-count">{{ s.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom grid -->
+  <div class="bottom-grid">
+
+    <!-- Đơn hàng mới nhất -->
+    <div class="card recent-orders-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Đơn hàng gần đây</div>
+          <div class="card-sub">10 đơn mới nhất</div>
+        </div>
+        <a class="card-link" routerLink="/admin/orders">Xem tất cả</a>
+      </div>
+      <div class="table-wrap">
+        <table class="mini-table">
+          <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Sản phẩm</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let o of recentOrders">
+            <td class="order-id">#{{ o.id }}</td>
+            <td>
+              <div class="customer-cell">
+                <div class="avatar-sm" [style.background]="o.avatarColor">
+                  {{ o.name[0] }}
+                </div>
+                <span class="customer-name-sm">{{ o.name }}</span>
+              </div>
+            </td>
+            <td class="product-count">{{ o.items }} sản phẩm</td>
+            <td class="order-amount">{{ o.total | number:'1.0-0' }}đ</td>
+            <td>
+                <span class="status-badge" [ngClass]="o.statusClass">
+                  {{ o.status }}
+                </span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cột phải -->
+    <div class="side-cards">
+
+      <!-- Sản phẩm bán chạy -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Bán chạy nhất</div>
+          <a class="card-link" routerLink="/admin/products">Chi tiết</a>
+        </div>
+        <div class="top-products">
+          <div class="top-product-item" *ngFor="let p of topProducts; let i = index">
+            <div class="top-rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
+              {{ i + 1 }}
+            </div>
+            <div class="top-product-info">
+              <div class="top-product-name">{{ p.name }}</div>
+              <div class="top-product-meta">{{ p.category }} · {{ p.sold }} đã bán</div>
+            </div>
+            <div class="top-product-revenue">{{ p.revenue | number:'1.0-0' }}đ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cảnh báo tồn kho -->
+      <div class="card alert-card">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="alert-icon">warning</mat-icon>
+            Sắp hết hàng
+          </div>
+          <span class="alert-count">{{ lowStockItems.length }}</span>
+        </div>
+        <div class="low-stock-list">
+          <div class="low-stock-item" *ngFor="let item of lowStockItems">
+            <div class="ls-info">
+              <div class="ls-name">{{ item.name }}</div>
+              <div class="ls-sku">{{ item.sku }}</div>
+            </div>
+            <div class="ls-stock" [class.critical]="item.stock <= 5">
+              còn {{ item.stock }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

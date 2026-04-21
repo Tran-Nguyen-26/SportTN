@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+
+export interface VariantImage {
+  preview: string;   // base64 để hiển thị
+  file: File;        // file thực để gửi lên BE
+}
 
 export interface ProductVariantForm {
   sku: string;
@@ -9,6 +14,7 @@ export interface ProductVariantForm {
   salePrice: number | null;
   stockQuantity: number | null;
   weightGram: number | null;
+  images: VariantImage[];
 }
 
 export interface ProductForm {
@@ -25,7 +31,7 @@ export interface ProductForm {
   templateUrl: './add-product.component.html',
   styleUrls: ['./add-product.component.css']
 })
-export class AddProductComponent {
+export class AddProductComponent implements OnInit {
 
   // ── DROPDOWN DATA ────────────────────────────
   categories = [
@@ -67,7 +73,11 @@ export class AddProductComponent {
   // ── ACTIVE TAB ────────────────────────────────
   activeTab: 'info' | 'variants' | 'images' = 'info';
 
-  constructor(private router: Router) {}
+  isEditMode = false;
+  productId: number | null = null;
+  isLoading = false;
+
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   // ── VARIANT METHODS ───────────────────────────
   addVariant(): void {
@@ -79,7 +89,58 @@ export class AddProductComponent {
       salePrice:     null,
       stockQuantity: null,
       weightGram:    null,
+      images: [],
     });
+  }
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditMode = true;
+      this.productId = +id;
+      this.loadProduct(+id);
+    }
+  }
+
+  private loadProduct(id: number): void {
+    this.isLoading = true;
+
+    // TODO: gọi API thật
+    // this.productService.getById(id).subscribe(...)
+
+    setTimeout(() => {
+      this.form = {
+        name:        'Áo thun chạy bộ nam thoáng khí - Run Dry',
+        description: 'Áo chạy bộ nam, chất liệu thoáng khí, thấm mồ hôi nhanh',
+        categoryId:  3,
+        brandId:     3,
+        active:      true,
+        variants: [
+          {
+            sku:           'RUN-SHIRT-M-BLUE-M',
+            color:         'Xanh dương',
+            size:          'M',
+            originalPrice: 299000,
+            salePrice:     199000,
+            stockQuantity: 80,
+            weightGram:    180,
+            images: [],
+          },
+          {
+            sku:           'RUN-SHIRT-M-BLACK-L',
+            color:         'Đen',
+            size:          'L',
+            originalPrice: 299000,
+            salePrice:     199000,
+            stockQuantity: 65,
+            weightGram:    190,
+            images: [],
+          }
+        ],
+      };
+      this.mainImagePreview = 'assets/products/ao-chay-bo.jpg';
+      this.isLoading = false;
+    }, 500);
   }
 
   removeVariant(index: number): void {
@@ -126,8 +187,11 @@ export class AddProductComponent {
 
   // ── SUBMIT ────────────────────────────────────
   onSubmit(): void {
-    console.log('Form data:', this.form);
-    // TODO: gọi API
+    if (this.isEditMode) {
+      //api
+    } else {
+      //api
+    }
   }
 
   onCancel(): void {
@@ -168,10 +232,35 @@ export class AddProductComponent {
 
   get minVariantPrice(): number {
     if (this.form.variants.length === 0) return 0;
-    // Lấy giá nhỏ nhất từ originalPrice hoặc salePrice tùy logic của bạn
+    // Lấy giá nhỏ nhất từ originalPrice hoặc salePrice
     const prices = this.form.variants
       .map(v => v.salePrice || v.originalPrice || 0)
       .filter(p => p > 0);
     return prices.length > 0 ? Math.min(...prices) : 0;
+  }
+
+  // Xử lý upload ảnh variant
+  onVariantImageChange(event: Event, variantIndex: number) {
+    const files = Array.from((event.target as HTMLInputElement).files || []);
+    const variant = this.form.variants[variantIndex];
+    const remaining = 4 - (variant.images?.length || 0);
+
+    files.slice(0, remaining).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        variant.images.push({
+          preview: reader.result as string,
+          file
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input để có thể chọn lại cùng file
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  removeVariantImage(variantIndex: number, imageIndex: number) {
+    this.form.variants[variantIndex].images.splice(imageIndex, 1);
   }
 }

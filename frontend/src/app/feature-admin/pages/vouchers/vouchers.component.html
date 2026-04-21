@@ -1,1 +1,384 @@
-<p>vouchers works!</p>
+<div class="vouchers-page">
+
+  <!-- Header -->
+  <app-page-header
+    title="Voucher"
+    subtitle="Quản lý mã giảm giá"
+    btnLabel="Tạo voucher"
+    btnIcon="add"
+    (btnClick)="openDrawer()">
+  </app-page-header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>confirmation_number</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ vouchers.length }}</span>
+        <span class="stat-label">Tổng voucher</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>check_circle</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ activeCount() }}</span>
+        <span class="stat-label">Đang hoạt động</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>schedule</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ scheduledCount() }}</span>
+        <span class="stat-label">Chưa bắt đầu</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red"><mat-icon>cancel</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ expiredCount() }}</span>
+        <span class="stat-label">Hết hạn / Hết lượt</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm mã voucher..."
+          [(ngModel)]="searchQuery">
+      </div>
+      <select class="filter-select" [(ngModel)]="selectedType">
+        <option *ngFor="let t of typeOptions" [value]="t.value">{{ t.label }}</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="selectedStatus">
+        <option *ngFor="let s of statusOptions" [value]="s.value">{{ s.label }}</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Mã voucher</th>
+          <th>Loại giảm</th>
+          <th>Giá trị</th>
+          <th>Đơn tối thiểu</th>
+          <th>Đã dùng / Giới hạn</th>
+          <th>Thời hạn</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let v of filteredVouchers">
+
+          <!-- Mã voucher -->
+          <td>
+            <div class="voucher-code-cell">
+              <div class="voucher-icon" [ngClass]="v.type === 'PERCENT' ? 'percent' : 'fixed'">
+                <mat-icon>{{ v.type === 'PERCENT' ? 'percent' : 'remove' }}</mat-icon>
+              </div>
+              <div>
+                <code class="voucher-code">{{ v.code }}</code>
+                <div class="voucher-desc">{{ v.description }}</div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Loại -->
+          <td>
+              <span class="type-badge" [ngClass]="v.type === 'PERCENT' ? 'percent' : 'fixed'">
+                {{ v.type === 'PERCENT' ? 'Phần trăm' : 'Số tiền cố định' }}
+              </span>
+          </td>
+
+          <!-- Giá trị -->
+          <td class="discount-value">
+            <ng-container *ngIf="v.type === 'PERCENT'">
+              <span class="value-big">{{ v.discountValue }}%</span>
+              <span class="value-cap" *ngIf="v.maxDiscount">tối đa {{ v.maxDiscount | number:'1.0-0' }}đ</span>
+            </ng-container>
+            <ng-container *ngIf="v.type === 'FIXED'">
+              <span class="value-big">{{ v.discountValue | number:'1.0-0' }}đ</span>
+            </ng-container>
+          </td>
+
+          <!-- Đơn tối thiểu -->
+          <td class="min-order">
+            <span *ngIf="v.minOrderValue">{{ v.minOrderValue | number:'1.0-0' }}đ</span>
+            <span *ngIf="!v.minOrderValue" class="no-limit">Không giới hạn</span>
+          </td>
+
+          <!-- Usage -->
+          <td>
+            <div class="usage-wrap">
+              <div class="usage-text">
+                <span class="usage-used">{{ v.usedCount }}</span>
+                <span class="usage-sep">/</span>
+                <span class="usage-total">{{ v.usageLimit ?? '∞' }}</span>
+              </div>
+              <div class="usage-bar-wrap" *ngIf="v.usageLimit">
+                <div
+                  class="usage-bar"
+                  [style.width.%]="getUsagePercent(v)"
+                  [class.full]="getUsagePercent(v) >= 100">
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Thời hạn -->
+          <td>
+            <div class="date-range">
+              <span class="date-from">{{ v.startDate }}</span>
+              <mat-icon class="date-arrow">arrow_forward</mat-icon>
+              <span class="date-to" [class.expired]="isExpired(v)">{{ v.endDate }}</span>
+            </div>
+          </td>
+
+          <!-- Trạng thái -->
+          <td>
+              <span class="status-badge" [ngClass]="getStatusClass(v)">
+                {{ getStatusLabel(v) }}
+              </span>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="action-btns">
+              <button class="action-btn copy" (click)="copyCode(v.code)" title="Sao chép mã">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <button class="action-btn edit" (click)="openDrawer(v)" title="Chỉnh sửa">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="action-btn delete" (click)="deleteVoucher(v.id)" title="Xóa">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="table-footer">
+      <span class="result-count">
+        Hiển thị {{ filteredVouchers.length }} / {{ vouchers.length }} voucher
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── DRAWER THÊM / SỬA ─────────────────────── -->
+<div class="overlay" *ngIf="drawerVisible" (click)="onOverlayClick($event)">
+  <div class="drawer">
+
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">{{ editingVoucher ? 'Chỉnh sửa voucher' : 'Tạo voucher mới' }}</div>
+        <div class="drawer-sub">{{ editingVoucher ? 'Cập nhật thông tin mã giảm giá' : 'Thiết lập mã giảm giá cho khách hàng' }}</div>
+      </div>
+      <button class="close-btn" (click)="closeDrawer()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Mã voucher -->
+      <div class="section">
+        <div class="section-label">Mã voucher</div>
+        <div class="field">
+          <label>Mã giảm giá <span class="req">*</span></label>
+          <div class="code-input-wrap">
+            <input
+              type="text"
+              [(ngModel)]="form.code"
+              placeholder="VD: SUMMER20"
+              class="code-input"
+              (input)="form.code = form.code.toUpperCase()">
+            <button class="btn-gen-code" (click)="generateCode()" title="Tạo mã ngẫu nhiên">
+              <mat-icon>auto_fix_high</mat-icon>
+              Tạo ngẫu nhiên
+            </button>
+          </div>
+          <span class="hint">Chỉ dùng chữ in hoa, số. VD: SALE30, FREESHIP</span>
+        </div>
+        <div class="field">
+          <label>Mô tả</label>
+          <input type="text" [(ngModel)]="form.description" placeholder="VD: Giảm 20% cho đơn từ 500k">
+        </div>
+      </div>
+
+      <!-- Loại & giá trị -->
+      <div class="section">
+        <div class="section-label">Loại & giá trị giảm</div>
+
+        <!-- Chọn loại -->
+        <div class="type-selector">
+          <div
+            class="type-option"
+            [class.selected]="form.type === 'PERCENT'"
+            (click)="form.type = 'PERCENT'">
+            <div class="type-icon percent">
+              <mat-icon>percent</mat-icon>
+            </div>
+            <div class="type-info">
+              <span class="type-name">Phần trăm</span>
+              <span class="type-desc">Giảm theo % đơn hàng</span>
+            </div>
+            <div class="type-check" *ngIf="form.type === 'PERCENT'">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          </div>
+          <div
+            class="type-option"
+            [class.selected]="form.type === 'FIXED'"
+            (click)="form.type = 'FIXED'">
+            <div class="type-icon fixed">
+              <mat-icon>remove</mat-icon>
+            </div>
+            <div class="type-info">
+              <span class="type-name">Số tiền cố định</span>
+              <span class="type-desc">Giảm trực tiếp số tiền</span>
+            </div>
+            <div class="type-check" *ngIf="form.type === 'FIXED'">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Giá trị -->
+        <div class="form-row-2">
+          <div class="field">
+            <label>
+              {{ form.type === 'PERCENT' ? 'Phần trăm giảm (%)' : 'Số tiền giảm (đ)' }}
+              <span class="req">*</span>
+            </label>
+            <input
+              type="number"
+              [(ngModel)]="form.discountValue"
+              [placeholder]="form.type === 'PERCENT' ? 'VD: 20' : 'VD: 50000'"
+              min="0"
+              [max]="form.type === 'PERCENT' ? 100 : null">
+          </div>
+          <div class="field" *ngIf="form.type === 'PERCENT'">
+            <label>Giảm tối đa (đ)</label>
+            <input
+              type="number"
+              [(ngModel)]="form.maxDiscount"
+              placeholder="VD: 200000"
+              min="0">
+            <span class="hint">Để trống nếu không giới hạn</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Đơn hàng tối thiểu (đ)</label>
+          <input
+            type="number"
+            [(ngModel)]="form.minOrderValue"
+            placeholder="VD: 500000"
+            min="0">
+          <span class="hint">Để trống nếu không yêu cầu đơn tối thiểu</span>
+        </div>
+      </div>
+
+      <!-- Thời gian -->
+      <div class="section">
+        <div class="section-label">Thời gian áp dụng</div>
+        <div class="form-row-2">
+          <div class="field">
+            <label>Ngày bắt đầu <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.startDate">
+          </div>
+          <div class="field">
+            <label>Ngày kết thúc <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.endDate">
+          </div>
+        </div>
+      </div>
+
+      <!-- Giới hạn sử dụng -->
+      <div class="section">
+        <div class="section-label">Giới hạn sử dụng</div>
+        <div class="form-row-2">
+          <div class="field">
+            <label>Tổng lượt dùng</label>
+            <input
+              type="number"
+              [(ngModel)]="form.usageLimit"
+              placeholder="VD: 100"
+              min="1">
+            <span class="hint">Để trống = không giới hạn</span>
+          </div>
+          <div class="field">
+            <label>Lượt/khách hàng</label>
+            <input
+              type="number"
+              [(ngModel)]="form.perUserLimit"
+              placeholder="VD: 1"
+              min="1">
+            <span class="hint">Để trống = không giới hạn</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kích hoạt -->
+      <div class="section">
+        <div class="section-label">Trạng thái</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Kích hoạt voucher</span>
+            <span class="t-desc">Voucher có thể được sử dụng khi trong thời hạn</span>
+          </div>
+          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="voucher-preview">
+        <div class="preview-label">Xem trước</div>
+        <div class="preview-card">
+          <div class="preview-left" [ngClass]="form.type === 'PERCENT' ? 'percent' : 'fixed'">
+            <div class="preview-value">
+              {{ form.discountValue || '??' }}{{ form.type === 'PERCENT' ? '%' : 'đ' }}
+            </div>
+            <div class="preview-type">{{ form.type === 'PERCENT' ? 'GIẢM' : 'TIẾT KIỆM' }}</div>
+          </div>
+          <div class="preview-right">
+            <div class="preview-code">{{ form.code || 'MÃVOUCHER' }}</div>
+            <div class="preview-desc">{{ form.description || 'Mô tả voucher' }}</div>
+            <div class="preview-exp" *ngIf="form.endDate">HSD: {{ form.endDate }}</div>
+          </div>
+          <div class="preview-notch left"></div>
+          <div class="preview-notch right"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn-cancel" (click)="closeDrawer()">Hủy</button>
+      <button class="btn-save" (click)="save()" [disabled]="!isFormValid()">
+        <mat-icon>{{ editingVoucher ? 'update' : 'save' }}</mat-icon>
+        {{ editingVoucher ? 'Cập nhật' : 'Tạo voucher' }}
+      </button>
+    </div>
+
+  </div>
+</div>

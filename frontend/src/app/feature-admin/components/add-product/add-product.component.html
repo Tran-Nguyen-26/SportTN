@@ -1,4 +1,4 @@
-<div class="add-product-page">
+<div class="add-product-page" *ngIf="!isLoading">
 
   <!-- Header -->
   <div class="page-header">
@@ -7,8 +7,14 @@
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div>
-        <h1 class="page-title">Thêm sản phẩm mới</h1>
-        <p class="page-sub">Điền đầy đủ thông tin để thêm sản phẩm</p>
+        <h1 class="page-title">
+          {{ isEditMode ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới' }}
+        </h1>
+        <p class="page-sub">
+          {{ isEditMode
+          ? 'Cập nhật thông tin sản phẩm #' + productId
+          : 'Điền đầy đủ thông tin để thêm sản phẩm' }}
+        </p>
       </div>
     </div>
     <div class="header-actions">
@@ -17,10 +23,16 @@
         class="btn-save"
         [disabled]="!isFormValid()"
         (click)="onSubmit()">
-        <mat-icon>save</mat-icon>
-        Lưu sản phẩm
+        <mat-icon>{{ isEditMode ? 'update' : 'save' }}</mat-icon>
+        {{ isEditMode ? 'Cập nhật' : 'Lưu sản phẩm' }}
       </button>
     </div>
+  </div>
+
+  <div class="edit-badge" *ngIf="isEditMode">
+    <mat-icon>edit</mat-icon>
+    Đang chỉnh sửa sản phẩm #{{ productId }}
+    <span class="edit-badge-hint">Các thay đổi sẽ được áp dụng ngay sau khi lưu</span>
   </div>
 
   <!-- Tabs -->
@@ -297,6 +309,48 @@
               </div>
             </div>
 
+            <!-- Row 3: Ảnh variant -->
+            <div class="variant-images-section">
+              <div class="variant-images-label">
+                <mat-icon>photo_library</mat-icon>
+                Hình ảnh variant
+                <span class="variant-img-count">{{ variant.images?.length || 0 }}/4</span>
+              </div>
+
+              <div class="variant-images-grid">
+
+                <!-- Ảnh đã chọn -->
+                <div
+                  class="variant-img-preview"
+                  *ngFor="let img of variant.images; let imgIdx = index">
+                  <img [src]="img.preview" alt="Variant image">
+                  <button
+                    class="remove-vimg-btn"
+                    (click)="removeVariantImage(i, imgIdx)"
+                    title="Xóa ảnh">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <!-- Badge ảnh chính -->
+                  <div class="main-img-badge" *ngIf="imgIdx === 0">Chính</div>
+                </div>
+
+                <!-- Upload thêm -->
+                <label
+                  class="variant-img-upload"
+                  *ngIf="!variant.images || variant.images.length < 4">
+                  <mat-icon>add_photo_alternate</mat-icon>
+                  <span>Thêm ảnh</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    hidden
+                    (change)="onVariantImageChange($event, i)">
+                </label>
+
+              </div>
+            </div>
+
           </div>
 
           <button
@@ -420,10 +474,15 @@
         class="btn-save"
         [disabled]="!isFormValid()"
         (click)="onSubmit()">
-        <mat-icon>save</mat-icon>
-        Lưu sản phẩm
+        <mat-icon>{{ isEditMode ? 'update' : 'save' }}</mat-icon>
+        {{ isEditMode ? 'Cập nhật' : 'Lưu sản phẩm' }}
       </button>
     </div>
   </div>
 
+</div>
+
+<div class="loading-wrap" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">Đang tải dữ liệu sản phẩm...</p>
 </div>
