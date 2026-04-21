@@ -1,1 +1,129 @@
-<p>categories works!</p>
+<div class="categories-page">
+
+  <app-page-header
+    title="Danh mục"
+    subtitle="Quản lý danh mục sản phẩm"
+    btnLabel="Thêm danh mục"
+    btnIcon="add">
+  </app-page-header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>account_tree</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ categories.length }}</span>
+        <span class="stat-label">Tổng danh mục</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>folder</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ parentCount() }}</span>
+        <span class="stat-label">Danh mục cha</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>folder_open</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ childCount() }}</span>
+        <span class="stat-label">Danh mục con</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><mat-icon>home</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ homeCount() }}</span>
+        <span class="stat-label">Hiện trên home</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm tên, slug..."
+          [(ngModel)]="searchQuery">
+      </div>
+      <select class="filter-select" [(ngModel)]="selectedType">
+        <option *ngFor="let t of typeOptions" [value]="t.value">
+          {{ t.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Tên danh mục</th>
+          <th>Slug</th>
+          <th>Danh mục cha</th>
+          <th>Số SP</th>
+          <th>Thứ tự</th>
+          <th>Hiện home</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let cat of filteredCategories">
+          <td>
+            <div class="cat-name-cell">
+              <div class="cat-icon" [class.is-parent]="!cat.parent">
+                <mat-icon>{{ cat.parent ? 'folder_open' : 'account_tree' }}</mat-icon>
+              </div>
+              <div>
+                <div class="cat-name">{{ cat.name }}</div>
+                <div class="cat-type">{{ cat.parent ? 'Danh mục con' : 'Danh mục cha' }}</div>
+              </div>
+            </div>
+          </td>
+          <td><code class="slug-text">{{ cat.slug }}</code></td>
+          <td>
+            <span class="parent-tag" *ngIf="cat.parent">{{ cat.parent }}</span>
+            <span class="no-parent" *ngIf="!cat.parent">—</span>
+          </td>
+          <td class="count">{{ cat.productCount }}</td>
+          <td class="order">{{ cat.displayOrder }}</td>
+          <td>
+            <div class="toggle-wrap">
+              <div class="toggle" [class.on]="cat.showOnHome">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <app-status-badge [status]="cat.active ? 'ACTIVE' : 'INACTIVE'">
+            </app-status-badge>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn edit" title="Sửa">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="action-btn delete" title="Xóa">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span class="result-count">
+        Hiển thị {{ filteredCategories.length }} / {{ categories.length }} danh mục
+      </span>
+    </div>
+
+  </div>
+</div>

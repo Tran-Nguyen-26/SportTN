@@ -1,1 +1,138 @@
-<p>invoices works!</p>
+<div class="invoices-page">
+
+  <app-page-header
+    title="Hóa đơn"
+    subtitle="Quản lý hóa đơn và thanh toán"
+    btnLabel="Tạo hóa đơn"
+    btnIcon="add">
+  </app-page-header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>receipt_long</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ invoices.length }}</span>
+        <span class="stat-label">Tổng hóa đơn</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>check_circle</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ formatPrice(totalPaidAmount()) }}</span>
+        <span class="stat-label">Đã thanh toán</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>schedule</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ formatPrice(totalPendingAmount())}}</span>
+        <span class="stat-label">Chờ thanh toán</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red"><mat-icon>warning</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ overdueCount() }}</span>
+        <span class="stat-label">Quá hạn</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm mã HĐ, khách hàng, mã đơn..."
+          [(ngModel)]="searchQuery">
+      </div>
+      <select class="filter-select" [(ngModel)]="selectedStatus">
+        <option *ngFor="let s of statusOptions" [value]="s.value">
+          {{ s.label }}
+        </option>
+      </select>
+      <button class="btn-export">
+        <mat-icon>download</mat-icon>
+        Xuất PDF
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Mã HĐ</th>
+          <th>Mã đơn</th>
+          <th>Khách hàng</th>
+          <th>Ngày tạo</th>
+          <th>Hạn TT</th>
+          <th>Thanh toán</th>
+          <th>Số tiền</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let inv of filteredInvoices()">
+          <td class="inv-id">{{ inv.id }}</td>
+          <td class="order-id">{{ inv.orderId }}</td>
+          <td>
+            <div class="customer-cell">
+              <div class="avatar">{{ inv.initials }}</div>
+              <span class="customer-name">{{ inv.customer }}</span>
+            </div>
+          </td>
+          <td class="date">{{ inv.issueDate }}</td>
+          <td [class.overdue-date]="inv.status === 'OVERDUE'">{{ inv.dueDate }}</td>
+          <td>
+            <span class="payment-chip">{{ inv.paymentMethod }}</span>
+          </td>
+          <td class="amount">{{ formatPrice(inv.amount) }}</td>
+          <td>
+              <span
+                class="status-badge"
+                [ngClass]="getStatusInvoice(inv.status).css">
+                {{ getStatusInvoice(inv.status).label }}
+              </span>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn view" title="Xem">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button class="action-btn download" title="Tải PDF">
+                <mat-icon>download</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Summary footer -->
+    <div class="summary-footer">
+      <div class="summary-item">
+        <span class="summary-label">Đã thanh toán:</span>
+        <span class="summary-value green">{{ formatPrice(totalPaidAmount()) }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Chờ thanh toán:</span>
+        <span class="summary-value orange">{{ formatPrice(totalPendingAmount()) }}</span>
+      </div>
+      <div class="summary-spacer"></div>
+      <div class="pagination">
+        <button class="page-btn" disabled><mat-icon>chevron_left</mat-icon></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
+      </div>
+    </div>
+
+  </div>
+</div>

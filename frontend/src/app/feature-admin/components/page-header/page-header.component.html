@@ -1,1 +1,10 @@
-<p>page-header works!</p>
+<div class="page-header">
+  <div class="header-left">
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+  </div>
+  <button class="btn-primary" *ngIf="btnLabel">
+    <mat-icon>{{ btnIcon }}</mat-icon>
+    {{ btnLabel }}
+  </button>
+</div>

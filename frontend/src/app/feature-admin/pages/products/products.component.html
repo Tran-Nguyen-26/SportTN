@@ -1,1 +1,146 @@
-<p>products works!</p>
+<div class="products-page">
+
+  <app-page-header
+    title="Sản phẩm"
+    subtitle="Quản lý danh sách sản phẩm"
+    btnLabel="Thêm sản phẩm"
+    btnIcon="add">
+  </app-page-header>
+
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm tên sản phẩm, thương hiệu..."
+          [(ngModel)]="searchQuery">
+      </div>
+
+      <select class="filter-select" [(ngModel)]="selectedCategory">
+        <option *ngFor="let c of categories" [value]="c.value">
+          {{ c.label }}
+        </option>
+      </select>
+
+      <!-- View mode toggle -->
+      <div class="view-toggle">
+        <button
+          class="view-btn"
+          [class.active]="viewMode === 'table'"
+          (click)="viewMode = 'table'">
+          <mat-icon>table_rows</mat-icon>
+        </button>
+        <button
+          class="view-btn"
+          [class.active]="viewMode === 'grid'"
+          (click)="viewMode = 'grid'">
+          <mat-icon>grid_view</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Table view -->
+    <div class="table-wrap" *ngIf="viewMode === 'table'">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Sản phẩm</th>
+          <th>Danh mục</th>
+          <th>Thương hiệu</th>
+          <th>Giá gốc</th>
+          <th>Giá sale</th>
+          <th>Tồn kho</th>
+          <th>Đã bán</th>
+          <th>Rating</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let p of filteredProducts">
+          <td>
+            <div class="product-cell">
+              <div class="product-thumb">{{ p.image }}</div>
+              <span class="product-name">{{ p.name }}</span>
+            </div>
+          </td>
+          <td><span class="category-tag">{{ p.category }}</span></td>
+          <td class="brand">{{ p.brand }}</td>
+          <td class="price">{{ formatPrice(p.price) }}</td>
+          <td class="sale-price">
+            <span *ngIf="p.salePrice">{{ formatPrice(p.salePrice) }}</span>
+            <span class="no-sale" *ngIf="!p.salePrice">—</span>
+          </td>
+          <td [class.low-stock]="p.stock < 50" [class.no-stock]="p.stock === 0">
+            {{ p.stock }}
+          </td>
+          <td class="sold">{{ p.sold.toLocaleString() }}</td>
+          <td>
+            <div class="rating-cell">
+              <mat-icon class="star-icon">star</mat-icon>
+              {{ p.rating }}
+            </div>
+          </td>
+          <td>
+            <app-status-badge [status]="p.status"></app-status-badge>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn view" title="Xem">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button class="action-btn edit" title="Sửa">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="action-btn delete" title="Xóa">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Grid view -->
+    <div class="product-grid" *ngIf="viewMode === 'grid'">
+      <div class="product-grid-card" *ngFor="let p of filteredProducts">
+        <div class="grid-thumb">{{ p.image }}</div>
+        <div class="grid-info">
+          <div class="grid-name">{{ p.name }}</div>
+          <div class="grid-brand">{{ p.brand }}</div>
+          <div class="grid-price">
+            <span class="new-price" *ngIf="p.salePrice">{{ formatPrice(p.salePrice) }}</span>
+            <span class="old-price" *ngIf="p.salePrice">{{ formatPrice(p.price) }}</span>
+            <span class="new-price" *ngIf="!p.salePrice">{{ formatPrice(p.price) }}</span>
+          </div>
+          <div class="grid-footer">
+            <app-status-badge [status]="p.status"></app-status-badge>
+            <div class="grid-actions">
+              <button class="action-btn edit"><mat-icon>edit</mat-icon></button>
+              <button class="action-btn delete"><mat-icon>delete</mat-icon></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="table-footer">
+      <span class="result-count">
+        Hiển thị {{ filteredProducts.length }} / {{ products.length }} sản phẩm
+      </span>
+      <div class="pagination">
+        <button class="page-btn" disabled><mat-icon>chevron_left</mat-icon></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
+      </div>
+    </div>
+
+  </div>
+</div>

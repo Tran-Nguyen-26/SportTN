@@ -1,1 +1,62 @@
-<p>brands works!</p>
+<div class="brands-page">
+
+  <app-page-header
+    title="Thương hiệu"
+    subtitle="Quản lý các thương hiệu sản phẩm"
+    btnLabel="Thêm thương hiệu"
+    btnIcon="add">
+  </app-page-header>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Tìm thương hiệu..."
+        [(ngModel)]="searchQuery">
+    </div>
+  </div>
+
+  <!-- Brand grid -->
+  <div class="brand-grid">
+    <div class="brand-card" *ngFor="let brand of filteredBrands">
+
+      <div class="brand-header">
+        <div class="brand-logo" [style.background]="brand.color + '18'" [style.color]="brand.color">
+          {{ brand.initials }}
+        </div>
+        <div class="brand-menu">
+          <button class="action-btn edit" title="Sửa">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button class="action-btn delete" title="Xóa">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="brand-name">{{ brand.name }}</div>
+
+      <div class="brand-footer">
+        <div class="brand-count">
+          <mat-icon>inventory_2</mat-icon>
+          {{ brand.productCount }} sản phẩm
+        </div>
+        <div class="toggle" [class.on]="brand.active">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Add new card -->
+    <div class="brand-card add-card">
+      <mat-icon class="add-icon">add_circle_outline</mat-icon>
+      <span class="add-label">Thêm thương hiệu</span>
+    </div>
+
+  </div>
+
+</div>
