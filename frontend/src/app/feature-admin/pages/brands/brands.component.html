@@ -1,10 +1,10 @@
 <div class="brands-page">
-
   <app-page-header
     title="Thương hiệu"
     subtitle="Quản lý các thương hiệu sản phẩm"
     btnLabel="Thêm thương hiệu"
-    btnIcon="add">
+    btnIcon="add"
+    (btnClick)="openDrawer()">
   </app-page-header>
 
   <!-- Toolbar -->
@@ -22,41 +22,237 @@
   <!-- Brand grid -->
   <div class="brand-grid">
     <div class="brand-card" *ngFor="let brand of filteredBrands">
-
       <div class="brand-header">
         <div class="brand-logo" [style.background]="brand.color + '18'" [style.color]="brand.color">
-          {{ brand.initials }}
+          <img *ngIf="brand.logoUrl" [src]="brand.logoUrl" [alt]="brand.name" class="brand-logo-img">
+          <span *ngIf="!brand.logoUrl">{{ brand.initials }}</span>
         </div>
         <div class="brand-menu">
-          <button class="action-btn edit" title="Sửa">
+          <button class="action-btn edit" (click)="openDrawer(brand)" title="Sửa">
             <mat-icon>edit</mat-icon>
           </button>
-          <button class="action-btn delete" title="Xóa">
+          <button class="action-btn delete" (click)="deleteBrand(brand.id)" title="Xóa">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       </div>
-
       <div class="brand-name">{{ brand.name }}</div>
-
+      <div class="brand-slug">{{ brand.slug }}</div>
       <div class="brand-footer">
         <div class="brand-count">
           <mat-icon>inventory_2</mat-icon>
           {{ brand.productCount }} sản phẩm
         </div>
-        <div class="toggle" [class.on]="brand.active">
+        <div class="toggle" [class.on]="brand.active" (click)="brand.active = !brand.active">
           <div class="toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add new card -->
+    <div class="brand-card add-card" (click)="openDrawer()">
+      <mat-icon class="add-icon">add_circle_outline</mat-icon>
+      <span class="add-label">Thêm thương hiệu</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── DRAWER ─────────────────────────────────── -->
+<div class="overlay" *ngIf="drawerVisible" (click)="onOverlayClick($event)">
+  <div class="drawer">
+
+    <!-- Header -->
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">{{ editingBrand ? 'Chỉnh sửa thương hiệu' : 'Thêm thương hiệu' }}</div>
+        <div class="drawer-sub">{{ editingBrand ? 'Cập nhật thông tin thương hiệu' : 'Tạo thương hiệu mới' }}</div>
+      </div>
+      <button class="close-btn" (click)="closeDrawer()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body">
+
+      <!-- Thông tin cơ bản -->
+      <div class="section">
+        <div class="section-label">Thông tin cơ bản</div>
+
+        <div class="field">
+          <label>Tên thương hiệu <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="form.name"
+            (ngModelChange)="onNameChange($event)"
+            placeholder="VD: Nike, Adidas, Decathlon...">
+        </div>
+
+        <div class="field">
+          <label>Slug <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="form.slug"
+            placeholder="nike"
+            class="slug-input">
+          <span class="hint">Tự động tạo từ tên · Dùng chữ thường, số, dấu gạch ngang</span>
+        </div>
+
+        <div class="field">
+          <label>Mô tả</label>
+          <textarea
+            [(ngModel)]="form.description"
+            placeholder="Mô tả ngắn về thương hiệu..."
+            rows="3"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Website</label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">https://</span>
+            <input
+              type="text"
+              [(ngModel)]="form.website"
+              placeholder="www.nike.com"
+              class="input-with-prefix">
+          </div>
+        </div>
+      </div>
+
+      <!-- Logo -->
+      <div class="section">
+        <div class="section-label">Logo thương hiệu</div>
+
+        <!-- Source tabs -->
+        <div class="img-source-tabs">
+          <button
+            class="img-source-tab"
+            [class.active]="logoSource === 'upload'"
+            (click)="logoSource = 'upload'">
+            <mat-icon>upload</mat-icon>
+            Tải lên
+          </button>
+          <button
+            class="img-source-tab"
+            [class.active]="logoSource === 'url'"
+            (click)="logoSource = 'url'">
+            <mat-icon>link</mat-icon>
+            Nhập URL
+          </button>
+        </div>
+
+        <!-- Upload -->
+        <ng-container *ngIf="logoSource === 'upload'">
+          <div class="logo-upload-zone" (click)="logoInput.click()" *ngIf="!logoPreview">
+            <input #logoInput type="file" accept="image/*" hidden (change)="onLogoChange($event)">
+            <div class="logo-upload-icon">
+              <mat-icon>add_photo_alternate</mat-icon>
+            </div>
+            <span class="logo-upload-text">Chọn file logo</span>
+            <span class="logo-upload-hint">PNG, SVG, JPG · Nền trong suốt tốt hơn · Tối đa 2MB</span>
+          </div>
+          <div class="logo-preview-wrap" *ngIf="logoPreview">
+            <div class="logo-preview-box" [style.background]="form.color + '18'">
+              <img [src]="logoPreview" alt="Logo preview" class="logo-preview-img">
+            </div>
+            <button class="logo-remove-btn" (click)="removeLogo()">
+              <mat-icon>close</mat-icon>
+              Xóa logo
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- URL -->
+        <ng-container *ngIf="logoSource === 'url'">
+          <div class="url-field">
+            <mat-icon class="url-icon">link</mat-icon>
+            <input
+              type="text"
+              class="url-input"
+              placeholder="https://example.com/logo.png"
+              [(ngModel)]="form.logoUrl"
+              (input)="onLogoUrlChange($event)">
+            <button class="url-clear-btn" *ngIf="form.logoUrl" (click)="clearLogoUrl()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div class="logo-preview-wrap" *ngIf="logoUrlPreview">
+            <div class="logo-preview-box" [style.background]="form.color + '18'">
+              <img
+                [src]="logoUrlPreview"
+                alt="Logo preview"
+                class="logo-preview-img"
+                (load)="logoUrlValid = true"
+                (error)="logoUrlValid = false">
+            </div>
+            <div class="url-status ok" *ngIf="logoUrlValid === true">
+              <mat-icon>check_circle</mat-icon> URL hợp lệ
+            </div>
+            <div class="url-status err" *ngIf="logoUrlValid === false">
+              <mat-icon>error</mat-icon> URL không hợp lệ
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <!-- Màu thương hiệu -->
+      <div class="section">
+        <div class="section-label">Màu thương hiệu</div>
+        <div class="color-picker-wrap">
+          <div
+            class="color-swatch"
+            *ngFor="let c of presetColors"
+            [class.selected]="form.color === c"
+            [style.background]="c"
+            (click)="form.color = c"
+            [title]="c">
+            <mat-icon *ngIf="form.color === c">check</mat-icon>
+          </div>
+          <!-- Custom color -->
+          <label class="color-custom" title="Chọn màu khác">
+            <input type="color" [(ngModel)]="form.color" class="color-input">
+            <mat-icon>colorize</mat-icon>
+          </label>
+        </div>
+
+        <!-- Preview màu -->
+        <div class="color-preview">
+          <div class="color-preview-logo" [style.background]="form.color + '18'" [style.color]="form.color">
+            <img *ngIf="effectiveLogo" [src]="effectiveLogo" alt="logo" style="width:28px;height:28px;object-fit:contain">
+            <span *ngIf="!effectiveLogo">{{ form.name ? form.name.slice(0,2).toUpperCase() : 'AB' }}</span>
+          </div>
+          <div class="color-preview-info">
+            <span class="color-preview-name">{{ form.name || 'Tên thương hiệu' }}</span>
+            <span class="color-preview-hex">{{ form.color }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trạng thái -->
+      <div class="section">
+        <div class="section-label">Trạng thái</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Kích hoạt</span>
+            <span class="t-desc">Thương hiệu hiển thị khi lọc sản phẩm</span>
+          </div>
+          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+            <div class="toggle-thumb"></div>
+          </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Add new card -->
-    <div class="brand-card add-card">
-      <mat-icon class="add-icon">add_circle_outline</mat-icon>
-      <span class="add-label">Thêm thương hiệu</span>
+    <!-- Footer -->
+    <div class="drawer-footer">
+      <button class="btn-cancel" (click)="closeDrawer()">Hủy</button>
+      <button class="btn-save" (click)="save()" [disabled]="!isFormValid()">
+        <mat-icon>{{ editingBrand ? 'update' : 'save' }}</mat-icon>
+        {{ editingBrand ? 'Cập nhật' : 'Lưu thương hiệu' }}
+      </button>
     </div>
 
   </div>
-
 </div>

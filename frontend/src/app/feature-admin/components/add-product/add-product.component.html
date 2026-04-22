@@ -61,6 +61,15 @@
       <mat-icon>photo_library</mat-icon>
       Hình ảnh
     </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'reviews'"
+      (click)="activeTab = 'reviews'"
+      *ngIf="isEditMode">
+      <mat-icon>star</mat-icon>
+      Reviews
+      <span class="tab-badge">{{ reviews.length }}</span>
+    </button>
   </div>
 
   <!-- ── TAB: THÔNG TIN CƠ BẢN ─────────────── -->
@@ -315,39 +324,50 @@
                 <mat-icon>photo_library</mat-icon>
                 Hình ảnh variant
                 <span class="variant-img-count">{{ variant.images?.length || 0 }}/4</span>
-              </div>
-
-              <div class="variant-images-grid">
-
-                <!-- Ảnh đã chọn -->
-                <div
-                  class="variant-img-preview"
-                  *ngFor="let img of variant.images; let imgIdx = index">
-                  <img [src]="img.preview" alt="Variant image">
+                <div class="variant-img-tabs">
                   <button
-                    class="remove-vimg-btn"
-                    (click)="removeVariantImage(i, imgIdx)"
-                    title="Xóa ảnh">
+                    class="vimg-tab"
+                    [class.active]="variant.imageSource !== 'url'"
+                    (click)="variant.imageSource = 'upload'">
+                    <mat-icon>upload</mat-icon>
+                  </button>
+                  <button
+                    class="vimg-tab"
+                    [class.active]="variant.imageSource === 'url'"
+                    (click)="variant.imageSource = 'url'">
+                    <mat-icon>link</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="variant-url-add" *ngIf="variant.imageSource === 'url'">
+                <div class="url-field small">
+                  <mat-icon class="url-icon">link</mat-icon>
+                  <input
+                    type="text"
+                    class="url-input"
+                    placeholder="https://...jpg"
+                    [(ngModel)]="variant.pendingUrl"
+                    (keydown.enter)="addVariantUrl(variant)">
+                  <button class="btn-add-url sm" (click)="addVariantUrl(variant)" [disabled]="!variant.pendingUrl">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="variant-images-grid">
+                <div class="variant-img-preview" *ngFor="let img of variant.images; let imgIdx = index">
+                  <img [src]="img.preview" alt="Variant image">
+                  <button class="remove-vimg-btn" (click)="removeVariantImage(i, imgIdx)">
                     <mat-icon>close</mat-icon>
                   </button>
-                  <!-- Badge ảnh chính -->
                   <div class="main-img-badge" *ngIf="imgIdx === 0">Chính</div>
                 </div>
-
-                <!-- Upload thêm -->
                 <label
                   class="variant-img-upload"
-                  *ngIf="!variant.images || variant.images.length < 4">
+                  *ngIf="variant.imageSource !== 'url' && (!variant.images || variant.images.length < 4)">
                   <mat-icon>add_photo_alternate</mat-icon>
                   <span>Thêm ảnh</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    hidden
-                    (change)="onVariantImageChange($event, i)">
+                  <input type="file" accept="image/*" multiple hidden (change)="onVariantImageChange($event, i)">
                 </label>
-
               </div>
             </div>
 
@@ -400,27 +420,73 @@
         <div class="form-card-title">Ảnh chính</div>
         <p class="form-card-sub">Ảnh hiển thị trong danh sách sản phẩm</p>
 
+        <!-- Source tabs -->
+        <div class="img-source-tabs">
+          <button
+            class="img-source-tab"
+            [class.active]="mainImageSource === 'upload'"
+            (click)="mainImageSource = 'upload'">
+            <mat-icon>upload</mat-icon>
+            Tải lên
+          </button>
+          <button
+            class="img-source-tab"
+            [class.active]="mainImageSource === 'url'"
+            (click)="mainImageSource = 'url'">
+            <mat-icon>link</mat-icon>
+            Nhập URL
+          </button>
+        </div>
+
         <div class="main-image-wrap">
 
-          <!-- Preview -->
-          <div class="image-preview main-preview" *ngIf="mainImagePreview">
-            <img [src]="mainImagePreview" alt="Main image">
-            <button class="remove-img-btn" (click)="removeMainImage()">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
+          <!-- Upload mode -->
+          <ng-container *ngIf="mainImageSource === 'upload'">
+            <div class="image-preview main-preview" *ngIf="mainImagePreview">
+              <img [src]="mainImagePreview" alt="Main image">
+              <button class="remove-img-btn" (click)="removeMainImage()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <label class="upload-zone main-upload" *ngIf="!mainImagePreview">
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <span class="upload-title">Kéo thả hoặc click để chọn ảnh</span>
+              <span class="upload-sub">PNG, JPG tối đa 5MB</span>
+              <input type="file" accept="image/*" class="file-input" (change)="onMainImageChange($event)">
+            </label>
+          </ng-container>
 
-          <!-- Upload zone -->
-          <label class="upload-zone main-upload" *ngIf="!mainImagePreview">
-            <mat-icon class="upload-icon">cloud_upload</mat-icon>
-            <span class="upload-title">Kéo thả hoặc click để chọn ảnh</span>
-            <span class="upload-sub">PNG, JPG tối đa 5MB</span>
-            <input
-              type="file"
-              accept="image/*"
-              class="file-input"
-              (change)="onMainImageChange($event)">
-          </label>
+          <!-- URL mode -->
+          <ng-container *ngIf="mainImageSource === 'url'">
+            <div class="url-input-wrap">
+              <div class="url-field">
+                <mat-icon class="url-icon">link</mat-icon>
+                <input
+                  type="text"
+                  class="url-input"
+                  placeholder="https://example.com/image.jpg"
+                  [(ngModel)]="form.mainImageUrl"
+                  (input)="onMainImageUrlChange($event)">
+                <button
+                  class="url-clear-btn"
+                  *ngIf="form.mainImageUrl"
+                  (click)="form.mainImageUrl = ''; mainUrlPreview = ''">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <div class="url-preview" *ngIf="mainUrlPreview">
+                <img [src]="mainUrlPreview" alt="Preview"
+                     (error)="onUrlImgError('main')"
+                     (load)="onUrlImgLoad('main')">
+                <div class="url-preview-status ok" *ngIf="mainUrlValid === true">
+                  <mat-icon>check_circle</mat-icon> Ảnh hợp lệ
+                </div>
+                <div class="url-preview-status err" *ngIf="mainUrlValid === false">
+                  <mat-icon>error</mat-icon> URL không hợp lệ
+                </div>
+              </div>
+            </div>
+          </ng-container>
 
         </div>
       </div>
@@ -430,35 +496,248 @@
         <div class="form-card-title">Ảnh phụ</div>
         <p class="form-card-sub">Tối đa 6 ảnh, hiển thị trong trang chi tiết</p>
 
-        <div class="extra-images-grid">
+        <div class="img-source-tabs">
+          <button class="img-source-tab" [class.active]="extraImageSource === 'upload'" (click)="extraImageSource = 'upload'">
+            <mat-icon>upload</mat-icon> Tải lên
+          </button>
+          <button class="img-source-tab" [class.active]="extraImageSource === 'url'" (click)="extraImageSource = 'url'">
+            <mat-icon>link</mat-icon> Nhập URL
+          </button>
+        </div>
 
-          <!-- Ảnh đã chọn -->
-          <div
-            class="image-preview extra-preview"
-            *ngFor="let img of extraImagePreviews; let i = index">
+        <!-- URL input cho ảnh phụ -->
+        <div class="extra-url-add" *ngIf="extraImageSource === 'url'">
+          <div class="url-field">
+            <mat-icon class="url-icon">link</mat-icon>
+            <input
+              type="text"
+              class="url-input"
+              placeholder="https://example.com/image.jpg"
+              [(ngModel)]="pendingExtraUrl"
+              (keydown.enter)="addExtraUrl()">
+            <button class="btn-add-url" (click)="addExtraUrl()" [disabled]="!pendingExtraUrl">
+              <mat-icon>add</mat-icon>
+              Thêm
+            </button>
+          </div>
+          <span class="hint">Nhấn Enter hoặc bấm Thêm để thêm ảnh</span>
+        </div>
+
+        <div class="extra-images-grid">
+          <div class="image-preview extra-preview" *ngFor="let img of extraImagePreviews; let i = index">
             <img [src]="img" alt="Extra image">
-            <button class="remove-img-btn" (click)="removeExtraImage(i)">
+            <button class="remove-img-btn" (click)="removeExtraImage(i)"><mat-icon>close</mat-icon></button>
+          </div>
+          <label class="upload-zone extra-upload" *ngIf="extraImageSource === 'upload' && extraImagePreviews.length < 6">
+            <mat-icon class="upload-icon-sm">add_photo_alternate</mat-icon>
+            <span class="upload-sub">Thêm ảnh</span>
+            <input type="file" accept="image/*" multiple class="file-input" (change)="onExtraImagesChange($event)">
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── TAB: REVIEWS ─────────────────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'reviews'">
+
+    <div class="reviews-layout">
+
+      <!-- Cột trái: tổng quan rating -->
+      <div class="rating-overview">
+
+        <div class="form-card">
+          <div class="form-card-title">Tổng quan đánh giá</div>
+
+          <!-- Điểm trung bình -->
+          <div class="avg-rating-wrap">
+            <div class="avg-number">{{ avgRating }}</div>
+            <div class="avg-right">
+              <div class="avg-stars">
+                <mat-icon
+                  *ngFor="let s of getStars(5)"
+                  class="star"
+                  [class.filled]="s <= avgRating"
+                  [class.half]="s > avgRating && s < avgRating + 1">
+                  {{ s <= avgRating ? 'star' : 'star_border' }}
+                </mat-icon>
+              </div>
+              <div class="avg-count">{{ reviews.length }} đánh giá</div>
+            </div>
+          </div>
+
+          <!-- Breakdown theo sao -->
+          <div class="breakdown-list">
+            <div
+              class="breakdown-item"
+              *ngFor="let b of ratingBreakdown"
+              [class.active]="selectedRating === b.star"
+              (click)="selectedRating = selectedRating === b.star ? 0 : b.star">
+
+              <span class="breakdown-star">{{ b.star }}</span>
+              <mat-icon class="breakdown-icon">star</mat-icon>
+
+              <div class="breakdown-bar">
+                <div
+                  class="breakdown-fill"
+                  [style.width.%]="b.percent">
+                </div>
+              </div>
+
+              <span class="breakdown-count">{{ b.count }}</span>
+            </div>
+          </div>
+
+          <!-- Filter tag -->
+          <div class="filter-tag" *ngIf="selectedRating">
+            <mat-icon>filter_list</mat-icon>
+            Lọc: {{ selectedRating }} sao
+            <button class="clear-filter" (click)="selectedRating = 0">
               <mat-icon>close</mat-icon>
             </button>
           </div>
 
-          <!-- Upload thêm -->
-          <label
-            class="upload-zone extra-upload"
-            *ngIf="extraImagePreviews.length < 6">
-            <mat-icon class="upload-icon-sm">add_photo_alternate</mat-icon>
-            <span class="upload-sub">Thêm ảnh</span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              class="file-input"
-              (change)="onExtraImagesChange($event)">
-          </label>
+        </div>
+
+        <!-- Stats nhanh -->
+        <div class="form-card quick-stats">
+          <div class="quick-stat">
+          <span class="qs-value green">
+            {{ visibleReviewsCount }}
+          </span>
+            <span class="qs-label">Đang hiện</span>
+          </div>
+          <div class="qs-divider"></div>
+          <div class="quick-stat">
+          <span class="qs-value red">
+            {{ hiddenReviewsCount }}
+          </span>
+            <span class="qs-label">Đã ẩn</span>
+          </div>
+          <div class="qs-divider"></div>
+          <div class="quick-stat">
+          <span class="qs-value blue">
+            {{ repliedReviewsCount }}
+          </span>
+            <span class="qs-label">Đã trả lời</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Cột phải: danh sách reviews -->
+      <div class="reviews-list">
+
+        <!-- Empty state -->
+        <div class="review-empty" *ngIf="filteredReviews.length === 0">
+          <mat-icon>rate_review</mat-icon>
+          <p>Không có đánh giá nào</p>
+        </div>
+
+        <!-- Review items -->
+        <div
+          class="review-item"
+          *ngFor="let review of filteredReviews"
+          [class.hidden-review]="!review.isVisible">
+
+          <!-- Header -->
+          <div class="review-header">
+            <div class="reviewer-info">
+              <div class="reviewer-avatar">{{ review.customerAvatar }}</div>
+              <div>
+                <div class="reviewer-name">{{ review.customerName }}</div>
+                <div class="reviewer-date">{{ review.date }}</div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="review-actions">
+            <span class="hidden-badge" *ngIf="!review.isVisible">
+              <mat-icon>visibility_off</mat-icon>
+              Đã ẩn
+            </span>
+
+              <button
+                class="review-action-btn"
+                [class.active]="!review.isVisible"
+                (click)="toggleVisibility(review)"
+                [title]="review.isVisible ? 'Ẩn review' : 'Hiện review'">
+                <mat-icon>
+                  {{ review.isVisible ? 'visibility' : 'visibility_off' }}
+                </mat-icon>
+              </button>
+
+              <button
+                class="review-action-btn reply-btn"
+                (click)="startReply(review.id)"
+                title="Trả lời">
+                <mat-icon>reply</mat-icon>
+              </button>
+
+              <button
+                class="review-action-btn danger-btn"
+                (click)="deleteReview(review.id)"
+                title="Xóa">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="review-stars">
+            <mat-icon
+              *ngFor="let s of getStars(5)"
+              class="star"
+              [class.filled]="s <= review.rating">
+              {{ s <= review.rating ? 'star' : 'star_border' }}
+            </mat-icon>
+            <span class="review-rating-num">{{ review.rating }}/5</span>
+          </div>
+
+          <!-- Comment -->
+          <p class="review-comment">{{ review.comment }}</p>
+
+          <!-- Admin reply đã có -->
+          <div class="admin-reply" *ngIf="review.adminReply && replyingId !== review.id">
+            <div class="reply-header">
+              <mat-icon>storefront</mat-icon>
+              <span>Phản hồi từ SportZone Admin</span>
+              <button
+                class="edit-reply-btn"
+                (click)="startReply(review.id)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+            <p class="reply-text">{{ review.adminReply }}</p>
+          </div>
+
+          <!-- Form trả lời -->
+          <div class="reply-form" *ngIf="replyingId === review.id">
+            <div class="reply-form-header">
+              <mat-icon>reply</mat-icon>
+              <span>Trả lời đánh giá này</span>
+            </div>
+            <textarea
+              class="reply-textarea"
+              rows="3"
+              placeholder="Nhập phản hồi của bạn..."
+              [(ngModel)]="replyText">
+          </textarea>
+            <div class="reply-form-footer">
+              <button class="btn-cancel-reply" (click)="cancelReply()">Hủy</button>
+              <button
+                class="btn-submit-reply"
+                [disabled]="!replyText.trim()"
+                (click)="submitReply(review)">
+                <mat-icon>send</mat-icon>
+                {{ review.adminReply ? 'Cập nhật' : 'Gửi phản hồi' }}
+              </button>
+            </div>
+          </div>
 
         </div>
       </div>
-
     </div>
   </div>
 

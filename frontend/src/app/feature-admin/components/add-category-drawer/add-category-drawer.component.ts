@@ -28,6 +28,10 @@ export class AddCategoryDrawerComponent {
 
   previewUrl: string | null = null;
 
+  imageSource: 'upload' | 'url' = 'upload';
+  urlPreview: string = '';
+  urlValid: boolean | null = null;
+
   form: CategoryForm = this.emptyForm();
 
   emptyForm(): CategoryForm {
@@ -63,16 +67,32 @@ export class AddCategoryDrawerComponent {
     if ((e.target as HTMLElement).classList.contains('overlay')) this.close();
   }
 
-  close() {
-    this.visible = false;
-    this.visibleChange.emit(false);
-    this.form = this.emptyForm();
-    this.previewUrl = null;
-  }
-
   save() {
     if (!this.form.name || !this.form.slug) return;
     this.saved.emit({ ...this.form });
     this.close();
+  }
+
+  onImageUrlChange(event: Event): void {
+    const url = (event.target as HTMLInputElement).value.trim();
+    this.form.imageUrl = url;
+    this.urlPreview    = url;
+    this.urlValid      = null;
+  }
+
+  clearImageUrl(): void {
+    this.form.imageUrl = '';
+    this.urlPreview    = '';
+    this.urlValid      = null;
+  }
+
+  close() {
+    this.visible = false;
+    this.visibleChange.emit(false);
+    this.form        = this.emptyForm();
+    this.previewUrl  = null;
+    this.imageSource = 'upload';
+    this.urlPreview  = '';
+    this.urlValid    = null;
   }
 }

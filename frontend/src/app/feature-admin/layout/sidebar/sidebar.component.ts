@@ -53,12 +53,12 @@ export class SidebarComponent {
         { label: 'Flash Sale',  icon: 'bolt',             route: '/admin/flash-sale' },
       ]
     },
-    {
-      groupLabel: 'Kho hàng',
-      items: [
-        { label: 'Inventory',   icon: 'warehouse',        route: '/admin/inventory' },
-      ]
-    },
+    // {
+    //   groupLabel: 'Kho hàng',
+    //   items: [
+    //     { label: 'Inventory',   icon: 'warehouse',        route: '/admin/inventory' },
+    //   ]
+    // },
     {
       groupLabel: 'System',
       items: [
