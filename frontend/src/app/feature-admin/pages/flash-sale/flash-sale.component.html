@@ -1,1 +1,396 @@
-<p>flash-sale works!</p>
+<div class="flash-sale-page">
+
+  <!-- Header -->
+  <app-page-header
+    title="Flash Sale"
+    subtitle="Quản lý chương trình giảm giá theo khung giờ"
+    btnLabel="Tạo flash sale"
+    btnIcon="add"
+    (btnClick)="openDrawer()">
+  </app-page-header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>bolt</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ flashSales.length }}</span>
+        <span class="stat-label">Tổng flash sale</span>
+      </div>
+    </div>
+    <div class="stat-card live-stat" *ngIf="liveSession">
+      <div class="stat-icon red">
+        <mat-icon>live_tv</mat-icon>
+        <span class="live-dot"></span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value live-text">ĐANG DIỄN RA</span>
+        <span class="stat-label">{{ liveSession.name }}</span>
+      </div>
+      <div class="stat-countdown">
+        <span class="countdown-label">Còn lại</span>
+        <span class="countdown-value">{{ liveCountdown }}</span>
+      </div>
+    </div>
+    <div class="stat-card" *ngIf="!liveSession">
+      <div class="stat-icon green"><mat-icon>check_circle</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ activeCount() }}</span>
+        <span class="stat-label">Đang hoạt động</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>schedule</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ upcomingCount() }}</span>
+        <span class="stat-label">Sắp diễn ra</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><mat-icon>history</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ endedCount() }}</span>
+        <span class="stat-label">Đã kết thúc</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status filter tabs -->
+  <div class="filter-bar">
+    <div class="status-tabs">
+      <button
+        class="status-tab"
+        *ngFor="let t of statusTabs"
+        [class.active]="selectedStatus === t.value"
+        (click)="selectedStatus = t.value">
+        {{ t.label }}
+        <span class="tab-count">{{ getTabCount(t.value) }}</span>
+      </button>
+    </div>
+    <div class="search-wrap">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Tìm flash sale..."
+        [(ngModel)]="searchQuery">
+    </div>
+  </div>
+
+  <!-- Flash sale list -->
+  <div class="sale-list">
+    <div
+      class="sale-card"
+      *ngFor="let sale of filteredSales"
+      [ngClass]="getSaleStatusClass(sale)">
+
+      <!-- Card header -->
+      <div class="sale-card-header">
+        <div class="sale-status-badge" [ngClass]="getSaleStatusClass(sale)">
+          <span class="status-dot"></span>
+          {{ getSaleStatusLabel(sale) }}
+        </div>
+        <div class="sale-actions">
+          <button class="action-btn" (click)="openDrawer(sale)" title="Chỉnh sửa">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            class="action-btn toggle-btn"
+            [class.active]="sale.active"
+            (click)="sale.active = !sale.active"
+            title="{{ sale.active ? 'Tắt' : 'Bật' }}">
+            <mat-icon>{{ sale.active ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+          </button>
+          <button class="action-btn delete-btn" (click)="deleteSale(sale.id)" title="Xóa">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sale info -->
+      <div class="sale-info">
+        <div class="sale-name">{{ sale.name }}</div>
+        <div class="sale-time-row">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ sale.startTime }} → {{ sale.endTime }}</span>
+          <span class="sale-date">{{ sale.date }}</span>
+        </div>
+      </div>
+
+      <!-- Countdown nếu đang live -->
+      <div class="sale-live-bar" *ngIf="isLive(sale)">
+        <div class="live-indicator">
+          <span class="live-pulse"></span>
+          LIVE
+        </div>
+        <div class="live-progress-wrap">
+          <div class="live-progress" [style.width.%]="getLiveProgress(sale)"></div>
+        </div>
+        <span class="live-remain">còn {{ liveCountdown }}</span>
+      </div>
+
+      <!-- Upcoming countdown -->
+      <div class="sale-upcoming-bar" *ngIf="isUpcoming(sale)">
+        <mat-icon>timer</mat-icon>
+        <span>Bắt đầu sau {{ getUpcomingCountdown(sale) }}</span>
+      </div>
+
+      <!-- Products in sale -->
+      <div class="sale-products-header">
+        <span class="sale-products-title">
+          <mat-icon>inventory_2</mat-icon>
+          {{ sale.products.length }} sản phẩm
+        </span>
+        <button class="btn-add-product" (click)="openProductPicker(sale)">
+          <mat-icon>add</mat-icon>
+          Thêm SP
+        </button>
+      </div>
+
+      <div class="sale-products-list">
+        <div class="sale-product-row" *ngFor="let p of sale.products">
+
+          <div class="sp-thumb" [style.background]="p.thumbColor">
+            <mat-icon>checkroom</mat-icon>
+          </div>
+
+          <div class="sp-info">
+            <div class="sp-name">{{ p.name }}</div>
+            <div class="sp-sku">{{ p.sku }}</div>
+          </div>
+
+          <div class="sp-price-wrap">
+            <span class="sp-original">{{ p.originalPrice | number:'1.0-0' }}đ</span>
+            <span class="sp-arrow">→</span>
+            <span class="sp-sale">{{ p.salePrice | number:'1.0-0' }}đ</span>
+            <span class="sp-discount">-{{ getDiscount(p) }}%</span>
+          </div>
+
+          <div class="sp-stock-wrap">
+            <span class="sp-stock-label">Tồn kho flash</span>
+            <div class="sp-stock-input-wrap">
+              <input
+                type="number"
+                class="sp-stock-input"
+                [(ngModel)]="p.flashStock"
+                min="1"
+                [placeholder]="p.originalStock">
+            </div>
+          </div>
+
+          <div class="sp-sold-wrap">
+            <span class="sp-sold-num">{{ p.sold }}</span>
+            <span class="sp-sold-label">đã bán</span>
+            <div class="sp-sold-bar">
+              <div class="sp-sold-fill" [style.width.%]="getSoldPercent(p)"></div>
+            </div>
+          </div>
+
+          <button class="sp-remove-btn" (click)="removeProduct(sale, p.id)">
+            <mat-icon>close</mat-icon>
+          </button>
+
+        </div>
+
+        <div class="sale-empty" *ngIf="sale.products.length === 0">
+          <mat-icon>inventory_2</mat-icon>
+          <span>Chưa có sản phẩm. Bấm "Thêm SP" để thêm.</span>
+        </div>
+      </div>
+
+      <!-- Card footer: tổng kết -->
+      <div class="sale-card-footer" *ngIf="sale.products.length > 0">
+        <div class="footer-stat">
+          <span class="fs-label">Tổng tồn kho flash</span>
+          <span class="fs-value">{{ getTotalFlashStock(sale) }}</span>
+        </div>
+        <div class="footer-stat">
+          <span class="fs-label">Đã bán</span>
+          <span class="fs-value green">{{ getTotalSold(sale) }}</span>
+        </div>
+        <div class="footer-stat">
+          <span class="fs-label">Doanh thu ước tính</span>
+          <span class="fs-value blue">{{ getEstRevenue(sale) | number:'1.0-0' }}đ</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty state -->
+    <div class="list-empty" *ngIf="filteredSales.length === 0">
+      <mat-icon>bolt</mat-icon>
+      <p>Không có flash sale nào</p>
+      <button class="btn-create-empty" (click)="openDrawer()">
+        <mat-icon>add</mat-icon>
+        Tạo flash sale đầu tiên
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     DRAWER TẠO / SỬA FLASH SALE
+══════════════════════════════════════════════ -->
+<div class="overlay" *ngIf="drawerVisible" (click)="onOverlayClick($event)">
+  <div class="drawer">
+
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">{{ editingSale ? 'Chỉnh sửa flash sale' : 'Tạo flash sale mới' }}</div>
+        <div class="drawer-sub">Thiết lập khung giờ & sản phẩm giảm giá</div>
+      </div>
+      <button class="close-btn" (click)="closeDrawer()"><mat-icon>close</mat-icon></button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Thông tin cơ bản -->
+      <div class="section">
+        <div class="section-label">Thông tin</div>
+
+        <div class="field">
+          <label>Tên flash sale <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.name" placeholder="VD: Flash Sale Thứ 6 - Đồ Bơi">
+        </div>
+
+        <div class="field">
+          <label>Mô tả</label>
+          <input type="text" [(ngModel)]="form.description" placeholder="VD: Giảm đến 50% đồ bơi lội">
+        </div>
+      </div>
+
+      <!-- Thời gian -->
+      <div class="section">
+        <div class="section-label">Thời gian diễn ra</div>
+
+        <div class="field">
+          <label>Ngày <span class="req">*</span></label>
+          <input type="date" [(ngModel)]="form.date">
+        </div>
+
+        <div class="form-row-2">
+          <div class="field">
+            <label>Giờ bắt đầu <span class="req">*</span></label>
+            <input type="time" [(ngModel)]="form.startTime">
+          </div>
+          <div class="field">
+            <label>Giờ kết thúc <span class="req">*</span></label>
+            <input type="time" [(ngModel)]="form.endTime">
+          </div>
+        </div>
+
+        <!-- Duration preview -->
+        <div class="duration-preview" *ngIf="form.startTime && form.endTime">
+          <mat-icon>timer</mat-icon>
+          <span>Thời lượng: <strong>{{ getDuration() }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Cài đặt -->
+      <div class="section">
+        <div class="section-label">Cài đặt</div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Kích hoạt</span>
+            <span class="t-desc">Flash sale sẽ tự động bắt đầu đúng giờ</span>
+          </div>
+          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+
+        <div class="toggle-row" style="margin-top:8px">
+          <div class="toggle-info">
+            <span class="t-label">Hiển thị đếm ngược</span>
+            <span class="t-desc">Đồng hồ đếm ngược trên trang sản phẩm</span>
+          </div>
+          <div class="toggle" [class.on]="form.showCountdown" (click)="form.showCountdown = !form.showCountdown">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn-cancel" (click)="closeDrawer()">Hủy</button>
+      <button class="btn-save" (click)="save()" [disabled]="!isFormValid()">
+        <mat-icon>{{ editingSale ? 'update' : 'bolt' }}</mat-icon>
+        {{ editingSale ? 'Cập nhật' : 'Tạo flash sale' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PRODUCT PICKER MODAL
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="pickerVisible" (click)="onPickerOverlayClick($event)">
+  <div class="product-picker">
+
+    <div class="picker-header">
+      <div class="picker-title">Thêm sản phẩm vào flash sale</div>
+      <div class="picker-sub">{{ pickingForSale?.name }}</div>
+      <button class="close-btn" (click)="pickerVisible = false"><mat-icon>close</mat-icon></button>
+    </div>
+
+    <div class="picker-search">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        [(ngModel)]="pickerQuery"
+        placeholder="Tìm sản phẩm...">
+    </div>
+
+    <div class="picker-list">
+      <div
+        class="picker-item"
+        *ngFor="let p of filteredPickerProducts"
+        [class.selected]="isInSale(p.id)"
+        (click)="toggleProductInSale(p)">
+
+        <div class="pi-thumb" [style.background]="p.thumbColor">
+          <mat-icon>checkroom</mat-icon>
+        </div>
+
+        <div class="pi-info">
+          <div class="pi-name">{{ p.name }}</div>
+          <div class="pi-meta">{{ p.sku }} · Tồn: {{ p.stock }}</div>
+        </div>
+
+        <div class="pi-price">
+          <span class="pi-original">{{ p.originalPrice | number:'1.0-0' }}đ</span>
+        </div>
+
+        <div class="pi-sale-price" (click)="$event.stopPropagation()" *ngIf="isInSale(p.id)">
+          <label>Giá sale</label>
+          <input
+            type="number"
+            [(ngModel)]="p.tempSalePrice"
+            [placeholder]="p.originalPrice"
+            class="pi-price-input">
+        </div>
+
+        <div class="pi-check" [class.checked]="isInSale(p.id)">
+          <mat-icon>{{ isInSale(p.id) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="picker-footer">
+      <span class="picker-selected-count">Đã chọn {{ selectedProductIds.size }} sản phẩm</span>
+      <div class="picker-footer-actions">
+        <button class="btn-cancel" (click)="pickerVisible = false">Hủy</button>
+        <button class="btn-save" (click)="confirmProductPicker()">
+          <mat-icon>check</mat-icon>
+          Xác nhận
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

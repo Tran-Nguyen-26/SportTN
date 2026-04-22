@@ -4,6 +4,7 @@ import com.ttn.sporttn.common.exception.BusinessException;
 import com.ttn.sporttn.common.exception.ErrorCode;
 import com.ttn.sporttn.modules.category.dto.request.CreateCategoryRequest;
 import com.ttn.sporttn.modules.category.dto.request.UpdateCategoryRequest;
+import com.ttn.sporttn.modules.category.dto.response.CategoryAdminResponse;
 import com.ttn.sporttn.modules.category.dto.response.CategoryResponse;
 import com.ttn.sporttn.modules.category.entity.Category;
 import com.ttn.sporttn.modules.category.repository.CategoryRepository;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -132,5 +135,15 @@ public class CategoryService {
         Category updated = categoryRepository.save(category);
         log.info("[CATEGORY] Thay đổi trạng thái thành công. id={}, active={}", updated.getId(), updated.getActive());
         return CategoryResponse.from(updated);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CategoryAdminResponse> getCategoriesForAdmin(Pageable pageable) {
+        return categoryRepository.findAllForAdmin(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryAdminResponse> getCategoriesForAdmin() {
+        return categoryRepository.findAllForAdmin();
     }
 }

@@ -91,7 +91,7 @@ public class Product {
     }
 
     public void increaseSoldCount(int quantity) {
-        this.searchCount += quantity;
+        this.soldCount += quantity;
     }
 
     public void increaseSearchCount() {

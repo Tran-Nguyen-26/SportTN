@@ -65,43 +65,30 @@
         <tr *ngFor="let p of filteredProducts">
           <td>
             <div class="product-cell">
-              <div class="product-thumb">{{ p.image }}</div>
+              <div class="product-thumb">{{ getInitials(p.name) }}</div>
               <span class="product-name">{{ p.name }}</span>
             </div>
           </td>
-          <td><span class="category-tag">{{ p.category }}</span></td>
-          <td class="brand">{{ p.brand }}</td>
-          <td class="price">{{ formatPrice(p.price) }}</td>
+          <td><span class="category-tag">{{ p.categoryName }}</span></td>
+          <td class="brand">{{ p.brandName }}</td>
+          <td class="price">{{ formatPrice(p.minPrice) }}</td>
           <td class="sale-price">
             <span *ngIf="p.salePrice">{{ formatPrice(p.salePrice) }}</span>
             <span class="no-sale" *ngIf="!p.salePrice">—</span>
           </td>
-          <td [class.low-stock]="p.stock < 50" [class.no-stock]="p.stock === 0">
-            {{ p.stock }}
+          <td [class.low-stock]="p.totalStock < 50" [class.no-stock]="p.totalStock === 0">
+            {{ p.totalStock }}
           </td>
-          <td class="sold">{{ p.sold.toLocaleString() }}</td>
+          <td class="sold">{{ p.soldCount?.toLocaleString() }}</td>
           <td>
             <div class="rating-cell">
-              <mat-icon class="star-icon">star</mat-icon>
               {{ p.rating }}
+              <mat-icon class="star-icon">star</mat-icon>
             </div>
           </td>
           <td>
-            <app-status-badge [status]="p.status"></app-status-badge>
+            <app-status-badge [status]="p.active ? 'ACTIVE' : 'INACTIVE'"></app-status-badge>
           </td>
-<!--          <td>-->
-<!--            <div class="action-btns">-->
-<!--              <button class="action-btn view" title="Xem">-->
-<!--                <mat-icon>visibility</mat-icon>-->
-<!--              </button>-->
-<!--              <button class="action-btn edit" title="Sửa">-->
-<!--                <mat-icon>edit</mat-icon>-->
-<!--              </button>-->
-<!--              <button class="action-btn delete" title="Xóa">-->
-<!--                <mat-icon>delete</mat-icon>-->
-<!--              </button>-->
-<!--            </div>-->
-<!--          </td>-->
           <td>
             <div class="action-wrap">
 
@@ -130,8 +117,8 @@
                 </button>
 
                 <button class="dropdown-item" (click)="onToggleStatus(p)">
-                  <mat-icon>{{ p.status === 'ACTIVE' ? 'visibility_off' : 'visibility' }}</mat-icon>
-                  <span>{{ p.status === 'ACTIVE' ? 'Ẩn sản phẩm' : 'Hiện sản phẩm' }}</span>
+                  <mat-icon>{{ p.active ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  <span>{{ p.active ? 'Ẩn sản phẩm' : 'Hiện sản phẩm' }}</span>
                 </button>
 
                 <div class="dropdown-divider"></div>
@@ -153,24 +140,21 @@
     <!-- Grid view -->
     <div class="product-grid" *ngIf="viewMode === 'grid'">
       <div class="product-grid-card" *ngFor="let p of filteredProducts">
-        <div class="grid-thumb">{{ p.image }}</div>
+        <div class="grid-thumb">
+          <img [src]="p.mainImageUrl" [alt]="p.name" class="grid-image">
+        </div>
+
         <div class="grid-info">
           <div class="grid-name">{{ p.name }}</div>
-          <div class="grid-brand">{{ p.brand }}</div>
+          <div class="grid-brand">{{ p.brandName }}</div>
           <div class="grid-price">
             <span class="new-price" *ngIf="p.salePrice">{{ formatPrice(p.salePrice) }}</span>
-            <span class="old-price" *ngIf="p.salePrice">{{ formatPrice(p.price) }}</span>
-            <span class="new-price" *ngIf="!p.salePrice">{{ formatPrice(p.price) }}</span>
+            <span class="old-price" *ngIf="p.salePrice">{{ formatPrice(p.minPrice) }}</span>
+            <span class="new-price" *ngIf="!p.salePrice">{{ formatPrice(p.minPrice) }}</span>
           </div>
-<!--          <div class="grid-footer">-->
-<!--            <app-status-badge [status]="p.status"></app-status-badge>-->
-<!--            <div class="grid-actions">-->
-<!--              <button class="action-btn edit"><mat-icon>edit</mat-icon></button>-->
-<!--              <button class="action-btn delete"><mat-icon>delete</mat-icon></button>-->
-<!--            </div>-->
-<!--          </div>-->
+
           <div class="grid-footer">
-            <app-status-badge [status]="p.status"></app-status-badge>
+            <app-status-badge [status]="p.active ? 'ACTIVE': 'INACTIVE'"></app-status-badge>
             <div class="grid-action-wrap">
 
               <button
@@ -211,15 +195,34 @@
     </div>
 
     <!-- Footer -->
+
     <div class="table-footer">
-      <span class="result-count">
-        Hiển thị {{ filteredProducts.length }} / {{ products.length }} sản phẩm
-      </span>
+  <span class="result-count">
+    Hiển thị <b>{{ products().length }}</b> / <b>{{ totalElements() }}</b> sản phẩm
+  </span>
+
       <div class="pagination">
-        <button class="page-btn" disabled><mat-icon>chevron_left</mat-icon></button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
+        <button
+          class="page-btn"
+          [disabled]="currentPage() === 0"
+          (click)="onPageChange(currentPage() - 1)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <button
+          *ngFor="let pageIndex of pagesArray(); trackBy: trackByPageIndex"
+          class="page-btn"
+          [class.active]="currentPage() === pageIndex"
+          (click)="onPageChange(pageIndex)">
+          {{ pageIndex + 1 }}
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage() === totalPages() - 1"
+          (click)="onPageChange(currentPage() + 1)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
       </div>
     </div>
 

@@ -3,8 +3,14 @@ import {environment} from "../../../../enviroments/enviroment";
 import {HttpClient} from "@angular/common/http";
 import {ApiResponse, ProductCardResponse} from "../../models/home-response/home-response";
 import {Observable} from "rxjs";
-import {ProductPageResponse} from "../../models/product/product.model";
+import {
+  ProductAdminResponse,
+  ProductDetail,
+  ProductPageResponse,
+  ProductUpdateRequest
+} from "../../models/product/product.model";
 import {ListRange} from "@angular/cdk/collections";
+import {PageResponse} from "../../models/page-response";
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +32,17 @@ export class ProductService {
 
   getPopularProducts(): Observable<ApiResponse<ProductCardResponse[]>> {
     return this.http.get<ApiResponse<ProductCardResponse[]>>(`${this.apiUrl}/popular`);
+  }
+
+  getProductsForAdmin(params: any): Observable<ApiResponse<PageResponse<ProductAdminResponse>>> {
+    return this.http.get<ApiResponse<PageResponse<ProductAdminResponse>>>(`${this.apiUrl}/list`, { params })
+  }
+
+  updateProduct(id: number, data: ProductUpdateRequest): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/${id}`, data);
+  }
+
+  getEditDetail(id: number): Observable<ApiResponse<ProductDetail>> {
+    return this.http.get<ApiResponse<ProductDetail>>(`${this.apiUrl}/${id}/detail`);
   }
 }

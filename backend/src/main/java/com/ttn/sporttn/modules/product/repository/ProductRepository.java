@@ -1,5 +1,7 @@
 package com.ttn.sporttn.modules.product.repository;
 
+import com.ttn.sporttn.modules.product.dto.response.admin.ProductAdminResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -39,5 +41,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     Optional<Product> findBySlug(String slug);
+
+    @Query("SELECT p.id as id, p.name as name, c.name as categoryName, b.name as brandName, " +
+            "MIN(v.originalPrice) as minPrice, SUM(v.stockQuantity) as totalStock, " +
+            "p.soldCount as soldCount, p.rating as rating, p.active as active, " +
+            "p.mainImageUrl as mainImageUrl " +
+            "FROM Product p " +
+            "LEFT JOIN p.category c " +
+            "LEFT JOIN p.brand b " +
+            "LEFT JOIN p.variants v " +
+            "GROUP BY p.id, p.name, c.name, b.name, p.soldCount, p.rating, p.active, p.mainImageUrl")
+    Page<ProductAdminResponse> findAllForAdmin(Pageable pageable);
 
 }

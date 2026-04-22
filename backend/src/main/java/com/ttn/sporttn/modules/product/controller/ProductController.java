@@ -2,12 +2,19 @@ package com.ttn.sporttn.modules.product.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
+import com.ttn.sporttn.modules.product.dto.request.admin.ProductUpdateRequest;
+import com.ttn.sporttn.modules.product.dto.response.admin.ProductAdminResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductCardResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductPageResponse;
+import com.ttn.sporttn.modules.product.dto.response.admin.ProductDetailFromUpdateResponse;
 import com.ttn.sporttn.modules.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,15 +72,15 @@ public class ProductController {
      * Update product (Admin only)
      * PUT /api/v1/products/{id}
      */
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<ProductDetailResponse>> updateProduct(
-        @PathVariable Long id,
-        @Valid @RequestBody ProductRequest request
-    ) {
-        ProductDetailResponse product = productService.updateProduct(id, request);
-        return ResponseEntity.ok(ApiResponse.ok(product, "Cập nhật sản phẩm thành công"));
-    }
+//    @PutMapping("/{id}")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<ApiResponse<ProductDetailResponse>> updateProduct(
+//        @PathVariable Long id,
+//        @Valid @RequestBody ProductRequest request
+//    ) {
+//        ProductDetailResponse product = productService.updateProduct(id, request);
+//        return ResponseEntity.ok(ApiResponse.ok(product, "Cập nhật sản phẩm thành công"));
+//    }
 
     /**
      * Delete product (Admin only)
@@ -93,4 +100,24 @@ public class ProductController {
         List<ProductCardResponse> popularProducts = productService.getPopularProducts();
         return ResponseEntity.ok(ApiResponse.ok(popularProducts));
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<Page<ProductAdminResponse>>> getProductsForAdmin(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ProductAdminResponse> products = productService.getProductsForAdmin(pageable);
+        return ResponseEntity.ok(ApiResponse.ok(products, "Lấy danh sách sản phẩm thành công"));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> updateProduct(@PathVariable Long id, @Valid ProductUpdateRequest request) {
+        productService.updateProduct(id, request);
+        return ResponseEntity.ok(ApiResponse.ok("Cập nhật sản phẩm thành công: id: " + id));
+    }
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<ApiResponse<ProductDetailFromUpdateResponse>> getProductDetailFromUpdate(@PathVariable Long id) {
+        ProductDetailFromUpdateResponse response = productService.getProductDetailFromUpdate(id);
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 
 export interface CategoryForm {
   name: string;
@@ -13,6 +13,11 @@ export interface CategoryForm {
   active: boolean;
 }
 
+export interface ParentCategory {
+  id: number;
+  name: string;
+}
+
 @Component({
   selector: 'app-add-category-drawer',
   templateUrl: './add-category-drawer.component.html',
@@ -22,6 +27,7 @@ export class AddCategoryDrawerComponent {
   @Input() visible = false;
   @Input() parentCategories: { id: number; name: string }[] = [];
   @Input() editMode = false;
+
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() saved = new EventEmitter<CategoryForm>();

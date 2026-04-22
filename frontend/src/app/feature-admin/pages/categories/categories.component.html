@@ -101,7 +101,7 @@
           <td class="count">{{ cat.productCount }}</td>
           <td class="order">{{ cat.displayOrder }}</td>
           <td>
-            <div class="toggle-wrap">
+            <div class="toggle-wrap" (click)="toggleShowOnHomeStatus(cat)">
               <div class="toggle" [class.on]="cat.showOnHome">
                 <div class="toggle-thumb"></div>
               </div>
