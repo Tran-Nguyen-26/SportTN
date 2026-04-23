@@ -16,9 +16,9 @@ import {UsersComponent} from "./pages/users/users.component";
 import {NotificationsComponent} from "./pages/notifications/notifications.component";
 import {SettingsComponent} from "./pages/settings/settings.component";
 import {adminGuard} from "../core/guards/admin/admin.guard";
-import {ChartCardComponent} from "./components/chart-card/chart-card.component";
 import {FlashSaleComponent} from "./pages/flash-sale/flash-sale.component";
 import {AddProductComponent} from "./components/add-product/add-product.component";
+import {ChartsComponent} from "./pages/charts/charts.component";
 
 const routes: Routes = [
   {
@@ -29,7 +29,7 @@ const routes: Routes = [
       { path: '',             redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard',    component: DashboardComponent    },
       { path: 'analytics',    component: AnalyticsComponent    },
-      { path: 'charts', component: ChartCardComponent },
+      { path: 'charts', component: ChartsComponent},
       { path: 'orders',       component: OrdersComponent       },
       { path: 'products',     component: ProductsComponent     },
       { path: 'products/add', component: AddProductComponent },

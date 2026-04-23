@@ -1,0 +1,499 @@
+<div class="charts-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Charts</h1>
+      <p class="page-sub">Thư viện biểu đồ — khám phá các loại chart</p>
+    </div>
+  </div>
+
+  <!-- Section nav -->
+  <div class="section-nav">
+    <button
+      class="section-btn"
+      *ngFor="let s of sections"
+      [class.active]="activeSection === s.value"
+      (click)="activeSection = s.value">
+      <mat-icon>{{ s.icon }}</mat-icon>
+      {{ s.label }}
+    </button>
+  </div>
+
+  <!-- ── BAR CHART ───────────────────────────── -->
+  <div *ngIf="activeSection === 'bar'">
+
+    <div class="chart-row">
+
+      <!-- Vertical Bar -->
+      <div class="chart-card chart-lg">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Doanh thu theo danh mục</div>
+            <div class="chart-sub">Triệu đồng — tháng 6/2025</div>
+          </div>
+          <div class="toggle-group">
+            <button
+              class="tg-btn"
+              [class.active]="barOrientation === 'vertical'"
+              (click)="barOrientation = 'vertical'">
+              <mat-icon>bar_chart</mat-icon>
+            </button>
+            <button
+              class="tg-btn"
+              [class.active]="barOrientation === 'horizontal'"
+              (click)="barOrientation = 'horizontal'">
+              <mat-icon>align_horizontal_left</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Vertical bars -->
+        <div class="bar-chart-wrap" *ngIf="barOrientation === 'vertical'">
+          <div class="bar-y-axis">
+            <span *ngFor="let l of [400,300,200,100,0]">{{ l }}</span>
+          </div>
+          <div class="bar-chart-area">
+            <div class="bar-grid">
+              <div class="bar-grid-line" *ngFor="let l of [0,1,2,3,4]"></div>
+            </div>
+            <div class="bars-group">
+              <div class="bar-item" *ngFor="let d of barData">
+                <div class="bar-tooltip">{{ d.value }}tr</div>
+                <div
+                  class="bar-fill"
+                  [style.height.%]="(d.value / barMax) * 100"
+                  [style.background]="d.color">
+                </div>
+                <span class="bar-label">{{ d.label }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Horizontal bars -->
+        <div class="hbar-chart" *ngIf="barOrientation === 'horizontal'">
+          <div class="hbar-item" *ngFor="let d of barData">
+            <span class="hbar-label">{{ d.label }}</span>
+            <div class="hbar-track">
+              <div
+                class="hbar-fill"
+                [style.width.%]="(d.value / barMax) * 100"
+                [style.background]="d.color">
+              </div>
+            </div>
+            <span class="hbar-value">{{ d.value }}tr</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bar legend & summary -->
+      <div class="chart-card chart-sm">
+        <div class="chart-header">
+          <div class="chart-title">Chi tiết danh mục</div>
+        </div>
+        <div class="legend-list">
+          <div class="legend-item" *ngFor="let d of barData">
+            <div class="legend-dot" [style.background]="d.color"></div>
+            <span class="legend-label">{{ d.label }}</span>
+            <div class="legend-bar-mini">
+              <div
+                class="legend-bar-fill"
+                [style.width.%]="(d.value / barMax) * 100"
+                [style.background]="d.color + '33'">
+              </div>
+            </div>
+            <span class="legend-value">{{ d.value }}tr</span>
+          </div>
+        </div>
+        <div class="chart-total">
+          <span class="total-label">Tổng</span>
+          <span class="total-value">
+            {{ totalBarValue }}tr
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── LINE CHART ──────────────────────────── -->
+  <div *ngIf="activeSection === 'line'">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">So sánh doanh thu 2024 vs 2025</div>
+          <div class="chart-sub">Đơn vị: triệu đồng</div>
+        </div>
+        <div class="legend-inline">
+          <div class="legend-item-inline" *ngFor="let ds of lineDatasets">
+            <div
+              class="legend-line"
+              [style.background]="ds.color"
+              [class.dashed-line]="ds.dashed">
+            </div>
+            {{ ds.label }}
+          </div>
+        </div>
+      </div>
+
+      <div class="svg-chart-wrap">
+        <div class="svg-y-labels">
+          <span *ngFor="let l of lineSteps">{{ l }}</span>
+        </div>
+        <div class="svg-area">
+          <svg
+            viewBox="0 0 800 260"
+            preserveAspectRatio="none"
+            class="line-svg">
+
+            <!-- Grid lines -->
+            <line
+              *ngFor="let s of lineSteps; let i = index"
+              x1="0" [attr.y1]="i * 65"
+              x2="800" [attr.y2]="i * 65"
+              stroke="#f1f5f9" stroke-width="1"/>
+
+            <!-- Lines -->
+            <ng-container *ngFor="let ds of lineDatasets">
+              <path
+                [attr.d]="getLinePath(ds.values, 800, 260, lineMax)"
+                fill="none"
+                [attr.stroke]="ds.color"
+                stroke-width="2.5"
+                [attr.stroke-dasharray]="ds.dashed ? '6 4' : 'none'"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+              <!-- Dots -->
+              <circle
+                *ngFor="let v of ds.values; let i = index"
+                [attr.cx]="(i / (ds.values.length - 1)) * 800"
+                [attr.cy]="260 - (v / lineMax) * 260"
+                r="4"
+                [attr.fill]="ds.color"
+                stroke="#fff"
+                stroke-width="2"/>
+            </ng-container>
+
+          </svg>
+          <div class="svg-x-labels">
+            <span *ngFor="let l of lineLabels">{{ l }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PIE & DONUT ─────────────────────────── -->
+  <div *ngIf="activeSection === 'pie'">
+    <div class="chart-row">
+
+      <!-- Pie -->
+      <div class="chart-card chart-md">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Phương thức thanh toán</div>
+            <div class="chart-sub">Tỷ lệ phần trăm</div>
+          </div>
+        </div>
+        <div class="circle-chart-wrap">
+          <div class="pie-circle" [style]="pieStyle"></div>
+        </div>
+        <div class="pie-legend">
+          <div class="pie-legend-item" *ngFor="let d of pieData">
+            <div class="legend-dot" [style.background]="d.color"></div>
+            <span class="pie-legend-label">{{ d.label }}</span>
+            <span class="pie-legend-pct">{{ d.value }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut -->
+      <div class="chart-card chart-md">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Trạng thái đơn hàng</div>
+            <div class="chart-sub">Tháng 6/2025</div>
+          </div>
+        </div>
+        <div class="circle-chart-wrap">
+          <div class="donut-wrap">
+            <div class="donut-circle" [style]="donutStyle"></div>
+            <div class="donut-center">
+              <div class="donut-center-value">3.842</div>
+              <div class="donut-center-label">Đơn hàng</div>
+            </div>
+          </div>
+        </div>
+        <div class="pie-legend">
+          <div class="pie-legend-item" *ngFor="let d of donutData">
+            <div class="legend-dot" [style.background]="d.color"></div>
+            <span class="pie-legend-label">{{ d.label }}</span>
+            <span class="pie-legend-pct">{{ d.value }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stacked bar (pie alternative) -->
+      <div class="chart-card chart-md">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Phân bổ doanh thu</div>
+            <div class="chart-sub">Theo danh mục — stacked</div>
+          </div>
+        </div>
+        <div class="stacked-bar-wrap">
+          <div class="stacked-bar">
+            <div
+              class="stacked-seg"
+              *ngFor="let d of pieData"
+              [style.width.%]="d.value"
+              [style.background]="d.color"
+              [title]="d.label + ': ' + d.value + '%'">
+            </div>
+          </div>
+          <div class="stacked-labels">
+            <div class="stacked-label" *ngFor="let d of pieData">
+              <div class="legend-dot" [style.background]="d.color"></div>
+              <span>{{ d.label }}</span>
+              <strong>{{ d.value }}%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── AREA CHART ──────────────────────────── -->
+  <div *ngIf="activeSection === 'area'">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Khách hàng mới vs quay lại</div>
+          <div class="chart-sub">So sánh xu hướng theo tháng</div>
+        </div>
+        <div class="legend-inline">
+          <div class="legend-item-inline" *ngFor="let ds of areaDatasets">
+            <div class="legend-dot" [style.background]="ds.color"></div>
+            {{ ds.label }}
+          </div>
+        </div>
+      </div>
+
+      <div class="svg-chart-wrap">
+        <div class="svg-y-labels">
+          <span *ngFor="let l of areaSteps">{{ l }}</span>
+        </div>
+        <div class="svg-area">
+          <svg
+            viewBox="0 0 800 260"
+            preserveAspectRatio="none"
+            class="line-svg">
+
+            <defs>
+              <linearGradient
+                *ngFor="let ds of areaDatasets; let i = index"
+                [attr.id]="'areaGrad' + i"
+                x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" [attr.stop-color]="ds.color" stop-opacity="0.3"/>
+                <stop offset="100%" [attr.stop-color]="ds.color" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Grid -->
+            <line
+              *ngFor="let s of areaSteps; let i = index"
+              x1="0" [attr.y1]="i * 65"
+              x2="800" [attr.y2]="i * 65"
+              stroke="#f1f5f9" stroke-width="1"/>
+
+            <!-- Area fills -->
+            <path
+              *ngFor="let ds of areaDatasets; let i = index"
+              [attr.d]="getAreaPath(ds.values, 800, 260, areaMax)"
+              [attr.fill]="'url(#areaGrad' + i + ')'"/>
+
+            <!-- Lines -->
+            <path
+              *ngFor="let ds of areaDatasets"
+              [attr.d]="getLinePath(ds.values, 800, 260, areaMax)"
+              fill="none"
+              [attr.stroke]="ds.color"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+
+            <!-- Dots -->
+            <ng-container *ngFor="let ds of areaDatasets">
+              <circle
+                *ngFor="let v of ds.values; let i = index"
+                [attr.cx]="(i / (ds.values.length - 1)) * 800"
+                [attr.cy]="260 - (v / areaMax) * 260"
+                r="4"
+                [attr.fill]="ds.color"
+                stroke="#fff"
+                stroke-width="2"/>
+            </ng-container>
+
+          </svg>
+          <div class="svg-x-labels">
+            <span *ngFor="let l of areaLabels">{{ l }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── RADAR CHART ─────────────────────────── -->
+  <div *ngIf="activeSection === 'radar'">
+    <div class="chart-row">
+
+      <div class="chart-card chart-md">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Đánh giá năng lực</div>
+            <div class="chart-sub">SportZone vs Đối thủ</div>
+          </div>
+          <div class="legend-inline">
+            <div class="legend-item-inline" *ngFor="let ds of radarDatasets">
+              <div class="legend-dot" [style.background]="ds.color"></div>
+              {{ ds.label }}
+            </div>
+          </div>
+        </div>
+
+        <div class="radar-wrap">
+          <svg viewBox="0 0 300 300" class="radar-svg">
+
+            <!-- Grid polygons -->
+            <polygon
+              *ngFor="let level of [1,2,3,4]"
+              [attr.points]="getRadarGridPoints(level, radarLabels.length, 150, 150, 110)"
+              fill="none"
+              stroke="#e2e8f0"
+              stroke-width="1"/>
+
+            <!-- Axis lines -->
+            <line
+              *ngFor="let line of radarLines"
+              [attr.x1]="150"
+              [attr.y1]="150"
+              [attr.x2]="line.x2"
+              [attr.y2]="line.y2"
+              stroke="#e2e8f0"
+              stroke-width="1"/>
+
+            <!-- Data polygons -->
+            <polygon
+              *ngFor="let ds of radarDatasets"
+              [attr.points]="getRadarPoints(ds.values, 150, 150, 110)"
+              [attr.fill]="ds.fill"
+              [attr.stroke]="ds.color"
+              stroke-width="2"/>
+
+            <!-- Labels -->
+            <text
+              *ngFor="let label of radarLabels; let i = index"
+              [attr.x]="getRadarLabelPos(i, radarLabels.length, 150, 150, 110).x"
+              [attr.y]="getRadarLabelPos(i, radarLabels.length, 150, 150, 110).y"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="11"
+              fill="#64748b">
+              {{ label }}
+            </text>
+
+          </svg>
+        </div>
+
+      </div>
+
+      <!-- Radar scores table -->
+      <div class="chart-card chart-md">
+        <div class="chart-header">
+          <div class="chart-title">Điểm chi tiết</div>
+        </div>
+        <div class="radar-table">
+          <div class="rt-header">
+            <span>Tiêu chí</span>
+            <span *ngFor="let ds of radarDatasets">{{ ds.label }}</span>
+          </div>
+          <div class="rt-row" *ngFor="let label of radarLabels; let i = index">
+            <span class="rt-label">{{ label }}</span>
+            <span
+              class="rt-value"
+              *ngFor="let ds of radarDatasets"
+              [class.rt-winner]="isWinner(ds.values[i], i)">
+              {{ ds.values[i] }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SCATTER PLOT ────────────────────────── -->
+  <div *ngIf="activeSection === 'scatter'">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Giá vs Đánh giá sản phẩm</div>
+          <div class="chart-sub">X: Giá (nghìn đồng) — Y: Rating (%)</div>
+        </div>
+        <div class="legend-inline">
+          <div class="legend-item-inline" *ngFor="let ds of scatterDatasets">
+            <div class="legend-dot-circle" [style.background]="ds.color"></div>
+            {{ ds.label }}
+          </div>
+        </div>
+      </div>
+
+      <div class="scatter-wrap">
+        <div class="scatter-y-labels">
+          <span *ngFor="let l of scatterYLabels">{{ l }}</span>
+        </div>
+        <div class="scatter-area">
+          <svg viewBox="0 0 600 300" class="scatter-svg">
+
+            <!-- Grid -->
+            <line
+              *ngFor="let l of scatterYLabels; let i = index"
+              x1="0" [attr.y1]="i * 60"
+              x2="600" [attr.y2]="i * 60"
+              stroke="#f1f5f9" stroke-width="1"/>
+            <line
+              *ngFor="let l of scatterXLabels; let i = index"
+              [attr.x1]="i * 120" y1="0"
+              [attr.x2]="i * 120" y2="300"
+              stroke="#f1f5f9" stroke-width="1"/>
+
+            <!-- Points -->
+            <ng-container *ngFor="let ds of scatterDatasets">
+              <circle
+                *ngFor="let pt of ds.points"
+                [attr.cx]="(pt.x / 100) * 600"
+                [attr.cy]="300 - (pt.y / 100) * 300"
+                r="7"
+                [attr.fill]="ds.color + 'bb'"
+                [attr.stroke]="ds.color"
+                stroke-width="1.5">
+                <title>{{ ds.label }}: Giá {{ pt.x }}k — Rating {{ pt.y }}%</title>
+              </circle>
+            </ng-container>
+
+          </svg>
+          <div class="scatter-x-labels">
+            <span *ngFor="let l of scatterXLabels">{{ l }}k</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

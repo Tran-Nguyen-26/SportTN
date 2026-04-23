@@ -1,38 +1,47 @@
-import { Component } from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
+import {BrandAddRequest, BrandResponse} from "../../../core/models/brand/brand";
+import {BrandService} from "../../../core/services/brand/brand.service";
 
-export interface Brand {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  website: string;
-  logoUrl: string;
-  color: string;
-  initials: string;
-  productCount: number;
-  active: boolean;
-}
-
-export interface BrandForm {
-  name: string;
-  slug: string;
-  description: string;
-  website: string;
-  logoUrl: string;
-  color: string;
-  active: boolean;
-}
+// export interface Brand {
+//   id: number;
+//   name: string;
+//   slug: string;
+//   description: string;
+//   website: string;
+//   logoUrl: string;
+//   color: string;
+//   initials: string;
+//   productCount: number;
+//   active: boolean;
+// }
+//
+// export interface BrandForm {
+//   name: string;
+//   slug: string;
+//   description: string;
+//   website: string;
+//   logoUrl: string;
+//   color: string;
+//   active: boolean;
+// }
 
 @Component({
   selector: 'app-brands',
   templateUrl: './brands.component.html',
   styleUrls: ['./brands.component.css']
 })
-export class BrandsComponent {
+export class BrandsComponent implements OnInit {
 
-  searchQuery = '';
+  constructor(private brandService: BrandService) {
+
+  }
+
+
+  brands = signal<BrandResponse[]>([]);
+  searchQuery = signal('');
   drawerVisible = false;
-  editingBrand: Brand | null = null;
+  editingBrand: BrandResponse | null = null;
+  isLoading = signal(false);
 
   // ── Logo state ───────────────────────────────
   logoSource: 'upload' | 'url' = 'upload';
@@ -47,37 +56,58 @@ export class BrandsComponent {
     '#64748b', '#ea580c',
   ];
 
-  form: BrandForm = this.emptyForm();
+  form: BrandAddRequest = this.emptyForm();
 
-  brands: Brand[] = [
-    { id: 1,  name: 'DECATHLON', slug: 'decathlon', description: 'Thương hiệu thể thao Pháp', website: 'www.decathlon.com', logoUrl: '', color: '#2563eb', initials: 'DE', productCount: 142, active: true },
-    { id: 2,  name: 'NABAIJI',   slug: 'nabaiji',   description: 'Thương hiệu đồ bơi',       website: 'www.decathlon.com', logoUrl: '', color: '#0891b2', initials: 'NA', productCount: 68,  active: true },
-    { id: 3,  name: 'KIPRUN',    slug: 'kiprun',    description: 'Thương hiệu chạy bộ',      website: 'www.decathlon.com', logoUrl: '', color: '#16a34a', initials: 'KI', productCount: 54,  active: true },
-    { id: 4,  name: 'DOMYOS',    slug: 'domyos',    description: 'Thương hiệu gym & fitness', website: 'www.decathlon.com', logoUrl: '', color: '#7c3aed', initials: 'DO', productCount: 38,  active: true },
-    { id: 5,  name: 'NIKE',      slug: 'nike',      description: 'Just Do It',                website: 'www.nike.com',      logoUrl: '', color: '#0f172a', initials: 'NK', productCount: 96,  active: true },
-    { id: 6,  name: 'ADIDAS',    slug: 'adidas',    description: 'Impossible is Nothing',    website: 'www.adidas.com',    logoUrl: '', color: '#dc2626', initials: 'AD', productCount: 87,  active: true },
-    { id: 7,  name: 'SPEEDO',    slug: 'speedo',    description: 'Thương hiệu bơi lội',      website: 'www.speedo.com',    logoUrl: '', color: '#d97706', initials: 'SP', productCount: 45,  active: false },
-  ];
+  ngOnInit() {
+    this.loadBrands();
+  }
+
+  loadBrands() {
+    this.isLoading.set(true);
+    this.brandService.getBrands().subscribe({
+      next: (res) => {
+        if (res.data) {
+          this.brands.set(res.data);
+        }
+        this.isLoading.set(false);
+        console.log(res.data);
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải danh sách thương hiệu:', err);
+        this.isLoading.set(false);
+      }
+    })
+  }
+
+  // brands: Brand[] = [
+  //   { id: 1,  name: 'DECATHLON', slug: 'decathlon', description: 'Thương hiệu thể thao Pháp', website: 'www.decathlon.com', logoUrl: '', color: '#2563eb', initials: 'DE', productCount: 142, active: true },
+  //   { id: 2,  name: 'NABAIJI',   slug: 'nabaiji',   description: 'Thương hiệu đồ bơi',       website: 'www.decathlon.com', logoUrl: '', color: '#0891b2', initials: 'NA', productCount: 68,  active: true },
+  //   { id: 3,  name: 'KIPRUN',    slug: 'kiprun',    description: 'Thương hiệu chạy bộ',      website: 'www.decathlon.com', logoUrl: '', color: '#16a34a', initials: 'KI', productCount: 54,  active: true },
+  //   { id: 4,  name: 'DOMYOS',    slug: 'domyos',    description: 'Thương hiệu gym & fitness', website: 'www.decathlon.com', logoUrl: '', color: '#7c3aed', initials: 'DO', productCount: 38,  active: true },
+  //   { id: 5,  name: 'NIKE',      slug: 'nike',      description: 'Just Do It',                website: 'www.nike.com',      logoUrl: '', color: '#0f172a', initials: 'NK', productCount: 96,  active: true },
+  //   { id: 6,  name: 'ADIDAS',    slug: 'adidas',    description: 'Impossible is Nothing',    website: 'www.adidas.com',    logoUrl: '', color: '#dc2626', initials: 'AD', productCount: 87,  active: true },
+  //   { id: 7,  name: 'SPEEDO',    slug: 'speedo',    description: 'Thương hiệu bơi lội',      website: 'www.speedo.com',    logoUrl: '', color: '#d97706', initials: 'SP', productCount: 45,  active: false },
+  // ];
 
   // ── Filter ───────────────────────────────────
-  get filteredBrands(): Brand[] {
-    const q = this.searchQuery.toLowerCase();
-    if (!q) return this.brands;
-    return this.brands.filter(b =>
+  get filteredBrands(): BrandResponse[] {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.brands();
+    return this.brands().filter(b =>
       b.name.toLowerCase().includes(q) ||
       b.slug.toLowerCase().includes(q)
     );
   }
 
   // ── Drawer ───────────────────────────────────
-  openDrawer(brand?: Brand): void {
+  openDrawer(brand?: BrandResponse): void {
     if (brand) {
       this.editingBrand = brand;
       this.form = {
         name:        brand.name,
         slug:        brand.slug,
         description: brand.description,
-        website:     brand.website,
+        websiteUrl:     brand.websiteUrl,
         logoUrl:     brand.logoUrl,
         color:       brand.color,
         active:      brand.active,
@@ -123,21 +153,19 @@ export class BrandsComponent {
         initials: this.getInitials(this.form.name),
       });
     } else {
-      // TODO: gọi create API
-      this.brands.push({
-        id:           Date.now(),
-        ...this.form,
-        logoUrl,
-        initials:     this.getInitials(this.form.name),
-        productCount: 0,
-      });
+      this.brandService.addBrand({...this.form, logoUrl}).subscribe(res => {
+        if (res.data) {
+          this.brands.update(all => [res.data, ...all]);
+          this.closeDrawer();
+        }
+      })
     }
     this.closeDrawer();
   }
 
   deleteBrand(id: number): void {
     // TODO: confirm + API
-    this.brands = this.brands.filter(b => b.id !== id);
+    // this.brands = this.brands().filter(b => b.id !== id);
   }
 
   // ── Name / Slug ──────────────────────────────
@@ -188,11 +216,12 @@ export class BrandsComponent {
     return name.slice(0, 2).toUpperCase();
   }
 
-  private emptyForm(): BrandForm {
+  private emptyForm(): BrandAddRequest {
     return {
       name: '', slug: '', description: '',
-      website: '', logoUrl: '',
-      color: '#2563eb', active: true,
+      websiteUrl: '', logoUrl: '',
+      color: '#2563eb',
+      active: true,
     };
   }
 }

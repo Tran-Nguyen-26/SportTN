@@ -1,1 +1,409 @@
-<p>users works!</p>
+<div class="users-page">
+
+  <!-- Header -->
+  <app-page-header
+    title="Quản lý Users"
+    subtitle="Tài khoản admin và phân quyền hệ thống"
+    btnLabel="Thêm tài khoản"
+    btnIcon="person_add"
+    (btnClick)="openDrawer()">
+  </app-page-header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>manage_accounts</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ users.length }}</span>
+        <span class="stat-label">Tổng tài khoản</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>check_circle</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ activeCount() }}</span>
+        <span class="stat-label">Đang hoạt động</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><mat-icon>admin_panel_settings</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getRoleCount('ADMIN') }}</span>
+        <span class="stat-label">Admin</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>support_agent</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getRoleCount('STAFF') + getRoleCount('WAREHOUSE') }}</span>
+        <span class="stat-label">Nhân viên</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm tên, email..."
+          [(ngModel)]="searchQuery">
+      </div>
+      <select class="filter-select" [(ngModel)]="selectedRole">
+        <option *ngFor="let r of roleOptions" [value]="r.value">{{ r.label }}</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="selectedStatus">
+        <option value="">Tất cả trạng thái</option>
+        <option value="true">Đang hoạt động</option>
+        <option value="false">Đã vô hiệu hóa</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Tài khoản</th>
+          <th>Vai trò</th>
+          <th>Phân quyền</th>
+          <th>Đăng nhập gần nhất</th>
+          <th>Ngày tạo</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let u of filteredUsers" [class.inactive-row]="!u.active">
+
+          <!-- Tài khoản -->
+          <td>
+            <div class="user-cell">
+              <div class="avatar" [style.background]="u.avatarColor + '22'" [style.color]="u.avatarColor">
+                {{ u.name[0].toUpperCase() }}
+              </div>
+              <div class="user-info">
+                <div class="user-name">
+                  {{ u.name }}
+                  <span class="you-badge" *ngIf="u.isCurrentUser">Bạn</span>
+                </div>
+                <div class="user-email">{{ u.email }}</div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Vai trò -->
+          <td>
+              <span class="role-badge" [ngClass]="'role-' + u.role.toLowerCase()">
+                <mat-icon>{{ getRoleIcon(u.role) }}</mat-icon>
+                {{ getRoleLabel(u.role) }}
+              </span>
+          </td>
+
+          <!-- Phân quyền -->
+          <td>
+            <div class="perms-wrap">
+                <span
+                  class="perm-tag"
+                  *ngFor="let p of u.permissions.slice(0, 3)"
+                  [title]="p">
+                  {{ getPermShort(p) }}
+                </span>
+              <span class="perm-more" *ngIf="u.permissions.length > 3">
+                  +{{ u.permissions.length - 3 }}
+                </span>
+            </div>
+          </td>
+
+          <!-- Đăng nhập -->
+          <td>
+            <div class="login-info">
+              <span class="login-time" *ngIf="u.lastLogin">{{ u.lastLogin }}</span>
+              <span class="login-never" *ngIf="!u.lastLogin">Chưa đăng nhập</span>
+            </div>
+          </td>
+
+          <!-- Ngày tạo -->
+          <td class="created-date">{{ u.createdAt }}</td>
+
+          <!-- Trạng thái -->
+          <td>
+            <app-status-badge [status]="u.active ? 'ACTIVE' : 'INACTIVE'"></app-status-badge>
+          </td>
+
+          <!-- Thao tác -->
+          <td>
+            <div class="action-btns">
+              <button
+                class="action-btn view"
+                (click)="openDetail(u)"
+                title="Xem chi tiết & phân quyền">
+                <mat-icon>tune</mat-icon>
+              </button>
+              <button
+                class="action-btn edit"
+                (click)="openDrawer(u)"
+                title="Chỉnh sửa"
+                [disabled]="u.isCurrentUser">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                class="action-btn"
+                [class.toggle-on]="u.active"
+                [class.toggle-off]="!u.active"
+                (click)="toggleUserStatus(u)"
+                [title]="u.active ? 'Vô hiệu hóa' : 'Kích hoạt'"
+                [disabled]="u.isCurrentUser">
+                <mat-icon>{{ u.active ? 'block' : 'check_circle' }}</mat-icon>
+              </button>
+            </div>
+          </td>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="table-footer">
+      <span class="result-count">
+        Hiển thị {{ filteredUsers.length }} / {{ users.length }} tài khoản
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     DRAWER TẠO / SỬA USER
+══════════════════════════════════════════════ -->
+<div class="overlay" *ngIf="drawerVisible" (click)="onOverlayClick($event)">
+  <div class="drawer">
+
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title">{{ editingUser ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới' }}</div>
+        <div class="drawer-sub">{{ editingUser ? editingUser.email : 'Tạo tài khoản admin / nhân viên' }}</div>
+      </div>
+      <button class="close-btn" (click)="closeDrawer()"><mat-icon>close</mat-icon></button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- Thông tin cơ bản -->
+      <div class="section">
+        <div class="section-label">Thông tin cơ bản</div>
+
+        <div class="field">
+          <label>Họ và tên <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.name" placeholder="VD: Nguyễn Văn An">
+        </div>
+
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" [(ngModel)]="form.email" placeholder="admin@example.com"
+                 [disabled]="!!editingUser">
+          <span class="hint" *ngIf="editingUser">Email không thể thay đổi sau khi tạo</span>
+        </div>
+
+        <div class="field" *ngIf="!editingUser">
+          <label>Mật khẩu <span class="req">*</span></label>
+          <div class="password-wrap">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="form.password"
+              placeholder="Tối thiểu 8 ký tự">
+            <button class="pwd-toggle" (click)="showPassword = !showPassword">
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Số điện thoại</label>
+          <input type="tel" [(ngModel)]="form.phone" placeholder="0912 345 678">
+        </div>
+      </div>
+
+      <!-- Vai trò -->
+      <div class="section">
+        <div class="section-label">Vai trò & Phân quyền</div>
+
+        <div class="field">
+          <label>Vai trò <span class="req">*</span></label>
+          <div class="role-selector">
+            <div
+              class="role-option"
+              *ngFor="let r of roleDefinitions"
+              [class.selected]="form.role === r.value"
+              (click)="selectRole(r.value)">
+              <div class="role-opt-icon" [ngClass]="'ri-' + r.value.toLowerCase()">
+                <mat-icon>{{ r.icon }}</mat-icon>
+              </div>
+              <div class="role-opt-info">
+                <span class="role-opt-name">{{ r.label }}</span>
+                <span class="role-opt-desc">{{ r.desc }}</span>
+              </div>
+              <mat-icon class="role-check" *ngIf="form.role === r.value">check_circle</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom permissions -->
+        <div class="field" *ngIf="form.role">
+          <label>Phân quyền chi tiết</label>
+          <div class="permissions-grid">
+            <div
+              class="perm-item"
+              *ngFor="let p of allPermissions"
+              [class.checked]="form.permissions.includes(p.value)"
+              (click)="togglePerm(p.value)">
+              <div class="perm-checkbox">
+                <mat-icon>{{ form.permissions.includes(p.value) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+              </div>
+              <div class="perm-info">
+                <span class="perm-name">{{ p.label }}</span>
+                <span class="perm-desc">{{ p.desc }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trạng thái -->
+      <div class="section">
+        <div class="section-label">Trạng thái</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="t-label">Kích hoạt tài khoản</span>
+            <span class="t-desc">Tài khoản có thể đăng nhập vào hệ thống</span>
+          </div>
+          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn-cancel" (click)="closeDrawer()">Hủy</button>
+      <button class="btn-save" (click)="save()" [disabled]="!isFormValid()">
+        <mat-icon>{{ editingUser ? 'update' : 'person_add' }}</mat-icon>
+        {{ editingUser ? 'Cập nhật' : 'Tạo tài khoản' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     DETAIL / PERMISSION MODAL
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="detailUser" (click)="onDetailOverlayClick($event)">
+  <div class="detail-modal">
+
+    <div class="modal-header">
+      <div class="modal-user-info">
+        <div class="modal-avatar" [style.background]="detailUser.avatarColor + '22'" [style.color]="detailUser.avatarColor">
+          {{ detailUser.name[0].toUpperCase() }}
+        </div>
+        <div>
+          <div class="modal-name">{{ detailUser.name }}</div>
+          <div class="modal-email">{{ detailUser.email }}</div>
+        </div>
+        <span class="role-badge" [ngClass]="'role-' + detailUser.role.toLowerCase()">
+          <mat-icon>{{ getRoleIcon(detailUser.role) }}</mat-icon>
+          {{ getRoleLabel(detailUser.role) }}
+        </span>
+      </div>
+      <button class="close-btn" (click)="detailUser = null"><mat-icon>close</mat-icon></button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Activity -->
+      <div class="modal-section">
+        <div class="modal-section-title">Hoạt động</div>
+        <div class="activity-grid">
+          <div class="act-item">
+            <mat-icon>login</mat-icon>
+            <div>
+              <div class="act-label">Đăng nhập gần nhất</div>
+              <div class="act-value">{{ detailUser.lastLogin || 'Chưa đăng nhập' }}</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <mat-icon>calendar_today</mat-icon>
+            <div>
+              <div class="act-label">Ngày tạo tài khoản</div>
+              <div class="act-value">{{ detailUser.createdAt }}</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <mat-icon>task_alt</mat-icon>
+            <div>
+              <div class="act-label">Tổng thao tác</div>
+              <div class="act-value">{{ detailUser.actionCount | number }} hành động</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <mat-icon>devices</mat-icon>
+            <div>
+              <div class="act-label">Thiết bị đăng nhập</div>
+              <div class="act-value">{{ detailUser.device || 'Không có dữ liệu' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permissions -->
+      <div class="modal-section">
+        <div class="modal-section-title">Danh sách quyền</div>
+        <div class="perm-full-list">
+          <div
+            class="perm-full-item"
+            *ngFor="let p of allPermissions"
+            [class.has-perm]="detailUser.permissions.includes(p.value)">
+            <mat-icon>{{ detailUser.permissions.includes(p.value) ? 'check_circle' : 'cancel' }}</mat-icon>
+            <div class="pfl-info">
+              <span class="pfl-label">{{ p.label }}</span>
+              <span class="pfl-desc">{{ p.desc }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent actions log -->
+      <div class="modal-section">
+        <div class="modal-section-title">Lịch sử hoạt động gần đây</div>
+        <div class="activity-log">
+          <div class="log-item" *ngFor="let log of detailUser.activityLog">
+            <div class="log-icon" [ngClass]="log.type">
+              <mat-icon>{{ getLogIcon(log.type) }}</mat-icon>
+            </div>
+            <div class="log-content">
+              <div class="log-action">{{ log.action }}</div>
+              <div class="log-time">{{ log.time }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="detailUser = null">Đóng</button>
+      <button class="btn-edit-from-modal" (click)="openDrawerFromDetail()">
+        <mat-icon>edit</mat-icon>
+        Chỉnh sửa
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -15,7 +15,8 @@
         type="text"
         class="search-input"
         placeholder="Tìm thương hiệu..."
-        [(ngModel)]="searchQuery">
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)">
     </div>
   </div>
 
@@ -25,7 +26,7 @@
       <div class="brand-header">
         <div class="brand-logo" [style.background]="brand.color + '18'" [style.color]="brand.color">
           <img *ngIf="brand.logoUrl" [src]="brand.logoUrl" [alt]="brand.name" class="brand-logo-img">
-          <span *ngIf="!brand.logoUrl">{{ brand.initials }}</span>
+          <span *ngIf="!brand.logoUrl">{{ brand.name | slice:0:2 | uppercase }}</span>
         </div>
         <div class="brand-menu">
           <button class="action-btn edit" (click)="openDrawer(brand)" title="Sửa">
@@ -41,7 +42,7 @@
       <div class="brand-footer">
         <div class="brand-count">
           <mat-icon>inventory_2</mat-icon>
-          {{ brand.productCount }} sản phẩm
+          {{ brand.totalProducts }} sản phẩm
         </div>
         <div class="toggle" [class.on]="brand.active" (click)="brand.active = !brand.active">
           <div class="toggle-thumb"></div>
@@ -112,7 +113,7 @@
             <span class="input-prefix">https://</span>
             <input
               type="text"
-              [(ngModel)]="form.website"
+              [(ngModel)]="form.websiteUrl"
               placeholder="www.nike.com"
               class="input-with-prefix">
           </div>
@@ -152,7 +153,10 @@
             <span class="logo-upload-hint">PNG, SVG, JPG · Nền trong suốt tốt hơn · Tối đa 2MB</span>
           </div>
           <div class="logo-preview-wrap" *ngIf="logoPreview">
-            <div class="logo-preview-box" [style.background]="form.color + '18'">
+            <div
+              class="logo-preview-box"
+              [style.background]="form.color + '18'"
+            >
               <img [src]="logoPreview" alt="Logo preview" class="logo-preview-img">
             </div>
             <button class="logo-remove-btn" (click)="removeLogo()">

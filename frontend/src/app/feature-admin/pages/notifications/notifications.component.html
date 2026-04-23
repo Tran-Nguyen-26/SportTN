@@ -1,1 +1,348 @@
-<p>notifications works!</p>
+<div class="notifications-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Thông báo</h1>
+      <p class="page-sub">Quản lý & gửi thông báo đến khách hàng</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-mark-all" (click)="markAllRead()" [disabled]="unreadCount === 0">
+        <mat-icon>done_all</mat-icon>
+        Đánh dấu tất cả đã đọc
+      </button>
+      <button class="btn-compose" (click)="openCompose()">
+        <mat-icon>send</mat-icon>
+        Gửi thông báo
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue"><mat-icon>notifications</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ notifications.length }}</span>
+        <span class="stat-label">Tổng thông báo</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">
+        <mat-icon>mark_email_unread</mat-icon>
+        <span class="unread-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ unreadCount }}</span>
+        <span class="stat-label">Chưa đọc</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><mat-icon>send</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ sentCount }}</span>
+        <span class="stat-label">Đã gửi hôm nay</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><mat-icon>people</mat-icon></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalReach | number }}</span>
+        <span class="stat-label">Lượt tiếp cận</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- Left: Danh sách thông báo hệ thống -->
+    <div class="notif-panel">
+
+      <!-- Toolbar -->
+      <div class="panel-toolbar">
+        <div class="type-tabs">
+          <button
+            class="type-tab"
+            *ngFor="let t of typeTabs"
+            [class.active]="selectedType === t.value"
+            (click)="selectedType = t.value">
+            <mat-icon>{{ t.icon }}</mat-icon>
+            {{ t.label }}
+            <span class="type-count" *ngIf="getTypeCount(t.value) > 0">
+              {{ getTypeCount(t.value) }}
+            </span>
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <div class="search-wrap">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Tìm thông báo..."
+              [(ngModel)]="searchQuery">
+          </div>
+          <button class="btn-icon" (click)="clearAll()" title="Xóa tất cả">
+            <mat-icon>delete_sweep</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Notification list -->
+      <div class="notif-list">
+        <div
+          class="notif-item"
+          *ngFor="let n of filteredNotifications"
+          [class.unread]="!n.read"
+          [class.selected]="selectedNotif?.id === n.id"
+          (click)="selectNotif(n)">
+
+          <!-- Icon -->
+          <div class="notif-icon-wrap" [ngClass]="n.type">
+            <mat-icon>{{ getTypeIcon(n.type) }}</mat-icon>
+          </div>
+
+          <!-- Content -->
+          <div class="notif-content">
+            <div class="notif-title-row">
+              <span class="notif-title">{{ n.title }}</span>
+              <span class="notif-time">{{ n.timeAgo }}</span>
+            </div>
+            <div class="notif-body">{{ n.body }}</div>
+            <div class="notif-meta" *ngIf="n.meta">
+              <mat-icon>{{ n.meta.icon }}</mat-icon>
+              {{ n.meta.text }}
+            </div>
+          </div>
+
+          <!-- Unread dot -->
+          <div class="unread-dot" *ngIf="!n.read"></div>
+
+          <!-- Actions on hover -->
+          <div class="notif-item-actions">
+            <button
+              class="naction-btn"
+              (click)="$event.stopPropagation(); toggleRead(n)"
+              [title]="n.read ? 'Đánh dấu chưa đọc' : 'Đánh dấu đã đọc'">
+              <mat-icon>{{ n.read ? 'mark_email_unread' : 'mark_email_read' }}</mat-icon>
+            </button>
+            <button
+              class="naction-btn delete"
+              (click)="$event.stopPropagation(); deleteNotif(n.id)"
+              title="Xóa">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Empty -->
+        <div class="notif-empty" *ngIf="filteredNotifications.length === 0">
+          <mat-icon>notifications_none</mat-icon>
+          <p>Không có thông báo nào</p>
+        </div>
+
+      </div>
+
+      <!-- Load more -->
+      <div class="load-more" *ngIf="filteredNotifications.length > 0">
+        <button class="btn-load-more">Xem thêm</button>
+      </div>
+
+    </div>
+
+    <!-- Right: Chi tiết + Gửi thông báo -->
+    <div class="detail-panel">
+
+      <!-- Detail view -->
+      <div class="detail-card" *ngIf="selectedNotif && !composeMode">
+        <div class="detail-header">
+          <div class="detail-type-icon" [ngClass]="selectedNotif.type">
+            <mat-icon>{{ getTypeIcon(selectedNotif.type) }}</mat-icon>
+          </div>
+          <div class="detail-header-info">
+            <div class="detail-title">{{ selectedNotif.title }}</div>
+            <div class="detail-time">{{ selectedNotif.time }}</div>
+          </div>
+          <button class="close-detail-btn" (click)="selectedNotif = null">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="detail-body">
+          <p class="detail-text">{{ selectedNotif.body }}</p>
+
+          <div class="detail-meta-card" *ngIf="selectedNotif.meta">
+            <mat-icon>{{ selectedNotif.meta.icon }}</mat-icon>
+            <span>{{ selectedNotif.meta.text }}</span>
+          </div>
+
+          <div class="detail-link" *ngIf="selectedNotif.link">
+            <mat-icon>open_in_new</mat-icon>
+            <a [href]="selectedNotif.link">{{ selectedNotif.link }}</a>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="btn-detail-action primary" *ngIf="selectedNotif.actionLabel">
+            <mat-icon>{{ selectedNotif.actionIcon }}</mat-icon>
+            {{ selectedNotif.actionLabel }}
+          </button>
+          <button class="btn-detail-action" (click)="toggleRead(selectedNotif)">
+            <mat-icon>{{ selectedNotif.read ? 'mark_email_unread' : 'mark_email_read' }}</mat-icon>
+            {{ selectedNotif.read ? 'Đánh dấu chưa đọc' : 'Đánh dấu đã đọc' }}
+          </button>
+          <button class="btn-detail-action danger" (click)="deleteNotif(selectedNotif.id); selectedNotif = null">
+            <mat-icon>delete</mat-icon>
+            Xóa thông báo
+          </button>
+        </div>
+      </div>
+
+      <!-- Compose / Send notification -->
+      <div class="compose-card" *ngIf="composeMode">
+        <div class="compose-header">
+          <div class="compose-title">
+            <mat-icon>send</mat-icon>
+            Gửi thông báo đến khách hàng
+          </div>
+          <button class="close-detail-btn" (click)="composeMode = false">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="compose-body">
+
+          <!-- Loại thông báo -->
+          <div class="compose-field">
+            <label>Loại thông báo</label>
+            <div class="compose-type-grid">
+              <div
+                class="compose-type-opt"
+                *ngFor="let t of composeTypes"
+                [class.selected]="composeForm.type === t.value"
+                (click)="composeForm.type = t.value">
+                <mat-icon>{{ t.icon }}</mat-icon>
+                <span>{{ t.label }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiêu đề -->
+          <div class="compose-field">
+            <label>Tiêu đề <span class="req">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="composeForm.title"
+              placeholder="VD: Flash Sale bắt đầu lúc 20:00 hôm nay!">
+            <span class="char-count">{{ composeForm.title.length }}/100</span>
+          </div>
+
+          <!-- Nội dung -->
+          <div class="compose-field">
+            <label>Nội dung <span class="req">*</span></label>
+            <textarea
+              [(ngModel)]="composeForm.body"
+              placeholder="Nhập nội dung thông báo..."
+              rows="4"></textarea>
+            <span class="char-count">{{ composeForm.body.length }}/300</span>
+          </div>
+
+          <!-- Link -->
+          <div class="compose-field">
+            <label>Đường dẫn (tuỳ chọn)</label>
+            <div class="compose-link-wrap">
+              <mat-icon>link</mat-icon>
+              <input
+                type="text"
+                [(ngModel)]="composeForm.link"
+                placeholder="/flash-sale hoặc /san-pham/xyz">
+            </div>
+          </div>
+
+          <!-- Đối tượng gửi -->
+          <div class="compose-field">
+            <label>Gửi đến</label>
+            <div class="audience-options">
+              <div
+                class="audience-opt"
+                *ngFor="let a of audienceOptions"
+                [class.selected]="composeForm.audience === a.value"
+                (click)="composeForm.audience = a.value">
+                <mat-icon>{{ a.icon }}</mat-icon>
+                <div class="ao-info">
+                  <span class="ao-label">{{ a.label }}</span>
+                  <span class="ao-count">{{ a.count }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lên lịch -->
+          <div class="compose-field">
+            <div class="schedule-toggle-row">
+              <div>
+                <div class="schedule-label">Lên lịch gửi</div>
+                <div class="schedule-sub">Để trống để gửi ngay</div>
+              </div>
+              <div
+                class="toggle"
+                [class.on]="composeForm.scheduled"
+                (click)="composeForm.scheduled = !composeForm.scheduled">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="schedule-inputs" *ngIf="composeForm.scheduled">
+              <input type="date" [(ngModel)]="composeForm.scheduleDate">
+              <input type="time" [(ngModel)]="composeForm.scheduleTime">
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="notif-preview">
+            <div class="preview-label">Xem trước</div>
+            <div class="preview-phone">
+              <div class="preview-notif">
+                <div class="preview-app-icon" [ngClass]="composeForm.type">
+                  <mat-icon>{{ getComposeTypeIcon() }}</mat-icon>
+                </div>
+                <div class="preview-content">
+                  <div class="preview-title">{{ composeForm.title || 'Tiêu đề thông báo' }}</div>
+                  <div class="preview-body">{{ composeForm.body || 'Nội dung thông báo sẽ hiển thị ở đây...' }}</div>
+                  <div class="preview-time">Vừa xong</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="compose-footer">
+          <button class="btn-cancel-compose" (click)="composeMode = false">Hủy</button>
+          <button
+            class="btn-send"
+            (click)="sendNotification()"
+            [disabled]="!isComposeValid()">
+            <mat-icon>{{ composeForm.scheduled ? 'schedule_send' : 'send' }}</mat-icon>
+            {{ composeForm.scheduled ? 'Lên lịch gửi' : 'Gửi ngay' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="detail-empty" *ngIf="!selectedNotif && !composeMode">
+        <div class="detail-empty-icon">
+          <mat-icon>touch_app</mat-icon>
+        </div>
+        <p>Chọn thông báo để xem chi tiết</p>
+        <span>hoặc</span>
+        <button class="btn-compose-empty" (click)="openCompose()">
+          <mat-icon>send</mat-icon>
+          Gửi thông báo mới
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>

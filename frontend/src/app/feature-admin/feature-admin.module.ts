@@ -21,7 +21,6 @@ import { SettingsComponent } from './pages/settings/settings.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { StatsCardComponent } from './components/stats-card/stats-card.component';
 import { DataTableComponent } from './components/data-table/data-table.component';
-import { ChartCardComponent } from './components/chart-card/chart-card.component';
 import { PageHeaderComponent } from './components/page-header/page-header.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { StatusBadgeComponent } from './components/status-badge/status-badge.component';
@@ -30,6 +29,7 @@ import {FormsModule} from "@angular/forms";
 import { FlashSaleComponent } from './pages/flash-sale/flash-sale.component';
 import { AddProductComponent } from './components/add-product/add-product.component';
 import { AddCategoryDrawerComponent } from './components/add-category-drawer/add-category-drawer.component';
+import { ChartsComponent } from './pages/charts/charts.component';
 
 
 @NgModule({
@@ -53,13 +53,13 @@ import { AddCategoryDrawerComponent } from './components/add-category-drawer/add
     NotificationsComponent,
     StatsCardComponent,
     DataTableComponent,
-    ChartCardComponent,
     PageHeaderComponent,
     ConfirmDialogComponent,
     StatusBadgeComponent,
     FlashSaleComponent,
     AddProductComponent,
     AddCategoryDrawerComponent,
+    ChartsComponent,
   ],
   imports: [
     CommonModule,

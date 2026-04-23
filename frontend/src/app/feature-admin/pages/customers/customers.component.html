@@ -48,7 +48,8 @@
           type="text"
           class="search-input"
           placeholder="Tìm tên, email, SĐT..."
-          [(ngModel)]="searchQuery">
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)">
       </div>
       <select class="filter-select" [(ngModel)]="selectedStatus">
         <option *ngFor="let s of statusOptions" [value]="s.value">

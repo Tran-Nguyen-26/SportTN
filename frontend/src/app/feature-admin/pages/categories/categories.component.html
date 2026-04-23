@@ -19,7 +19,7 @@
     <div class="stat-card">
       <div class="stat-icon blue"><mat-icon>account_tree</mat-icon></div>
       <div class="stat-info">
-        <span class="stat-value">{{ categories.length }}</span>
+        <span class="stat-value">{{ categoryLength() }}</span>
         <span class="stat-label">Tổng danh mục</span>
       </div>
     </div>
@@ -56,7 +56,8 @@
           type="text"
           class="search-input"
           placeholder="Tìm tên, slug..."
-          [(ngModel)]="searchQuery">
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)">
       </div>
       <select class="filter-select" [(ngModel)]="selectedType">
         <option *ngFor="let t of typeOptions" [value]="t.value">

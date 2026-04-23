@@ -22,6 +22,8 @@ public class Brand {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    private String slug;
+
     private String description;
 
     @Column(name = "logo_url")

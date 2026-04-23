@@ -51,6 +51,10 @@ export class CategoriesComponent implements OnInit {
     })
   }
 
+  categoryLength = computed(() =>
+    this.categories().length
+  );
+
   parentCount = computed(() =>
     this.categories().filter(c => !c.parent).length
   );

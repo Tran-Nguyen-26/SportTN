@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChartCardComponent } from './chart-card.component';
+import { ChartsComponent } from './charts.component';
 
-describe('ChartCardComponent', () => {
-  let component: ChartCardComponent;
-  let fixture: ComponentFixture<ChartCardComponent>;
+describe('ChartsComponent', () => {
+  let component: ChartsComponent;
+  let fixture: ComponentFixture<ChartsComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ChartCardComponent]
+      declarations: [ChartsComponent]
     });
-    fixture = TestBed.createComponent(ChartCardComponent);
+    fixture = TestBed.createComponent(ChartsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
