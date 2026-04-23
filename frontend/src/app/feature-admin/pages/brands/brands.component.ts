@@ -2,29 +2,6 @@ import {Component, OnInit, signal} from '@angular/core';
 import {BrandAddRequest, BrandResponse} from "../../../core/models/brand/brand";
 import {BrandService} from "../../../core/services/brand/brand.service";
 
-// export interface Brand {
-//   id: number;
-//   name: string;
-//   slug: string;
-//   description: string;
-//   website: string;
-//   logoUrl: string;
-//   color: string;
-//   initials: string;
-//   productCount: number;
-//   active: boolean;
-// }
-//
-// export interface BrandForm {
-//   name: string;
-//   slug: string;
-//   description: string;
-//   website: string;
-//   logoUrl: string;
-//   color: string;
-//   active: boolean;
-// }
-
 @Component({
   selector: 'app-brands',
   templateUrl: './brands.component.html',
@@ -78,16 +55,6 @@ export class BrandsComponent implements OnInit {
       }
     })
   }
-
-  // brands: Brand[] = [
-  //   { id: 1,  name: 'DECATHLON', slug: 'decathlon', description: 'Thương hiệu thể thao Pháp', website: 'www.decathlon.com', logoUrl: '', color: '#2563eb', initials: 'DE', productCount: 142, active: true },
-  //   { id: 2,  name: 'NABAIJI',   slug: 'nabaiji',   description: 'Thương hiệu đồ bơi',       website: 'www.decathlon.com', logoUrl: '', color: '#0891b2', initials: 'NA', productCount: 68,  active: true },
-  //   { id: 3,  name: 'KIPRUN',    slug: 'kiprun',    description: 'Thương hiệu chạy bộ',      website: 'www.decathlon.com', logoUrl: '', color: '#16a34a', initials: 'KI', productCount: 54,  active: true },
-  //   { id: 4,  name: 'DOMYOS',    slug: 'domyos',    description: 'Thương hiệu gym & fitness', website: 'www.decathlon.com', logoUrl: '', color: '#7c3aed', initials: 'DO', productCount: 38,  active: true },
-  //   { id: 5,  name: 'NIKE',      slug: 'nike',      description: 'Just Do It',                website: 'www.nike.com',      logoUrl: '', color: '#0f172a', initials: 'NK', productCount: 96,  active: true },
-  //   { id: 6,  name: 'ADIDAS',    slug: 'adidas',    description: 'Impossible is Nothing',    website: 'www.adidas.com',    logoUrl: '', color: '#dc2626', initials: 'AD', productCount: 87,  active: true },
-  //   { id: 7,  name: 'SPEEDO',    slug: 'speedo',    description: 'Thương hiệu bơi lội',      website: 'www.speedo.com',    logoUrl: '', color: '#d97706', initials: 'SP', productCount: 45,  active: false },
-  // ];
 
   // ── Filter ───────────────────────────────────
   get filteredBrands(): BrandResponse[] {
@@ -145,13 +112,23 @@ export class BrandsComponent implements OnInit {
   save(): void {
     if (!this.isFormValid()) return;
     const logoUrl = this.effectiveLogo || '';
+
+
     if (this.editingBrand) {
-      // TODO: gọi update API
-      Object.assign(this.editingBrand, {
+      const updateData: BrandAddRequest = {
         ...this.form,
-        logoUrl,
-        initials: this.getInitials(this.form.name),
-      });
+        logoUrl
+      }
+      this.brandService.updateBrand(this.editingBrand.id, updateData).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.brands.update(all =>
+              all.map(b => b.id === res.data!.id ? res.data! : b)
+            );
+            this.closeDrawer();
+          }
+        }
+      })
     } else {
       this.brandService.addBrand({...this.form, logoUrl}).subscribe(res => {
         if (res.data) {

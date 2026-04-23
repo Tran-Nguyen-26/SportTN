@@ -3,19 +3,19 @@ import {Router} from "@angular/router";
 import {ProductService} from "../../../core/services/product/product.service";
 import {ProductAdminResponse} from "../../../core/models/product/product.model";
 
-export interface AdminProduct {
-  id: number;
-  name: string;
-  category: string;
-  brand: string;
-  price: number;
-  salePrice: number | null;
-  stock: number;
-  sold: number;
-  rating: number;
-  status: string;
-  image: string;
-}
+// export interface AdminProduct {
+//   id: number;
+//   name: string;
+//   category: string;
+//   brand: string;
+//   price: number;
+//   salePrice: number | null;
+//   stock: number;
+//   sold: number;
+//   rating: number;
+//   status: string;
+//   image: string;
+// }
 
 @Component({
   selector: 'app-products',

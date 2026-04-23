@@ -223,7 +223,7 @@
   transition: background 0.15s, color 0.15s;
 }
 
-.action-btn mat-icon { font-size: 16px; }
+.action-btn mat-icon { font-size: 20px; padding-top: 5px;}
 .action-btn:hover { background: #f8fafc; color: #0f172a; }
 .action-btn.toggle-btn.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
 .action-btn.delete-btn:hover  { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
@@ -248,7 +248,7 @@
   color: #64748b;
 }
 
-.sale-time-row mat-icon { font-size: 15px; color: #94a3b8; }
+.sale-time-row mat-icon { font-size: 15px; color: #94a3b8; padding-top: 10px}
 .sale-date { color: #94a3b8; font-size: 12px; margin-left: 4px; }
 
 /* Live bar */
@@ -338,7 +338,11 @@
   color: #374151;
 }
 
-.sale-products-title mat-icon { font-size: 15px; color: #94a3b8; }
+.sale-products-title mat-icon {
+  font-size: 15px;
+  color: #94a3b8;
+  padding-top: 10px;
+}
 
 .btn-add-product {
   display: flex;
@@ -357,7 +361,7 @@
 }
 
 .btn-add-product:hover { background: #dbeafe; }
-.btn-add-product mat-icon { font-size: 14px; }
+.btn-add-product mat-icon { font-size: 14px; padding-top: 8px;}
 
 /* Product list */
 .sale-products-list {
@@ -390,7 +394,12 @@
   flex-shrink: 0;
 }
 
-.sp-thumb mat-icon { font-size: 18px; color: rgba(0,0,0,0.25); }
+.sp-thumb mat-icon {
+  font-size: 18px;
+  color: rgba(0,0,0,0.25);
+  padding-top: 5px;
+  padding-left: 5px;
+}
 
 .sp-info { flex: 1; min-width: 0; }
 .sp-name { font-size: 12px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

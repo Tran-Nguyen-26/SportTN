@@ -1,6 +1,7 @@
 package com.ttn.sporttn.modules.product.service;
 
 import com.ttn.sporttn.modules.product.dto.request.admin.BrandAddRequest;
+import com.ttn.sporttn.modules.product.dto.request.admin.BrandUpdateRequest;
 import com.ttn.sporttn.modules.product.dto.response.admin.BrandResponse;
 import com.ttn.sporttn.modules.product.entity.Brand;
 import com.ttn.sporttn.modules.product.repository.BrandRepository;
@@ -38,6 +39,7 @@ public class BrandService {
         brand.setName(request.getName());
         brand.setDescription(request.getDescription());
         brand.setLogoUrl(request.getLogoUrl());
+        brand.setColor(request.getColor());
         brand.setActive(true);
         brand.setProducts(new ArrayList<>());
 
@@ -50,6 +52,30 @@ public class BrandService {
         Brand savedBrand = brandRepository.save(brand);
 
         return toBrandResponse(savedBrand);
+    }
+
+    @Transactional
+    public BrandResponse updateBrand(Long brandId, BrandUpdateRequest request) {
+        Brand brand = brandRepository.findById(brandId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thương hiệu với ID: " + brandId));
+
+        brand.setName(request.getName());
+        brand.setColor(request.getColor());
+        brand.setDescription(request.getDescription());
+        brand.setWebsiteUrl(request.getWebsiteUrl());
+        brand.setActive(request.isActive());
+
+        if (request.getLogoUrl() != null && !request.getLogoUrl().isBlank()) {
+            brand.setLogoUrl(request.getLogoUrl());
+        }
+
+        if (request.getSlug() != null && !request.getSlug().isBlank()) {
+            brand.setSlug(request.getSlug());
+        }
+
+        Brand updatedBrand = brandRepository.save(brand);
+
+        return toBrandResponse(updatedBrand);
     }
 
     private String generateSlug(String input) {
@@ -70,6 +96,7 @@ public class BrandService {
                 .id(brand.getId())
                 .name(brand.getName())
                 .slug(brand.getSlug())
+                .color(brand.getColor())
                 .logoUrl(brand.getLogoUrl())
                 .websiteUrl(brand.getWebsiteUrl())
                 .description(brand.getDescription())

@@ -6,6 +6,7 @@ import lombok.Getter;
 public class BrandAddRequest {
     private String name;
     private String slug;
+    private String color;
     private String description;
     private String logoUrl;
     private String websiteUrl;

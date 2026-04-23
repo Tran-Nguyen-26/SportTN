@@ -2,6 +2,7 @@ package com.ttn.sporttn.modules.product.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.product.dto.request.admin.BrandAddRequest;
+import com.ttn.sporttn.modules.product.dto.request.admin.BrandUpdateRequest;
 import com.ttn.sporttn.modules.product.dto.response.admin.BrandResponse;
 import com.ttn.sporttn.modules.product.service.BrandService;
 import jakarta.validation.Valid;
@@ -30,4 +31,11 @@ public class BrandController {
         return ResponseEntity.ok(ApiResponse.ok(brand, "Thêm thương hiệu thành công"));
     }
 
+    @PutMapping("/id/{brandId}")
+    public ResponseEntity<ApiResponse<BrandResponse>> updateBrand(
+            @PathVariable Long brandId,
+            @Valid @RequestBody BrandUpdateRequest request) {
+        BrandResponse brand = brandService.updateBrand(brandId, request);
+        return ResponseEntity.ok(ApiResponse.ok(brand, "Cập nhật thương hiệu thành công"));
+    }
 }

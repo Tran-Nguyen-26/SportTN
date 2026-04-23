@@ -146,10 +146,11 @@
 .product-name {
   font-weight: 500;
   color: #0f172a;
-  max-width: 200px;
+  max-width: 400px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  /*white-space: nowrap;*/
+  white-space: normal;
 }
 
 .category-tag {
@@ -252,7 +253,7 @@
 }
 
 .grid-info { padding: 12px; }
-.grid-name { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grid-name { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
 .grid-brand { font-size: 11px; color: #64748b; margin-bottom: 8px; }
 .grid-price { display: flex; gap: 6px; align-items: baseline; margin-bottom: 10px; }
 .new-price { font-size: 14px; font-weight: 700; color: #dc2626; }

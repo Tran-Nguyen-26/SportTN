@@ -26,6 +26,8 @@ public class Brand {
 
     private String description;
 
+    private String color;
+
     @Column(name = "logo_url")
     private String logoUrl;
 
