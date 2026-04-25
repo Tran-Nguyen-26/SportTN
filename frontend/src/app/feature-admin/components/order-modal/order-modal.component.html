@@ -1,0 +1,205 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal" *ngIf="order" role="dialog" [attr.aria-label]="isEditMode ? 'Chỉnh sửa đơn hàng' : 'Chi tiết đơn hàng'">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="icon-wrap" [class.edit-icon]="isEditMode">
+          <svg *ngIf="!isEditMode" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+          <svg *ngIf="isEditMode" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+        </span>
+        {{ isEditMode ? 'Cập nhật đơn hàng' : 'Chi tiết đơn hàng' }}
+        <span class="order-id-badge">{{ order.id }}</span>
+      </div>
+      <button class="close-btn" (click)="close()" title="Đóng">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- ═══════════════════ VIEW MODE ═══════════════════ -->
+      <ng-container *ngIf="!isEditMode">
+
+        <!-- Customer -->
+        <div class="section">
+          <div class="section-title">Khách hàng</div>
+          <div class="customer-card">
+            <div class="avatar">{{ order.avatar }}</div>
+            <div class="customer-info">
+              <div class="cname">{{ order.customer }}</div>
+              <div class="cdetail">0912 345 678 &middot; khachhang@email.com</div>
+            </div>
+            <span class="status-pill" [class]="getStatusClass(order.status)">
+              <span class="dot"></span>{{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Product -->
+        <div class="section">
+          <div class="section-title">Sản phẩm</div>
+          <div class="product-row">
+            <div class="product-thumb">🛍</div>
+            <div class="product-info">
+              <div class="pname">{{ order.product }}</div>
+              <div class="pdetail">Số lượng: 1</div>
+            </div>
+            <div class="price">{{ formatPrice(order.amount) }}</div>
+          </div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="section">
+          <div class="section-title">Thông tin đơn hàng</div>
+          <div class="info-grid">
+            <div class="info-cell">
+              <span class="info-label">Ngày đặt</span>
+              <span class="info-value">{{ order.date }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Thanh toán</span>
+              <span class="info-value">{{ order.paymentMethod }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Tổng tiền</span>
+              <span class="info-value amount-green">{{ formatPrice(order.amount) }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Trạng thái TT</span>
+              <span class="info-value">{{ order.status === 'DELIVERED' ? 'Đã thanh toán' : 'Chưa thanh toán' }}</span>
+            </div>
+            <div class="info-cell full">
+              <span class="info-label">Địa chỉ giao hàng</span>
+              <span class="info-value">{{ address }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="section" *ngIf="order.status !== 'CANCELLED'">
+          <div class="section-title">Hành trình đơn hàng</div>
+          <div class="timeline">
+            <div class="tl-item" *ngFor="let step of timeline">
+              <div class="tl-dot" [class.done]="step.done" [class.active]="step.active && !step.done"></div>
+              <div class="tl-body">
+                <div class="tl-label" [class.muted]="!step.done">{{ step.label }}</div>
+                <div class="tl-time" *ngIf="step.done">{{ step.time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cancelled-notice" *ngIf="order.status === 'CANCELLED'">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          Đơn hàng này đã bị hủy
+        </div>
+
+      </ng-container>
+
+      <!-- ═══════════════════ EDIT MODE ═══════════════════ -->
+      <ng-container *ngIf="isEditMode && editOrder">
+
+        <div class="edit-notice" *ngIf="!canEdit">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          Chỉ chỉnh sửa được đơn ở trạng thái <strong>Chờ xử lý</strong> hoặc <strong>Đã xác nhận</strong>.
+        </div>
+
+        <!-- Status -->
+        <div class="section">
+          <div class="section-title">Trạng thái</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Trạng thái đơn hàng</label>
+              <select class="form-control select" [(ngModel)]="editOrder.status" [disabled]="!canEdit">
+                <option *ngFor="let s of statusOptions" [value]="s.value">{{ s.label }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Trạng thái thanh toán</label>
+              <select class="form-control select" [(ngModel)]="paymentStatus" [disabled]="!canEdit">
+                <option *ngFor="let p of paymentStatusOptions" [value]="p.value">{{ p.label }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ghi chú nội bộ</label>
+            <textarea
+              class="form-control textarea"
+              [(ngModel)]="internalNote"
+              placeholder="Nhập ghi chú cho đơn hàng này..."
+              rows="2"
+              [disabled]="!canEdit">
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Shipping -->
+        <div class="section">
+          <div class="section-title">Thông tin giao hàng</div>
+          <div class="form-group">
+            <label class="form-label">Địa chỉ giao hàng</label>
+            <input class="form-control" type="text" [(ngModel)]="address" [disabled]="!canEdit" placeholder="Nhập địa chỉ...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phương thức thanh toán</label>
+            <select class="form-control select" [(ngModel)]="editOrder.paymentMethod" [disabled]="!canEdit">
+              <option *ngFor="let p of paymentOptions" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Product -->
+        <div class="section" style="margin-bottom:0">
+          <div class="section-title">Sản phẩm</div>
+          <div class="product-row edit-product">
+            <div class="product-thumb">🛍</div>
+            <div class="product-info">
+              <div class="pname">{{ order.product }}</div>
+              <div class="pdetail">{{ formatPrice(order.amount) }} / sản phẩm</div>
+            </div>
+            <div class="qty-control" *ngIf="canEdit">
+              <button class="qty-btn" (click)="adjustQty(-1)" [disabled]="quantity <= 1">−</button>
+              <span class="qty-val">{{ quantity }}</span>
+              <button class="qty-btn" (click)="adjustQty(1)">+</button>
+            </div>
+            <div class="price">{{ formatPrice(editOrder.amount) }}</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="total-row">
+          <span class="total-label">Tổng cộng</span>
+          <span class="total-val">{{ formatPrice(editOrder.amount) }}</span>
+        </div>
+
+      </ng-container>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <ng-container *ngIf="!isEditMode">
+        <button class="btn btn-ghost" (click)="close()">Đóng</button>
+        <button class="btn btn-secondary" (click)="switchToEdit()" *ngIf="canEdit">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+          Chỉnh sửa
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="isEditMode">
+        <button class="btn btn-danger" (click)="onCancelOrder()" *ngIf="canEdit && !showCancelConfirm">Hủy đơn</button>
+        <div class="confirm-cancel" *ngIf="showCancelConfirm">
+          <span class="confirm-text">Xác nhận hủy?</span>
+          <button class="btn btn-danger-solid" (click)="confirmCancel()">Có, hủy đơn</button>
+          <button class="btn btn-ghost" (click)="showCancelConfirm = false">Không</button>
+        </div>
+        <button class="btn btn-ghost" (click)="close()" *ngIf="!showCancelConfirm">Đóng</button>
+        <button class="btn btn-primary" (click)="onSave()" [disabled]="!canEdit || isSaving" *ngIf="!showCancelConfirm">
+          <span class="spinner" *ngIf="isSaving"></span>
+          {{ isSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+        </button>
+      </ng-container>
+    </div>
+
+  </div>
+</div>

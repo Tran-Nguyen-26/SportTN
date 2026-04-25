@@ -102,7 +102,8 @@
           </td>
           <td>
             <div class="action-btns">
-              <button class="action-btn view" title="Xem">
+              <!-- Sửa action-btn view -->
+              <button class="action-btn view" (click)="openInvoice(inv)" title="Xem chi tiết">
                 <mat-icon>visibility</mat-icon>
               </button>
               <button class="action-btn download" title="Tải PDF">
@@ -132,6 +133,204 @@
         <button class="page-btn active">1</button>
         <button class="page-btn">2</button>
         <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── INVOICE DETAIL MODAL ────────────────── -->
+<div
+  class="modal-overlay"
+  *ngIf="selectedInvoice"
+  (click)="onOverlayClick($event)">
+
+  <div class="invoice-modal">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="invoice-id">{{ selectedInvoice.id }}</div>
+        <span
+          class="status-badge"
+          [ngClass]="getStatusInvoice(selectedInvoice.status).css">
+          {{ getStatusInvoice(selectedInvoice.status).label }}
+        </span>
+      </div>
+      <div class="modal-header-right">
+        <button class="btn-print" (click)="printInvoice()">
+          <mat-icon>print</mat-icon>
+          In hóa đơn
+        </button>
+        <button class="btn-download">
+          <mat-icon>download</mat-icon>
+          Tải PDF
+        </button>
+        <button class="close-btn" (click)="closeInvoice()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Top info row -->
+      <div class="invoice-top">
+
+        <!-- Thông tin công ty -->
+        <div class="company-info">
+          <div class="company-logo">SZ</div>
+          <div>
+            <div class="company-name">SportZone</div>
+            <div class="company-detail">123 Nguyễn Huệ, Quận 1, TP.HCM</div>
+            <div class="company-detail">support@sportzone.vn | 1800 1234</div>
+          </div>
+        </div>
+
+        <!-- Thông tin hóa đơn -->
+        <div class="invoice-meta">
+          <div class="meta-row">
+            <span class="meta-label">Mã hóa đơn</span>
+            <span class="meta-value">{{ selectedInvoice.id }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Mã đơn hàng</span>
+            <span class="meta-value order-link">{{ selectedInvoice.orderId }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Ngày tạo</span>
+            <span class="meta-value">{{ selectedInvoice.issueDate }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Hạn thanh toán</span>
+            <span
+              class="meta-value"
+              [class.overdue-text]="selectedInvoice.status === 'OVERDUE'">
+              {{ selectedInvoice.dueDate }}
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Phương thức</span>
+            <span class="meta-value">
+              <span class="payment-chip">{{ selectedInvoice.paymentMethod }}</span>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="invoice-divider"></div>
+
+      <!-- Thông tin khách hàng -->
+      <div class="customer-section">
+        <div class="section-title">Thông tin khách hàng</div>
+        <div class="customer-grid">
+          <div class="customer-info-card">
+            <div class="ci-avatar">{{ selectedInvoice.initials }}</div>
+            <div>
+              <div class="ci-name">{{ selectedInvoice.customer }}</div>
+              <div class="ci-detail">
+                <mat-icon>email</mat-icon>
+                {{ selectedInvoice.customerEmail }}
+              </div>
+              <div class="ci-detail">
+                <mat-icon>phone</mat-icon>
+                {{ selectedInvoice.customerPhone }}
+              </div>
+              <div class="ci-detail">
+                <mat-icon>location_on</mat-icon>
+                {{ selectedInvoice.customerAddress }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-divider"></div>
+
+      <!-- Danh sách sản phẩm -->
+      <div class="items-section">
+        <div class="section-title">Danh sách sản phẩm</div>
+
+        <div class="items-table">
+          <div class="items-header">
+            <span class="col-product">Sản phẩm</span>
+            <span class="col-sku">SKU</span>
+            <span class="col-qty">SL</span>
+            <span class="col-price">Đơn giá</span>
+            <span class="col-total">Thành tiền</span>
+          </div>
+
+          <div class="item-row" *ngFor="let item of selectedInvoice.items">
+            <span class="col-product item-name">{{ item.productName }}</span>
+            <span class="col-sku">
+              <code class="sku-code">{{ item.sku }}</code>
+            </span>
+            <span class="col-qty item-qty">{{ item.quantity }}</span>
+            <span class="col-price">{{ formatPrice(item.unitPrice) }}</span>
+            <span class="col-total item-total">{{ formatPrice(item.totalPrice) }}</span>
+          </div>
+        </div>
+
+        <!-- Tổng tiền -->
+        <div class="invoice-summary">
+          <div class="summary-row">
+            <span class="sum-label">Tạm tính</span>
+            <span class="sum-value">{{ formatPrice(selectedInvoice.subtotal) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="sum-label">Phí vận chuyển</span>
+            <span class="sum-value">
+              {{ selectedInvoice.shippingFee > 0 ? formatPrice(selectedInvoice.shippingFee) : 'Miễn phí' }}
+            </span>
+          </div>
+          <div class="summary-row" *ngIf="selectedInvoice.discount > 0">
+            <span class="sum-label">Giảm giá</span>
+            <span class="sum-value discount">
+              -{{ formatPrice(selectedInvoice.discount) }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="sum-label">Thuế VAT (10%)</span>
+            <span class="sum-value">{{ formatPrice(selectedInvoice.tax) }}</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total-row">
+            <span class="sum-label-total">Tổng cộng</span>
+            <span class="sum-value-total">{{ formatPrice(selectedInvoice.amount) }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Ghi chú -->
+      <div class="note-section" *ngIf="selectedInvoice.note">
+        <div class="invoice-divider"></div>
+        <div class="section-title">Ghi chú</div>
+        <div class="note-text">
+          <mat-icon>notes</mat-icon>
+          {{ selectedInvoice.note }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-close-modal" (click)="closeInvoice()">Đóng</button>
+      <div class="footer-right">
+        <button class="btn-print" (click)="printInvoice()">
+          <mat-icon>print</mat-icon>
+          In hóa đơn
+        </button>
+        <button
+          class="btn-mark-paid"
+          *ngIf="selectedInvoice.status !== 'PAID'"
+          (click)="selectedInvoice.status = 'PAID'">
+          <mat-icon>check_circle</mat-icon>
+          Đánh dấu đã thanh toán
+        </button>
       </div>
     </div>
 

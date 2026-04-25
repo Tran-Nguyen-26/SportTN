@@ -39,7 +39,7 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 3px;
+  padding: 7px;
 }
 
 .period-tab {
@@ -65,12 +65,12 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 5px 12px;
   font-size: 13px;
   color: #64748b;
 }
 
-.date-range mat-icon { font-size: 16px; color: #94a3b8; }
+.date-range mat-icon { font-size: 16px; color: #94a3b8; padding-top: 8px;}
 
 .date-input {
   border: none;
@@ -88,7 +88,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 4px 14px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: #fff;
@@ -101,7 +101,7 @@
 }
 
 .btn-export:hover { background: #f8fafc; }
-.btn-export mat-icon { font-size: 16px; }
+.btn-export mat-icon { font-size: 16px; padding-top: 10px;}
 
 /* ── KPI CARDS ────────────────────────────────── */
 .kpi-row {
@@ -835,6 +835,6 @@
   width: fit-content;
 }
 
-.compare-delta mat-icon { font-size: 11px; }
+.compare-delta mat-icon { font-size: 11px; padding-top: 10px; padding-left: 10px;}
 .compare-delta.up   { background: #f0fdf4; color: #16a34a; }
 .compare-delta.down { background: #fef2f2; color: #dc2626; }

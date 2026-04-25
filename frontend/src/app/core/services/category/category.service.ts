@@ -8,7 +8,12 @@ export interface CategoryAdminResponse {
   id: number;
   name: string;
   slug: string;
+  parentId: number;
   parent: string;
+  description: string;
+  sectionTitle: string;
+  linkUrl: string;
+  imageUrl: string;
   productCount: number;
   displayOrder: number;
   showOnHome: boolean;

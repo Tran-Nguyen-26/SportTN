@@ -21,6 +21,9 @@ export class OrdersComponent {
   searchQuery = '';
   selectedStatus = '';
 
+  selectedOrder: Order | null = null;
+  modalMode: 'view' | 'edit' = 'view';
+
   statusOptions = [
     { value: '',           label: 'Tất cả trạng thái' },
     { value: 'PENDING',    label: 'Chờ xử lý' },
@@ -54,5 +57,29 @@ export class OrdersComponent {
 
   formatPrice(price: number): string {
     return price.toLocaleString('vi-VN') + 'đ';
+  }
+
+  openView(order: Order): void {
+    this.selectedOrder = order;
+    this.modalMode = 'view';
+  }
+
+  openEdit(order: Order): void {
+    this.selectedOrder = order;
+    this.modalMode = 'edit';
+  }
+
+  closeModal(): void {
+    this.selectedOrder = null;
+  }
+
+  onSaved(updated: Order): void {
+    const idx = this.orders.findIndex(o => o.id === updated.id);
+    if (idx > -1) this.orders[idx] = updated;
+  }
+
+  onCancelled(orderId: string): void {
+    const idx = this.orders.findIndex(o => o.id === orderId);
+    if (idx > -1) this.orders[idx].status = 'CANCELLED';
   }
 }

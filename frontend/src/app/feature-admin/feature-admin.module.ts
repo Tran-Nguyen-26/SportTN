@@ -30,6 +30,7 @@ import { FlashSaleComponent } from './pages/flash-sale/flash-sale.component';
 import { AddProductComponent } from './components/add-product/add-product.component';
 import { AddCategoryDrawerComponent } from './components/add-category-drawer/add-category-drawer.component';
 import { ChartsComponent } from './pages/charts/charts.component';
+import { OrderModalComponent } from './components/order-modal/order-modal.component';
 
 
 @NgModule({
@@ -60,6 +61,7 @@ import { ChartsComponent } from './pages/charts/charts.component';
     AddProductComponent,
     AddCategoryDrawerComponent,
     ChartsComponent,
+    OrderModalComponent,
   ],
   imports: [
     CommonModule,

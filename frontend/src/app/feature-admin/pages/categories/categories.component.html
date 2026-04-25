@@ -114,10 +114,10 @@
           </td>
           <td>
             <div class="action-btns">
-              <button class="action-btn edit" title="Sửa">
+              <button class="action-btn edit" title="Sửa" (click)="openEditDrawer(cat)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button class="action-btn delete" title="Xóa">
+              <button class="action-btn delete" title="Xóa" (click)="onDelete(cat)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -135,3 +135,11 @@
 
   </div>
 </div>
+
+<app-page-header
+  title="Danh mục"
+  subtitle="Quản lý danh mục sản phẩm"
+  btnLabel="Thêm danh mục"
+  btnIcon="add"
+  (btnClick)="openAddDrawer()">
+</app-page-header>

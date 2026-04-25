@@ -748,19 +748,19 @@
   flex-shrink: 0;
 }
 
-.btn-cancel {
-  flex: 1;
-  padding: 9px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s;
-}
+/*.btn-cancel {*/
+/*  flex: 1;*/
+/*  padding: 9px 16px;*/
+/*  border: 1px solid #e2e8f0;*/
+/*  border-radius: 8px;*/
+/*  background: #fff;*/
+/*  font-size: 13px;*/
+/*  font-weight: 600;*/
+/*  color: #374151;*/
+/*  cursor: pointer;*/
+/*  font-family: inherit;*/
+/*  transition: background 0.15s;*/
+/*}*/
 
 .btn-cancel:hover { background: #f8fafc; }
 

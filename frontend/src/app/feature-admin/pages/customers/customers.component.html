@@ -97,10 +97,10 @@
           </td>
           <td>
             <div class="action-btns">
-              <button class="action-btn view" title="Xem chi tiết">
+              <button class="action-btn view" title="Xem chi tiết" (click)="openDetail(customer)">
                 <mat-icon>visibility</mat-icon>
               </button>
-              <button class="action-btn edit" title="Chỉnh sửa">
+              <button class="action-btn edit" title="Chỉnh sửa" (click)="openEdit(customer)">
                 <mat-icon>edit</mat-icon>
               </button>
             </div>
@@ -120,6 +120,317 @@
         <button class="page-btn">2</button>
         <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
       </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DETAIL MODAL
+══════════════════════════════════════════ -->
+<div
+  class="modal-overlay"
+  *ngIf="detailCustomer"
+  (click)="onDetailOverlayClick($event)">
+
+  <div class="customer-modal">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-customer-info">
+        <div
+          class="modal-avatar"
+          [style.background]="getAvatarColorById(detailCustomer.id) + '22'"
+          [style.color]="getAvatarColorById(detailCustomer.id)">
+          {{ detailCustomer.initials }}
+        </div>
+        <div>
+          <div class="modal-name">{{ detailCustomer.fullName }}</div>
+          <div class="modal-email">{{ detailCustomer.email }}</div>
+          <div class="modal-join">
+            Thành viên từ {{ detailCustomer.joinDate }}
+          </div>
+        </div>
+        <app-status-badge [status]="detailCustomer.status"></app-status-badge>
+      </div>
+      <button class="close-btn" (click)="closeDetail()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <!-- KPI nhanh -->
+      <div class="kpi-row">
+        <div class="kpi-item">
+          <div class="kpi-icon blue"><mat-icon>shopping_bag</mat-icon></div>
+          <div>
+            <div class="kpi-value">{{ detailCustomer.totalOrders }}</div>
+            <div class="kpi-label">Đơn hàng</div>
+          </div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-icon green"><mat-icon>payments</mat-icon></div>
+          <div>
+            <div class="kpi-value">{{ formatPrice(detailCustomer.totalSpent) }}</div>
+            <div class="kpi-label">Tổng chi tiêu</div>
+          </div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-icon purple"><mat-icon>stars</mat-icon></div>
+          <div>
+            <div class="kpi-value">
+              {{ detailCustomer.totalOrders > 10 ? 'VIP' : detailCustomer.totalOrders > 5 ? 'Thân thiết' : 'Mới' }}
+            </div>
+            <div class="kpi-label">Hạng thành viên</div>
+          </div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-icon orange"><mat-icon>receipt_long</mat-icon></div>
+          <div>
+            <div class="kpi-value">
+              {{ detailCustomer.totalOrders > 0
+              ? formatPrice(Math.round(detailCustomer.totalSpent / detailCustomer.totalOrders))
+              : '0đ' }}
+            </div>
+            <div class="kpi-label">Giá trị TB/đơn</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <!-- Thông tin cá nhân -->
+      <div class="modal-section">
+        <div class="section-title">Thông tin cá nhân</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon>phone</mat-icon>
+            <div>
+              <div class="info-label">Điện thoại</div>
+              <div class="info-value">{{ detailCustomer.phone }}</div>
+            </div>
+          </div>
+          <div class="info-item">
+            <mat-icon>wc</mat-icon>
+            <div>
+              <div class="info-label">Giới tính</div>
+              <div class="info-value">{{ getGenderLabel(detailCustomer.gender || '') }}</div>
+            </div>
+          </div>
+          <div class="info-item" *ngIf="detailCustomer.birthday">
+            <mat-icon>cake</mat-icon>
+            <div>
+              <div class="info-label">Ngày sinh</div>
+              <div class="info-value">{{ detailCustomer.birthday }}</div>
+            </div>
+          </div>
+          <div class="info-item" *ngIf="detailCustomer.address">
+            <mat-icon>location_on</mat-icon>
+            <div>
+              <div class="info-label">Địa chỉ</div>
+              <div class="info-value">{{ detailCustomer.address }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Note -->
+        <div class="note-box" *ngIf="detailCustomer.note">
+          <mat-icon>sticky_note_2</mat-icon>
+          {{ detailCustomer.note }}
+        </div>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <!-- Lịch sử đơn hàng -->
+      <div class="modal-section">
+        <div class="section-title">
+          Lịch sử đơn hàng
+          <span class="section-count">{{ detailCustomer.orderHistory?.length || 0 }}</span>
+        </div>
+
+        <div
+          class="empty-orders"
+          *ngIf="!detailCustomer.orderHistory?.length">
+          <mat-icon>inbox</mat-icon>
+          <span>Chưa có đơn hàng nào</span>
+        </div>
+
+        <div class="order-history-list" *ngIf="detailCustomer.orderHistory?.length">
+          <div
+            class="order-history-item"
+            *ngFor="let order of detailCustomer.orderHistory">
+            <div class="oh-left">
+              <div class="oh-id">{{ order.id }}</div>
+              <div class="oh-date">{{ order.date }} · {{ order.items }} sản phẩm</div>
+            </div>
+            <div class="oh-right">
+              <div class="oh-total">{{ formatPrice(order.total) }}</div>
+              <span class="oh-badge" [ngClass]="getOrderStatusClass(order.status)">
+                {{ getOrderStatusLabel(order.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-close-modal" (click)="closeDetail()">Đóng</button>
+      <button class="btn-edit-modal" (click)="openEditFromDetail()">
+        <mat-icon>edit</mat-icon>
+        Chỉnh sửa
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     EDIT DRAWER
+══════════════════════════════════════════ -->
+<div
+  class="drawer-overlay"
+  *ngIf="drawerVisible"
+  (click)="onDrawerOverlayClick($event)">
+
+  <div class="edit-drawer">
+
+    <!-- Header -->
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <div
+          class="drawer-avatar"
+          *ngIf="editingCustomer"
+          [style.background]="getAvatarColorById(editingCustomer.id) + '22'"
+          [style.color]="getAvatarColorById(editingCustomer.id)">
+          {{ editingCustomer.initials }}
+        </div>
+        <div>
+          <div class="drawer-title">Chỉnh sửa khách hàng</div>
+          <div class="drawer-sub">{{ editingCustomer?.email }}</div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeDrawer()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body">
+
+      <!-- Thông tin cơ bản -->
+      <div class="d-section">
+        <div class="d-section-label">Thông tin cơ bản</div>
+
+        <div class="d-field">
+          <label class="d-label required">Họ và tên</label>
+          <input
+            class="d-input"
+            type="text"
+            [(ngModel)]="form.fullName"
+            placeholder="Nguyễn Văn An">
+        </div>
+
+        <div class="d-field">
+          <label class="d-label required">Số điện thoại</label>
+          <input
+            class="d-input"
+            type="tel"
+            [(ngModel)]="form.phone"
+            placeholder="0912 345 678">
+        </div>
+
+        <div class="d-row">
+          <div class="d-field">
+            <label class="d-label">Giới tính</label>
+            <select class="d-select" [(ngModel)]="form.gender">
+              <option *ngFor="let g of genderOptions" [value]="g.value">
+                {{ g.label }}
+              </option>
+            </select>
+          </div>
+          <div class="d-field">
+            <label class="d-label">Ngày sinh</label>
+            <input
+              class="d-input"
+              type="text"
+              [(ngModel)]="form.birthday"
+              placeholder="DD/MM/YYYY">
+          </div>
+        </div>
+
+        <div class="d-field">
+          <label class="d-label">Địa chỉ</label>
+          <input
+            class="d-input"
+            type="text"
+            [(ngModel)]="form.address"
+            placeholder="123 Đường ABC, Quận X, TP.HCM">
+        </div>
+
+        <div class="d-field">
+          <label class="d-label">Ghi chú nội bộ</label>
+          <textarea
+            class="d-textarea"
+            rows="3"
+            [(ngModel)]="form.note"
+            placeholder="Ghi chú về khách hàng này...">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- Trạng thái -->
+      <div class="d-section">
+        <div class="d-section-label">Trạng thái tài khoản</div>
+
+        <div class="status-selector">
+          <div
+            class="status-option"
+            [class.selected-active]="form.status === 'ACTIVE'"
+            (click)="form.status = 'ACTIVE'">
+            <mat-icon>check_circle</mat-icon>
+            <div>
+              <div class="so-label">Hoạt động</div>
+              <div class="so-desc">Khách có thể đăng nhập và mua hàng</div>
+            </div>
+            <mat-icon class="so-check" *ngIf="form.status === 'ACTIVE'">
+              radio_button_checked
+            </mat-icon>
+          </div>
+
+          <div
+            class="status-option"
+            [class.selected-inactive]="form.status === 'INACTIVE'"
+            (click)="form.status = 'INACTIVE'">
+            <mat-icon>block</mat-icon>
+            <div>
+              <div class="so-label">Vô hiệu hóa</div>
+              <div class="so-desc">Khách không thể đăng nhập</div>
+            </div>
+            <mat-icon class="so-check" *ngIf="form.status === 'INACTIVE'">
+              radio_button_checked
+            </mat-icon>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="drawer-footer">
+      <button class="btn-cancel-d" (click)="closeDrawer()">Hủy</button>
+      <button
+        class="btn-save-d"
+        [disabled]="!isFormValid()"
+        (click)="saveEdit()">
+        <mat-icon>save</mat-icon>
+        Lưu thay đổi
+      </button>
     </div>
 
   </div>

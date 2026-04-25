@@ -106,6 +106,17 @@ export class AnalyticsComponent {
 
   totalCatRevenue = '1.25tỷ';
 
+  // get donutStyle(): SafeStyle {
+  //   let deg = 0;
+  //   const segments = this.categoryRevenue.map(c => {
+  //     const start = deg;
+  //     deg += c.pct * 3.6;
+  //     return `${c.color} ${start}deg ${deg}deg`;
+  //   });
+  //   const gradient = `conic-gradient(${segments.join(', ')})`;
+  //   return this.sanitizer.bypassSecurityTrustStyle(gradient);
+  // }
+
   get donutStyle(): SafeStyle {
     let deg = 0;
     const segments = this.categoryRevenue.map(c => {
@@ -113,6 +124,7 @@ export class AnalyticsComponent {
       deg += c.pct * 3.6;
       return `${c.color} ${start}deg ${deg}deg`;
     });
+    // Chỉ trả về hàm gradient, không kèm tên thuộc tính ở đây
     const gradient = `conic-gradient(${segments.join(', ')})`;
     return this.sanitizer.bypassSecurityTrustStyle(gradient);
   }

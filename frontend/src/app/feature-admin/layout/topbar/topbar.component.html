@@ -1,9 +1,11 @@
 <header class="topbar">
 
+  <!-- Toggle sidebar -->
   <button class="toggle-btn" (click)="onToggle()">
     <mat-icon>menu</mat-icon>
   </button>
 
+  <!-- Breadcrumb -->
   <div class="breadcrumb">
     <span class="bc-root">Admin</span>
     <mat-icon class="bc-sep">chevron_right</mat-icon>
@@ -12,34 +14,462 @@
 
   <div class="topbar-right">
 
-    <div class="search-wrap">
+    <!-- Search -->
+    <div class="search-wrap" [class.focused]="searchFocused">
       <mat-icon class="search-icon">search</mat-icon>
       <input
         type="text"
         class="search-input"
         placeholder="Tìm kiếm..."
-        [(ngModel)]="searchQuery">
+        [(ngModel)]="searchQuery"
+        (focus)="searchFocused = true"
+        (blur)="searchFocused = false">
       <span class="search-shortcut">⌘K</span>
     </div>
 
-    <button class="icon-btn">
-      <mat-icon>notifications</mat-icon>
-      <span class="notif-badge">3</span>
-    </button>
+    <!-- Notifications bell -->
+    <div class="dropdown-host" [class.open]="notifOpen">
+      <button class="icon-btn" (click)="toggleNotif()">
+        <mat-icon>notifications</mat-icon>
+        <span class="notif-badge" *ngIf="unreadNotifs > 0">{{ unreadNotifs }}</span>
+      </button>
 
-    <button class="icon-btn">
-      <mat-icon>settings</mat-icon>
-    </button>
+      <div class="dropdown notif-dropdown" *ngIf="notifOpen">
+        <div class="dd-header">
+          <span class="dd-title">Thông báo</span>
+          <button class="dd-action-btn" (click)="markAllRead()">
+            <mat-icon>done_all</mat-icon>
+            Đánh dấu đã đọc
+          </button>
+        </div>
 
-    <div class="user-btn">
-      <div class="user-avatar">AD</div>
-      <div class="user-info">
-        <span class="user-name">Admin</span>
-        <span class="user-role">Administrator</span>
+        <div class="notif-list">
+          <div
+            class="notif-item"
+            *ngFor="let n of recentNotifs"
+            [class.unread]="!n.read"
+            (click)="openNotifItem(n)">
+            <div class="ni-icon" [ngClass]="n.type">
+              <mat-icon>{{ getNotifIcon(n.type) }}</mat-icon>
+            </div>
+            <div class="ni-content">
+              <div class="ni-title">{{ n.title }}</div>
+              <div class="ni-body">{{ n.body }}</div>
+              <div class="ni-time">{{ n.timeAgo }}</div>
+            </div>
+            <div class="ni-dot" *ngIf="!n.read"></div>
+          </div>
+        </div>
+
+        <div class="dd-footer">
+          <div class="dd-view-all" (click)="goToNotifications(); notifOpen = false">
+            Xem tất cả thông báo
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
       </div>
-      <mat-icon>expand_more</mat-icon>
+    </div>
+
+    <!-- Settings gear -->
+    <div class="dropdown-host" [class.open]="settingsOpen">
+      <button class="icon-btn" (click)="toggleSettings()">
+        <mat-icon>settings</mat-icon>
+      </button>
+
+      <div class="dropdown settings-dropdown" *ngIf="settingsOpen">
+        <div class="dd-header">
+          <span class="dd-title">Cài đặt nhanh</span>
+        </div>
+
+        <div class="settings-list">
+
+          <!-- Theme toggle -->
+          <div class="settings-item">
+            <div class="si-left">
+              <div class="si-icon"><mat-icon>dark_mode</mat-icon></div>
+              <div class="si-info">
+                <span class="si-label">Giao diện tối</span>
+                <span class="si-desc">Chuyển sang dark mode</span>
+              </div>
+            </div>
+            <div class="toggle-sm" [class.on]="darkMode" (click)="darkMode = !darkMode">
+              <div class="toggle-sm-thumb"></div>
+            </div>
+          </div>
+
+          <!-- Language -->
+          <div class="settings-item">
+            <div class="si-left">
+              <div class="si-icon"><mat-icon>language</mat-icon></div>
+              <div class="si-info">
+                <span class="si-label">Ngôn ngữ</span>
+                <span class="si-desc">Tiếng Việt</span>
+              </div>
+            </div>
+            <mat-icon class="si-arrow">chevron_right</mat-icon>
+          </div>
+
+          <!-- Notifications settings -->
+          <div class="settings-item">
+            <div class="si-left">
+              <div class="si-icon"><mat-icon>notifications_active</mat-icon></div>
+              <div class="si-info">
+                <span class="si-label">Thông báo âm thanh</span>
+                <span class="si-desc">Phát âm khi có đơn mới</span>
+              </div>
+            </div>
+            <div class="toggle-sm" [class.on]="soundEnabled" (click)="soundEnabled = !soundEnabled">
+              <div class="toggle-sm-thumb"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <div class="settings-links">
+          <a class="settings-link" (click)="goToSettings(); settingsOpen = false">
+            <mat-icon>tune</mat-icon>
+            Cài đặt hệ thống
+          </a>
+          <a class="settings-link" (click)="openHelp()">
+           <mat-icon>help_outline</mat-icon>
+           Trợ giúp & hướng dẫn
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- User avatar + dropdown -->
+    <div class="dropdown-host user-host" [class.open]="userOpen">
+      <div class="user-btn" (click)="toggleUser()">
+        <div class="user-avatar">{{ currentUser.initials }}</div>
+        <div class="user-info">
+          <span class="user-name">{{ currentUser.name }}</span>
+          <span class="user-role">{{ currentUser.roleLabel }}</span>
+        </div>
+        <mat-icon class="user-chevron" [class.rotated]="userOpen">expand_more</mat-icon>
+      </div>
+
+      <div class="dropdown user-dropdown" *ngIf="userOpen">
+
+        <!-- Profile summary -->
+        <div class="user-dd-profile">
+          <div class="udp-avatar" [style.background]="currentUser.color + '22'" [style.color]="currentUser.color">
+            {{ currentUser.initials }}
+          </div>
+          <div class="udp-info">
+            <div class="udp-name">{{ currentUser.name }}</div>
+            <div class="udp-email">{{ currentUser.email }}</div>
+            <span class="udp-role-badge">{{ currentUser.roleLabel }}</span>
+          </div>
+        </div>
+
+        <div class="user-dd-divider"></div>
+
+        <!-- Menu items -->
+        <div class="user-dd-menu">
+          <a class="udm-item" (click)="openProfile(); userOpen = false">
+            <mat-icon>person</mat-icon>
+            Hồ sơ cá nhân
+          </a>
+          <a class="udm-item" (click)="openPwdModal(); userOpen = false">
+            <mat-icon>lock</mat-icon>
+            Đổi mật khẩu
+          </a>
+          <a class="udm-item" (click)="goToUsers(); userOpen = false">
+            <mat-icon>manage_accounts</mat-icon>
+            Quản lý tài khoản
+          </a>
+        </div>
+
+        <div class="user-dd-divider"></div>
+
+        <!-- Logout -->
+        <div class="user-dd-logout">
+          <a class="udm-item logout" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            Đăng xuất
+          </a>
+        </div>
+
+      </div>
     </div>
 
   </div>
-
 </header>
+
+<!-- ══════════════════════════════════════════════
+     MODAL HỒ SƠ CÁ NHÂN
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="profileModalOpen" (click)="onProfileOverlayClick($event)">
+  <div class="profile-modal">
+
+    <div class="modal-header">
+      <div class="modal-title">Hồ sơ cá nhân</div>
+      <button class="close-btn" (click)="profileModalOpen = false">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Avatar section -->
+      <div class="avatar-section">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar"
+               [style.background]="currentUser.color + '22'"
+               [style.color]="currentUser.color">
+            {{ profileForm.name ? profileForm.name[0].toUpperCase() : currentUser.initials }}
+          </div>
+          <button class="avatar-change-btn" title="Đổi ảnh đại diện">
+            <mat-icon>photo_camera</mat-icon>
+          </button>
+        </div>
+        <div class="avatar-info">
+          <div class="avatar-name">{{ currentUser.name }}</div>
+          <div class="avatar-role">{{ currentUser.roleLabel }}</div>
+          <div class="avatar-email">{{ currentUser.email }}</div>
+        </div>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <!-- Form fields -->
+      <div class="profile-form">
+
+        <div class="form-row-2">
+          <div class="field">
+            <label>Họ và tên <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="profileForm.name" placeholder="Nguyễn Văn A">
+          </div>
+          <div class="field">
+            <label>Số điện thoại</label>
+            <input type="tel" [(ngModel)]="profileForm.phone" placeholder="0912 345 678">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input type="email" [value]="currentUser.email" disabled class="input-disabled">
+          <span class="hint">Email không thể thay đổi</span>
+        </div>
+
+        <div class="field">
+          <label>Chức danh</label>
+          <input type="text" [(ngModel)]="profileForm.title" placeholder="VD: Quản lý cửa hàng">
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="profileModalOpen = false">Hủy</button>
+      <button class="btn-save" (click)="saveProfile()" [disabled]="!profileForm.name">
+        <mat-icon>save</mat-icon>
+        Lưu thay đổi
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL ĐỔI MẬT KHẨU
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="pwdModalOpen" (click)="onPwdOverlayClick($event)">
+  <div class="pwd-modal">
+
+    <div class="modal-header">
+      <div class="modal-title">Đổi mật khẩu</div>
+      <button class="close-btn" (click)="closePwdModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Security icon -->
+      <div class="pwd-icon-wrap">
+        <div class="pwd-icon">
+          <mat-icon>lock</mat-icon>
+        </div>
+        <p class="pwd-desc">Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.</p>
+      </div>
+
+      <div class="profile-form">
+
+        <!-- Mật khẩu hiện tại -->
+        <div class="field">
+          <label>Mật khẩu hiện tại <span class="req">*</span></label>
+          <div class="password-wrap">
+            <input
+              [type]="showCurrentPwd ? 'text' : 'password'"
+              [(ngModel)]="pwdForm.current"
+              placeholder="Nhập mật khẩu hiện tại"
+              [class.input-error]="pwdError.current">
+            <button class="pwd-toggle" (click)="showCurrentPwd = !showCurrentPwd">
+              <mat-icon>{{ showCurrentPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="pwdError.current">{{ pwdError.current }}</span>
+        </div>
+
+        <!-- Mật khẩu mới -->
+        <div class="field">
+          <label>Mật khẩu mới <span class="req">*</span></label>
+          <div class="password-wrap">
+            <input
+              [type]="showNewPwd ? 'text' : 'password'"
+              [(ngModel)]="pwdForm.newPwd"
+              placeholder="Tối thiểu 8 ký tự"
+              (ngModelChange)="checkPwdStrength($event)"
+              [class.input-error]="pwdError.newPwd">
+            <button class="pwd-toggle" (click)="showNewPwd = !showNewPwd">
+              <mat-icon>{{ showNewPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <!-- Strength bar -->
+          <div class="strength-wrap" *ngIf="pwdForm.newPwd">
+            <div class="strength-bar">
+              <div
+                class="strength-fill"
+                [ngClass]="pwdStrength.class"
+                [style.width]="pwdStrength.width">
+              </div>
+            </div>
+            <span class="strength-label" [ngClass]="pwdStrength.class">
+              {{ pwdStrength.label }}
+            </span>
+          </div>
+          <span class="field-error" *ngIf="pwdError.newPwd">{{ pwdError.newPwd }}</span>
+        </div>
+
+        <!-- Xác nhận mật khẩu -->
+        <div class="field">
+          <label>Xác nhận mật khẩu mới <span class="req">*</span></label>
+          <div class="password-wrap">
+            <input
+              [type]="showConfirmPwd ? 'text' : 'password'"
+              [(ngModel)]="pwdForm.confirm"
+              placeholder="Nhập lại mật khẩu mới"
+              [class.input-error]="pwdError.confirm">
+            <button class="pwd-toggle" (click)="showConfirmPwd = !showConfirmPwd">
+              <mat-icon>{{ showConfirmPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <span class="field-success" *ngIf="pwdForm.confirm && pwdForm.confirm === pwdForm.newPwd">
+            <mat-icon>check_circle</mat-icon> Mật khẩu khớp
+          </span>
+          <span class="field-error" *ngIf="pwdError.confirm">{{ pwdError.confirm }}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closePwdModal()">Hủy</button>
+      <button class="btn-save" (click)="savePassword()" [disabled]="!isPwdFormValid()">
+        <mat-icon>lock_reset</mat-icon>
+        Đổi mật khẩu
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL TRỢ GIÚP & HƯỚNG DẪN
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="helpModalOpen" (click)="onHelpOverlayClick($event)">
+  <div class="help-modal">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <mat-icon>help_outline</mat-icon>
+        Trợ giúp & Hướng dẫn
+      </div>
+      <button class="close-btn" (click)="helpModalOpen = false">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="help-body">
+
+      <!-- Search -->
+      <div class="help-search">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          [(ngModel)]="helpQuery"
+          placeholder="Tìm kiếm hướng dẫn...">
+      </div>
+
+      <!-- Quick links -->
+      <div class="help-section" *ngIf="!helpQuery">
+        <div class="help-section-title">Bắt đầu nhanh</div>
+        <div class="quicklinks-grid">
+          <div class="quicklink-item" *ngFor="let q of quickLinks" (click)="openGuide(q)">
+            <div class="ql-icon" [ngClass]="q.color">
+              <mat-icon>{{ q.icon }}</mat-icon>
+            </div>
+            <span class="ql-label">{{ q.label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ list -->
+      <div class="help-section">
+        <div class="help-section-title" *ngIf="!helpQuery">Câu hỏi thường gặp</div>
+        <div class="faq-list">
+          <div
+            class="faq-item"
+            *ngFor="let faq of filteredFaqs"
+            [class.open]="faq.open"
+            (click)="faq.open = !faq.open">
+            <div class="faq-question">
+              <span>{{ faq.question }}</span>
+              <mat-icon>{{ faq.open ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </div>
+            <div class="faq-answer" *ngIf="faq.open">{{ faq.answer }}</div>
+          </div>
+          <div class="faq-empty" *ngIf="filteredFaqs.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span>Không tìm thấy kết quả</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="help-contact" *ngIf="!helpQuery">
+        <div class="contact-title">Cần hỗ trợ thêm?</div>
+        <div class="contact-options">
+          <a class="contact-opt" href="mailto:support@sport.vn">
+            <mat-icon>email</mat-icon>
+            <div>
+              <div class="co-label">Email hỗ trợ</div>
+              <div class="co-value">support@sport.vn</div>
+            </div>
+          </a>
+          <a class="contact-opt" href="tel:19001234">
+            <mat-icon>phone</mat-icon>
+            <div>
+              <div class="co-label">Hotline</div>
+              <div class="co-value">1900 1234</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Overlay để đóng dropdown khi click ngoài -->
+<div class="topbar-overlay"
+     *ngIf="notifOpen || settingsOpen || userOpen"
+     (click)="closeAllDropdowns()">
+</div>

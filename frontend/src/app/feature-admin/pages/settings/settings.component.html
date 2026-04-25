@@ -1,1 +1,672 @@
-<p>settings works!</p>
+<div class="settings-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Cài đặt hệ thống</h1>
+      <p class="page-sub">Quản lý cấu hình và tuỳ chỉnh hệ thống</p>
+    </div>
+    <button class="btn-save" (click)="onSave()" [class.saving]="saving">
+      <mat-icon>{{ saving ? 'hourglass_top' : savedTab === activeTab ? 'check' : 'save' }}</mat-icon>
+      {{ saving ? 'Đang lưu...' : savedTab === activeTab ? 'Đã lưu!' : 'Lưu thay đổi' }}
+    </button>
+  </div>
+
+  <div class="settings-layout">
+
+    <!-- Tab sidebar -->
+    <div class="tab-sidebar">
+      <button
+        class="tab-btn"
+        *ngFor="let t of tabs"
+        [class.active]="activeTab === t.value"
+        (click)="activeTab = t.value">
+        <mat-icon>{{ t.icon }}</mat-icon>
+        {{ t.label }}
+        <mat-icon class="tab-arrow">chevron_right</mat-icon>
+      </button>
+    </div>
+
+    <!-- Tab content -->
+    <div class="tab-content">
+
+      <!-- ── GENERAL ─────────────────────────── -->
+      <div *ngIf="activeTab === 'general'">
+
+        <div class="settings-card">
+          <div class="card-title">Thông tin cơ bản</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tên website</label>
+              <input class="form-input" [(ngModel)]="general.siteName" placeholder="SportZone">
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL website</label>
+              <input class="form-input" [(ngModel)]="general.siteUrl" placeholder="https://...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mô tả ngắn</label>
+            <textarea class="form-textarea" rows="3" [(ngModel)]="general.description"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email liên hệ</label>
+              <input class="form-input" type="email" [(ngModel)]="general.contactEmail">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Điện thoại</label>
+              <input class="form-input" [(ngModel)]="general.contactPhone">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Địa chỉ</label>
+            <input class="form-input" [(ngModel)]="general.address">
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Khu vực & Ngôn ngữ</div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Ngôn ngữ</label>
+              <select class="form-select" [(ngModel)]="general.language">
+                <option *ngFor="let l of languages" [value]="l.value">{{ l.label }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Đơn vị tiền tệ</label>
+              <select class="form-select" [(ngModel)]="general.currency">
+                <option *ngFor="let c of currencies" [value]="c.value">{{ c.label }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Định dạng ngày</label>
+              <select class="form-select" [(ngModel)]="general.dateFormat">
+                <option *ngFor="let d of dateFormats" [value]="d.value">{{ d.label }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Chế độ bảo trì</div>
+          <div class="toggle-setting">
+            <div class="toggle-text">
+              <span class="ts-label">Bật chế độ bảo trì</span>
+              <span class="ts-desc">
+                Khi bật, người dùng sẽ thấy trang thông báo bảo trì
+              </span>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="general.maintenanceMode"
+              (click)="general.maintenanceMode = !general.maintenanceMode">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div class="maintenance-warn" *ngIf="general.maintenanceMode">
+            <mat-icon>warning</mat-icon>
+            Website đang ở chế độ bảo trì — khách hàng không truy cập được
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── STORE ───────────────────────────── -->
+      <div *ngIf="activeTab === 'store'">
+
+        <div class="settings-card">
+          <div class="card-title">Logo & Hình ảnh</div>
+
+          <div class="image-upload-row">
+
+            <div class="image-upload-item">
+              <label class="form-label">Logo</label>
+              <div class="img-preview-wrap" *ngIf="logoPreview">
+                <img [src]="logoPreview" alt="logo" class="img-preview">
+                <button class="remove-img" (click)="logoPreview = null">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <label class="upload-zone" *ngIf="!logoPreview">
+                <mat-icon>add_photo_alternate</mat-icon>
+                <span>Upload logo</span>
+                <span class="upload-hint">PNG, SVG — 512×512px</span>
+                <input type="file" accept="image/*" class="file-input"
+                       (change)="onImageChange($event, 'logo')">
+              </label>
+            </div>
+
+            <div class="image-upload-item">
+              <label class="form-label">Favicon</label>
+              <div class="img-preview-wrap favicon-preview" *ngIf="faviconPreview">
+                <img [src]="faviconPreview" alt="favicon" class="img-preview">
+                <button class="remove-img" (click)="faviconPreview = null">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <label class="upload-zone favicon-zone" *ngIf="!faviconPreview">
+                <mat-icon>image</mat-icon>
+                <span>Upload favicon</span>
+                <span class="upload-hint">ICO, PNG — 32×32px</span>
+                <input type="file" accept="image/*" class="file-input"
+                       (change)="onImageChange($event, 'favicon')">
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Chính sách bán hàng</div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Miễn phí ship từ (đ)</label>
+              <input class="form-input" type="number" [(ngModel)]="store.freeShipThreshold">
+              <span class="form-hint">Hiện: {{ formatPrice(store.freeShipThreshold) }}</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Thời gian đổi trả (ngày)</label>
+              <input class="form-input" type="number" [(ngModel)]="store.maxReturnDays">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bảo hành (tháng)</label>
+              <input class="form-input" type="number" [(ngModel)]="store.warrantyMonths">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Thuế VAT (%)</label>
+              <input class="form-input" type="number" [(ngModel)]="store.taxPercent">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cảnh báo tồn kho thấp</label>
+              <input class="form-input" type="number" [(ngModel)]="store.lowStockAlert">
+              <span class="form-hint">Cảnh báo khi tồn kho ≤ {{ store.lowStockAlert }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Tùy chọn cửa hàng</div>
+
+          <div class="toggle-list">
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Cho phép đánh giá sản phẩm</span>
+                <span class="ts-desc">Khách hàng có thể để lại review</span>
+              </div>
+              <div class="toggle" [class.on]="store.allowReview"
+                   (click)="store.allowReview = !store.allowReview">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Yêu cầu đăng nhập để mua hàng</span>
+                <span class="ts-desc">Khách vãng lai không thể checkout</span>
+              </div>
+              <div class="toggle" [class.on]="store.requireLoginBuy"
+                   (click)="store.requireLoginBuy = !store.requireLoginBuy">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Hiển thị sản phẩm hết hàng</span>
+                <span class="ts-desc">Vẫn hiện sản phẩm nhưng không cho mua</span>
+              </div>
+              <div class="toggle" [class.on]="store.showOutOfStock"
+                   (click)="store.showOutOfStock = !store.showOutOfStock">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── PAYMENT ─────────────────────────── -->
+      <div *ngIf="activeTab === 'payment'">
+
+        <div class="settings-card">
+          <div class="card-title">Phương thức thanh toán</div>
+          <p class="card-desc">Bật/tắt và cấu hình từng phương thức</p>
+
+          <div class="payment-list">
+            <div
+              class="payment-item"
+              *ngFor="let pm of paymentMethods"
+              [class.expanded]="expandedPayment === pm.id">
+
+              <div class="payment-header" (click)="togglePaymentExpand(pm.id)">
+                <div class="payment-left">
+                  <div class="payment-icon">
+                    <mat-icon>{{ pm.icon }}</mat-icon>
+                  </div>
+                  <div class="payment-info">
+                    <span class="payment-name">{{ pm.name }}</span>
+                    <span class="payment-status" [class.active]="pm.enabled">
+                      {{ pm.enabled ? 'Đang bật' : 'Đã tắt' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="payment-right">
+                  <div class="toggle" [class.on]="pm.enabled"
+                       (click)="$event.stopPropagation(); pm.enabled = !pm.enabled">
+                    <div class="toggle-thumb"></div>
+                  </div>
+                  <mat-icon class="expand-icon">
+                    {{ expandedPayment === pm.id ? 'expand_less' : 'expand_more' }}
+                  </mat-icon>
+                </div>
+              </div>
+
+              <!-- COD detail -->
+              <div class="payment-detail" *ngIf="expandedPayment === pm.id && pm.id === 'cod'">
+                <div class="form-group">
+                  <label class="form-label">Phí COD (đ)</label>
+                  <input class="form-input" type="number" [(ngModel)]="pm.fee">
+                  <span class="form-hint">0 = miễn phí COD</span>
+                </div>
+              </div>
+
+              <!-- VNPay detail -->
+              <div class="payment-detail" *ngIf="expandedPayment === pm.id && pm.id === 'vnpay'">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Merchant ID</label>
+                    <input class="form-input" [(ngModel)]="pm.merchantId">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Secret Key</label>
+                    <input class="form-input" type="password" [(ngModel)]="pm.secretKey">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Momo detail -->
+              <div class="payment-detail" *ngIf="expandedPayment === pm.id && pm.id === 'momo'">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Partner ID</label>
+                    <input class="form-input" [(ngModel)]="pm.partnerId">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Secret Key</label>
+                    <input class="form-input" type="password" [(ngModel)]="pm.secretKey">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Banking detail -->
+              <div class="payment-detail" *ngIf="expandedPayment === pm.id && pm.id === 'banking'">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Tên ngân hàng</label>
+                    <input class="form-input" [(ngModel)]="pm.bankName">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Số tài khoản</label>
+                    <input class="form-input" [(ngModel)]="pm.accountNo">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tên tài khoản</label>
+                  <input class="form-input" [(ngModel)]="pm.accountName">
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── SHIPPING ────────────────────────── -->
+      <div *ngIf="activeTab === 'shipping'">
+
+        <div class="settings-card">
+          <div class="card-title">Đơn vị vận chuyển</div>
+
+          <div class="shipping-list">
+            <div
+              class="shipping-item"
+              *ngFor="let sp of shippingProviders">
+
+              <div class="shipping-header">
+                <div class="shipping-left">
+                  <span class="shipping-emoji">{{ sp.icon }}</span>
+                  <div>
+                    <div class="shipping-name">{{ sp.name }}</div>
+                    <div class="shipping-fee">Phí cơ bản: {{ formatPrice(sp.feeBase) }}</div>
+                  </div>
+                </div>
+                <div class="toggle" [class.on]="sp.enabled"
+                     (click)="sp.enabled = !sp.enabled">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </div>
+
+              <div class="shipping-config" *ngIf="sp.enabled">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <input class="form-input" [(ngModel)]="sp.apiKey" type="password"
+                           placeholder="Nhập API key">
+                  </div>
+                  <div class="form-group" *ngIf="sp.shopId !== undefined">
+                    <label class="form-label">Shop ID</label>
+                    <input class="form-input" [(ngModel)]="sp.shopId">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phí cơ bản (đ)</label>
+                    <input class="form-input" type="number" [(ngModel)]="sp.feeBase">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Bảng phí vận chuyển theo vùng</div>
+
+          <div class="zone-table">
+            <div class="zone-header">
+              <span>Khu vực</span>
+              <span>Phí (đ)</span>
+              <span>Thời gian</span>
+            </div>
+            <div class="zone-row" *ngFor="let z of shippingZones">
+              <span class="zone-name">{{ z.zone }}</span>
+              <div class="zone-fee-wrap">
+                <input class="zone-input" type="number" [(ngModel)]="z.fee">
+              </div>
+              <div class="zone-days-wrap">
+                <input class="zone-input" [(ngModel)]="z.days"> ngày
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── NOTIFICATION ───────────────────── -->
+      <div *ngIf="activeTab === 'notification'">
+
+        <div class="settings-card">
+          <div class="card-title">Thông báo Email</div>
+
+          <div class="toggle-list">
+            <div class="toggle-setting" *ngFor="let item of [
+              { key: 'emailNewOrder',       label: 'Đơn hàng mới',           desc: 'Khi có đơn hàng được tạo'          },
+              { key: 'emailOrderShipped',   label: 'Đơn hàng giao đi',        desc: 'Khi đơn chuyển sang trạng thái giao'},
+              { key: 'emailOrderCompleted', label: 'Đơn hàng hoàn thành',     desc: 'Khi đơn được giao thành công'       },
+              { key: 'emailOrderCancelled', label: 'Đơn hàng bị hủy',         desc: 'Khi đơn bị hủy bởi khách hoặc admin'},
+              { key: 'emailLowStock',       label: 'Tồn kho thấp',            desc: 'Khi sản phẩm dưới ngưỡng cảnh báo'  },
+              { key: 'emailNewReview',      label: 'Đánh giá mới',            desc: 'Khi có review mới được đăng'        },
+              { key: 'emailNewUser',        label: 'Tài khoản mới',           desc: 'Khi có người dùng đăng ký'          }
+            ]">
+              <div class="toggle-text">
+                <span class="ts-label">{{ item.label }}</span>
+                <span class="ts-desc">{{ item.desc }}</span>
+              </div>
+              <div class="toggle"
+                   [class.on]="$any(notifications)[item.key]"
+                   (click)="$any(notifications)[item.key] = !$any(notifications)[item.key]">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Cấu hình SMTP</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">SMTP Host</label>
+              <input class="form-input" [(ngModel)]="notifications.smtpHost">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Port</label>
+              <input class="form-input" type="number" [(ngModel)]="notifications.smtpPort">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" [(ngModel)]="notifications.smtpUser">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mật khẩu</label>
+              <input class="form-input" type="password" [(ngModel)]="notifications.smtpPass">
+            </div>
+          </div>
+
+          <button class="btn-test">
+            <mat-icon>send</mat-icon>
+            Gửi email kiểm tra
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Thông báo Push</div>
+
+          <div class="toggle-list">
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Đơn hàng mới</span>
+                <span class="ts-desc">Push notification khi có đơn mới</span>
+              </div>
+              <div class="toggle" [class.on]="notifications.pushNewOrder"
+                   (click)="notifications.pushNewOrder = !notifications.pushNewOrder">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Tồn kho thấp</span>
+                <span class="ts-desc">Push khi hàng dưới ngưỡng cảnh báo</span>
+              </div>
+              <div class="toggle" [class.on]="notifications.pushLowStock"
+                   (click)="notifications.pushLowStock = !notifications.pushLowStock">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── SECURITY ───────────────────────── -->
+      <div *ngIf="activeTab === 'security'">
+
+        <div class="settings-card">
+          <div class="card-title">Đổi mật khẩu</div>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu hiện tại</label>
+            <div class="pwd-wrap">
+              <input
+                class="form-input"
+                [type]="showCurrentPwd ? 'text' : 'password'"
+                [(ngModel)]="currentPassword"
+                placeholder="••••••••">
+              <button class="pwd-eye" (click)="showCurrentPwd = !showCurrentPwd">
+                <mat-icon>{{ showCurrentPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mật khẩu mới</label>
+              <div class="pwd-wrap">
+                <input
+                  class="form-input"
+                  [type]="showNewPwd ? 'text' : 'password'"
+                  [(ngModel)]="newPassword"
+                  placeholder="Tối thiểu 8 ký tự">
+                <button class="pwd-eye" (click)="showNewPwd = !showNewPwd">
+                  <mat-icon>{{ showNewPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Xác nhận mật khẩu</label>
+              <div class="pwd-wrap">
+                <input
+                  class="form-input"
+                  [type]="showConfirmPwd ? 'text' : 'password'"
+                  [(ngModel)]="confirmPassword"
+                  placeholder="Nhập lại mật khẩu mới">
+                <button class="pwd-eye" (click)="showConfirmPwd = !showConfirmPwd">
+                  <mat-icon>{{ showConfirmPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password strength -->
+          <div class="pwd-strength" *ngIf="newPassword">
+            <div class="strength-bar">
+              <div
+                class="strength-fill"
+                [class.weak]="newPassword.length < 6"
+                [class.medium]="newPassword.length >= 6 && newPassword.length < 10"
+                [class.strong]="newPassword.length >= 10"
+                [style.width.%]="newPassword.length >= 10 ? 100 : newPassword.length >= 6 ? 60 : 30">
+              </div>
+            </div>
+            <span class="strength-label"
+                  [class.weak-text]="newPassword.length < 6"
+                  [class.medium-text]="newPassword.length >= 6 && newPassword.length < 10"
+                  [class.strong-text]="newPassword.length >= 10">
+              {{ newPassword.length < 6 ? 'Yếu' : newPassword.length < 10 ? 'Trung bình' : 'Mạnh' }}
+            </span>
+          </div>
+
+          <button class="btn-change-pwd"
+                  [disabled]="!currentPassword || !newPassword || newPassword !== confirmPassword">
+            <mat-icon>lock_reset</mat-icon>
+            Đổi mật khẩu
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Chính sách mật khẩu</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Độ dài tối thiểu</label>
+              <input class="form-input" type="number" [(ngModel)]="security.passwordMinLength" min="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số lần thử sai tối đa</label>
+              <input class="form-input" type="number" [(ngModel)]="security.maxLoginAttempts" min="3">
+            </div>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Yêu cầu chữ hoa</span>
+                <span class="ts-desc">Mật khẩu phải có ít nhất 1 chữ hoa</span>
+              </div>
+              <div class="toggle" [class.on]="security.requireUppercase"
+                   (click)="security.requireUppercase = !security.requireUppercase">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Yêu cầu số</span>
+                <span class="ts-desc">Mật khẩu phải có ít nhất 1 chữ số</span>
+              </div>
+              <div class="toggle" [class.on]="security.requireNumber"
+                   (click)="security.requireNumber = !security.requireNumber">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Yêu cầu ký tự đặc biệt</span>
+                <span class="ts-desc">!@#$%^&* v.v.</span>
+              </div>
+              <div class="toggle" [class.on]="security.requireSpecial"
+                   (click)="security.requireSpecial = !security.requireSpecial">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-title">Bảo mật nâng cao</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Timeout phiên (phút)</label>
+              <input class="form-input" type="number" [(ngModel)]="security.sessionTimeout">
+              <span class="form-hint">Tự đăng xuất sau {{ security.sessionTimeout }} phút không hoạt động</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rate limit API (req/phút)</label>
+              <input class="form-input" type="number" [(ngModel)]="security.apiRateLimit">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Whitelist IP (mỗi IP 1 dòng)</label>
+            <textarea
+              class="form-textarea"
+              rows="4"
+              [(ngModel)]="security.ipWhitelist"
+              placeholder="192.168.1.1&#10;10.0.0.0/24&#10;Để trống = cho phép tất cả">
+            </textarea>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Xác thực 2 bước (2FA)</span>
+                <span class="ts-desc">Yêu cầu OTP khi đăng nhập</span>
+              </div>
+              <div class="toggle" [class.on]="security.twoFactor"
+                   (click)="security.twoFactor = !security.twoFactor">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="toggle-setting">
+              <div class="toggle-text">
+                <span class="ts-label">Audit log</span>
+                <span class="ts-desc">Ghi lại mọi thao tác của admin</span>
+              </div>
+              <div class="toggle" [class.on]="security.auditLog"
+                   (click)="security.auditLog = !security.auditLog">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

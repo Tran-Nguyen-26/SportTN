@@ -103,10 +103,10 @@
           </td>
           <td>
             <div class="action-btns">
-              <button class="action-btn view" title="Xem chi tiết">
+              <button class="action-btn view" title="Xem chi tiết" (click)="openView(order)">
                 <mat-icon>visibility</mat-icon>
               </button>
-              <button class="action-btn edit" title="Cập nhật">
+              <button class="action-btn edit" title="Cập nhật" (click)="openEdit(order)">
                 <mat-icon>edit</mat-icon>
               </button>
             </div>
@@ -143,3 +143,12 @@
   </div>
 
 </div>
+
+<app-order-modal
+  *ngIf="selectedOrder"
+  [order]="selectedOrder"
+  [mode]="modalMode"
+  (closed)="closeModal()"
+  (saved)="onSaved($event)"
+  (cancelled)="onCancelled($event)">
+</app-order-modal>
