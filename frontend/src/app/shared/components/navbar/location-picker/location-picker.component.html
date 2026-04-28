@@ -1,1 +1,17 @@
-<p>location-picker works!</p>
+<div class="location-picker">
+  <button class="location-trigger" (click)="toggleOpen()">
+    <mat-icon>location_on</mat-icon>
+    <span>{{ selectedLocation }}</span>
+    <mat-icon class="expand-icon">{{ isOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+  </button>
+
+  <div class="location-dropdown" *ngIf="isOpen">
+    <button
+      class="location-option"
+      *ngFor="let location of locations"
+      [class.active]="location === selectedLocation"
+      (click)="selectLocation(location)">
+      {{ location }}
+    </button>
+  </div>
+</div>

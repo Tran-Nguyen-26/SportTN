@@ -1,45 +1,72 @@
-<mat-card class="coupon-card-stn">
-  <mat-card-header class="stn-header-sm">
-    <mat-icon>local_offer</mat-icon>
-    <mat-card-title>Mã giảm giá</mat-card-title>
-  </mat-card-header>
+<div class="coupon-card">
+  <div class="coupon-header">
+    <svg class="coupon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+      <line x1="7" y1="7" x2="7.01" y2="7"/>
+    </svg>
+    <span class="coupon-title">Mã giảm giá</span>
+  </div>
 
-  <mat-card-content class="stn-content-sm">
-    <div *ngIf="!appliedCoupon" class="coupon-input-wrap">
-      <form [formGroup]="couponForm" (ngSubmit)="applyCoupon()" class="inline-form">
-        <mat-form-field appearance="outline" class="stn-input-no-margin">
-          <mat-label>Nhập mã ưu đãi</mat-label>
-          <input matInput formControlName="couponCode" placeholder="Ví dụ: SPORTTN20" (input)="errorMessage = ''">
-          <mat-icon matPrefix>confirmation_number</mat-icon>
-        </mat-form-field>
-
-        <button
-          mat-flat-button
-          class="btn-apply-stn"
-          [disabled]="!couponForm.valid || isLoading">
-          <span *ngIf="!isLoading">Áp dụng</span>
-          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-        </button>
-      </form>
-
-      <div *ngIf="errorMessage" class="stn-error-box" [@fadeInOut]>
-        <mat-icon>info</mat-icon>
-        <span>{{ errorMessage }}</span>
+  <!-- Input area -->
+  <div class="coupon-input-area" *ngIf="!appliedCoupon" [@fadeSlide]>
+    <div class="input-row" [formGroup]="couponForm">
+      <div class="input-wrap" [class.has-error]="errorMessage">
+        <input
+          matInput
+          formControlName="couponCode"
+          class="coupon-input"
+          placeholder="Nhập mã ưu đãi (VD: SAVE20)"
+          (input)="clearError()"
+          (keydown.enter)="applyCoupon()"
+          autocomplete="off"
+          spellcheck="false"
+        />
       </div>
-    </div>
-
-    <div *ngIf="appliedCoupon" class="applied-coupon-stn" [@fadeInOut]>
-      <div class="coupon-info-group">
-        <div class="stn-badge-success">
-          <mat-icon>verified</mat-icon>
-          <span>{{ appliedCoupon }}</span>
-        </div>
-        <p class="stn-success-text">Đã áp dụng mã thành công!</p>
-      </div>
-
-      <button mat-icon-button color="warn" (click)="removeCoupon()" matTooltip="Gỡ mã">
-        <mat-icon>delete_outline</mat-icon>
+      <button
+        class="apply-btn"
+        [class.loading]="isLoading"
+        [disabled]="couponForm.invalid || isLoading"
+        (click)="applyCoupon()"
+      >
+        <span *ngIf="!isLoading">Áp dụng</span>
+        <span *ngIf="isLoading" class="spinner"></span>
       </button>
     </div>
-  </mat-card-content>
-</mat-card>
+
+    <div class="error-msg" *ngIf="errorMessage" [@fadeIn]>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ errorMessage }}
+    </div>
+
+    <div class="hint-coupons">
+      <span class="hint-label">Mã thử:</span>
+      <button
+        *ngFor="let code of hintCodes"
+        class="hint-chip"
+        (click)="fillCoupon(code)"
+      >{{ code }}</button>
+    </div>
+  </div>
+
+  <!-- Applied state -->
+  <div class="applied-area" *ngIf="appliedCoupon" [@fadeSlide]>
+    <div class="applied-row">
+      <div class="applied-info">
+        <div class="applied-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          {{ appliedCoupon }}
+        </div>
+        <span class="applied-desc">{{ getDiscountLabel() }}</span>
+      </div>
+      <button class="remove-coupon-btn" (click)="removeCoupon()" title="Gỡ mã">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

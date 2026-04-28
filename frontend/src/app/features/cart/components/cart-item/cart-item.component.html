@@ -1,39 +1,91 @@
-<div class="stn-cart-item">
-  <div class="stn-item-image">
-    <img [src]="item.product.image" [alt]="item.product.name" />
+<div class="cart-item" [@itemSlide]="'in'">
+
+  <!-- Product Image (variant image) -->
+  <div class="item-image-wrap">
+    <img
+      [src]="item.variant.image || item.product.image"
+      [alt]="item.product.name"
+      class="item-image"
+      (error)="onImageError($event)"
+    />
+    <span class="stock-badge" *ngIf="item.variant.stock > 0 && item.variant.stock <= 5">
+      Còn {{ item.variant.stock }}
+    </span>
+    <span class="out-badge" *ngIf="item.variant.stock === 0">Hết hàng</span>
   </div>
 
-  <div class="stn-item-details">
-    <p class="stn-brand">{{ item.product.brand }}</p>
-    <h3 class="stn-product-name">{{ item.product.name }}</h3>
-    <div class="stn-rating">
-      <mat-icon>star</mat-icon>
-      <span class="score">{{ item.product.rating }}</span>
-      <span class="count">({{ item.product.reviews }} đánh giá)</span>
-    </div>
-  </div>
+  <!-- Product + Variant Info -->
+  <div class="item-info">
+    <span class="item-brand">{{ item.product.brand }}</span>
+    <h3 class="item-name">{{ item.product.name }}</h3>
 
-  <div class="stn-quantity-ctrl">
-    <button mat-icon-button (click)="decreaseQuantity()" [disabled]="item.quantity <= 1">
-      <mat-icon>remove</mat-icon>
-    </button>
-    <span class="qty-number">{{ item.quantity }}</span>
-    <button mat-icon-button (click)="increaseQuantity()">
-      <mat-icon>add</mat-icon>
-    </button>
-  </div>
-
-  <div class="stn-price-section">
-    <span class="stn-total-price">{{ getTotalPrice() | currency:'VND':'symbol':'1.0-0' }}</span>
-    <div class="stn-price-meta">
-      <span class="stn-unit-price" *ngIf="getSavings() > 0">{{ item.price | currency:'VND':'symbol':'1.0-0' }}</span>
-      <span class="stn-savings-tag" *ngIf="getSavings() > 0">
-        Giảm {{ getSavings() | currency:'VND':'symbol':'1.0-0' }}
+    <!-- Variant pills -->
+    <div class="variant-row">
+      <!-- Color dot + label -->
+      <span class="variant-pill color-pill">
+        <span class="color-dot" [style.background]="item.variant.colorHex"></span>
+        {{ item.variant.color }}
       </span>
+      <!-- Size -->
+      <span class="variant-pill size-pill">
+        Size&nbsp;<strong>{{ item.variant.size }}</strong>
+      </span>
+      <!-- SKU (nhỏ, mờ) -->
+      <span class="sku-text">{{ item.variant.sku }}</span>
     </div>
+
+    <!-- Rating -->
+    <div class="item-rating">
+      <span class="stars">
+        <span *ngFor="let s of [1,2,3,4,5]"
+              class="star"
+              [class.filled]="s <= item.product.rating"
+              [class.half]="s - 0.5 <= item.product.rating && s > item.product.rating"
+        >★</span>
+      </span>
+      <span class="rating-count">({{ item.product.reviews }})</span>
+    </div>
+
+    <button class="remove-link" (click)="remove()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+      </svg>
+      Xóa
+    </button>
   </div>
 
-  <button mat-icon-button class="stn-remove-btn" (click)="remove()" matTooltip="Xóa sản phẩm">
-    <mat-icon>delete_outline</mat-icon>
-  </button>
+  <!-- Quantity Control -->
+  <div class="item-quantity">
+    <label class="qty-label">Số lượng</label>
+    <div class="qty-ctrl">
+      <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="item.quantity <= 1">−</button>
+      <span class="qty-value">{{ item.quantity }}</span>
+      <button class="qty-btn" (click)="increaseQuantity()" [disabled]="item.quantity >= item.variant.stock">+</button>
+    </div>
+    <span class="stock-hint" *ngIf="item.quantity >= item.variant.stock">
+      Tối đa {{ item.variant.stock }}
+    </span>
+  </div>
+
+  <!-- Price Block -->
+  <div class="item-price-block">
+    <span class="price-total">{{ getTotalPrice() | currency:'VND':'symbol':'1.0-0' }}</span>
+    <ng-container *ngIf="getSavings() > 0">
+      <span class="price-original">
+        {{ item.variant.originalPrice * item.quantity | currency:'VND':'symbol':'1.0-0' }}
+      </span>
+      <span class="savings-tag">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        −{{ getSavingsPercent() }}%
+      </span>
+    </ng-container>
+    <span class="unit-price" *ngIf="item.quantity > 1">
+      {{ item.priceSnapshot | currency:'VND':'symbol':'1.0-0' }}/sp
+    </span>
+  </div>
+
 </div>

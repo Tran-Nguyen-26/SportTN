@@ -6,5 +6,22 @@ import { Component } from '@angular/core';
   styleUrls: ['./location-picker.component.css']
 })
 export class LocationPickerComponent {
+  isOpen = false;
+  selectedLocation = 'TP. Ho Chi Minh';
+  locations = [
+    'TP. Ho Chi Minh',
+    'Ha Noi',
+    'Da Nang',
+    'Can Tho',
+    'Hai Phong'
+  ];
 
+  toggleOpen(): void {
+    this.isOpen = !this.isOpen;
+  }
+
+  selectLocation(location: string): void {
+    this.selectedLocation = location;
+    this.isOpen = false;
+  }
 }

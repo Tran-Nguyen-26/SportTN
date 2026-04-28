@@ -1,7 +1,11 @@
 <div class="account-page">
-    <app-account-menu></app-account-menu>
+    <aside class="account-sidebar">
+      <app-account-menu></app-account-menu>
+    </aside>
 
     <section class="account-content">
+      <div class="content-shell">
         <router-outlet></router-outlet>
+      </div>
     </section>
 </div>

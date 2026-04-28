@@ -1,11 +1,14 @@
 .account-page {
   display: grid;
   grid-template-columns: 280px 1fr;
-  gap: 30px;
-  max-width: 1400px;
+  gap: 22px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 40px 20px;
+  margin-top: 150px;
+  padding: 26px 16px 34px;
   min-height: calc(100vh - 140px);
+  background: linear-gradient(180deg, #f3f8ff 0%, #ffffff 42%);
+  border-radius: 24px;
   animation: fadeIn 0.3s ease-in;
 }
 
@@ -23,13 +26,35 @@
 .account-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+}
+
+.account-sidebar {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+}
+
+.content-shell {
+  border: 1px solid #dbeafe;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+  min-height: 640px;
 }
 
 @media (max-width: 768px) {
   .account-page {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px 15px;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .account-sidebar {
+    position: static;
+  }
+
+  .content-shell {
+    border-radius: 14px;
   }
 }

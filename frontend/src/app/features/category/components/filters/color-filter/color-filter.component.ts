@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 })
 export class ColorFilterComponent {
   showAll = false;
+  selectedColorName = '';
 
   colors = [
     { name: 'Đen', count: 1367, code: '#000000' },
@@ -31,5 +32,13 @@ export class ColorFilterComponent {
 
   toggleShowAll() {
     this.showAll = !this.showAll;
+  }
+
+  onSelectColor(name: string): void {
+    this.selectedColorName = this.selectedColorName === name ? '' : name;
+  }
+
+  clearSelectedColor(): void {
+    this.selectedColorName = '';
   }
 }

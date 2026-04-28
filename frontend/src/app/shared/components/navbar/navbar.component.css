@@ -9,10 +9,11 @@
   right: 0;
   z-index: 1000;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-bottom: 1px solid #dbeafe;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
 }
 
 .navbar-inner {
-  position: relative; /* để category-banner định vị tuyệt đối theo inner */
-  height: 120px;
+  position: relative;
+  min-height: 120px;
 }

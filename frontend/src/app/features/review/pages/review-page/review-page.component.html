@@ -1,1 +1,84 @@
-<p>review-page works!</p>
+<div class="review-page">
+  <h1 class="page-title">Tất cả đánh giá</h1>
+
+  <div class="review-layout">
+    <aside class="review-sidebar">
+      <div class="product-brief-card">
+        <img [src]="productInfo.image" [alt]="productInfo.name">
+        <div>
+          <h3>{{ productInfo.name }}</h3>
+          <p>{{ productInfo.price | number }} đ</p>
+        </div>
+      </div>
+
+      <div class="rating-summary-card">
+        <div class="summary-score">
+          <strong>{{ productInfo.averageRating }}</strong>
+          <span>★</span>
+        </div>
+        <small>({{ productInfo.totalReviews }} Đánh giá)</small>
+        <p>{{ productInfo.recommendPercent }}% khách hàng gợi ý sản phẩm này</p>
+
+        <div class="rating-bars">
+          <div class="bar-row" *ngFor="let stat of ratingStats">
+            <span>{{ stat.star }} ★</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="getRatingPercent(stat.count)"></div>
+            </div>
+            <span>{{ stat.count }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="review-main">
+      <div class="review-header">
+        <span class="review-tag">CUSTOMER REVIEW</span>
+        <p>Khám phá trải nghiệm thực tế của người dùng khi mua sản phẩm thể thao tại SportTN.</p>
+      </div>
+
+      <div class="filter-row">
+        <button
+          *ngFor="let filter of ratingFilters; let i = index"
+          class="filter-chip"
+          [class.active]="filter.active"
+          (click)="setActiveFilter(i)">
+          {{ filter.label }} ({{ filter.count }})
+        </button>
+      </div>
+
+      <div class="review-list">
+        <article class="review-card" *ngFor="let review of reviews">
+          <div class="review-top">
+            <div class="avatar">{{ review.userName.charAt(0) }}</div>
+            <div>
+              <h3>{{ review.userName }}</h3>
+              <div class="meta">
+                <span class="stars-inline">
+                  <mat-icon *ngFor="let s of getStars(review.rating)">{{ s }}</mat-icon>
+                </span>
+                <span>{{ review.date }}</span>
+              </div>
+            </div>
+          </div>
+
+          <h4>{{ review.title }}</h4>
+          <p>{{ review.content }}</p>
+
+          <div class="product-ref">
+            <mat-icon>sports_soccer</mat-icon>
+            <span>Sản phẩm: {{ review.product }}</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="pagination-row">
+        <button class="page-btn">Trước</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">Sau</button>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,16 +1,26 @@
 <div class="filter-sidebar">
+    <div class="filter-sidebar-top">
+        <span class="filter-badge">FILTER</span>
+        <h4>Bộ lọc sản phẩm</h4>
+    </div>
 
     <div class="categories">
         <ul class="category-list">
-            <li *ngFor="let cat of categories">
+            <li
+                *ngFor="let cat of categories"
+                [class.selected]="selectedCategoryLabel === cat.label"
+                (click)="onSelectCategory(cat.label)">
                 <img [src]="cat.image">
                 <span>{{ cat.label }} ({{ cat.count }})</span>
             </li>
         </ul>
+        <button
+            class="clear-category-btn"
+            *ngIf="selectedCategoryLabel"
+            (click)="clearQuickCategory()">
+            Xóa danh mục đã chọn
+        </button>
     </div>
-
-
-    <h4>Bộ lọc</h4>
 
     <!-- Brand Filter -->
     <app-filter-section

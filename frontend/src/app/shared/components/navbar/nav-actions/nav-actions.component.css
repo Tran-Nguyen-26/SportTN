@@ -1,31 +1,32 @@
 .nav-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
+
 .nav-actions div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
 }
 
 .nav-actions > div:hover {
-  color: #007bff;          
+  color: #007bff;
   transform: translateY(-2px);
 }
 
 .nav-actions mat-icon {
-  font-size: 24px;          
-  color: #555;       
+  font-size: 24px;
+  color: #555;
   transition: color 0.2s;
 }
 
 .nav-actions span {
   font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .account-menu,
@@ -36,15 +37,16 @@
 .support-menu .dropdown,
 .account-menu .dropdown {
   position: absolute;
-  top: 100%;    
+  top: calc(100% + 10px);
   left: 0;
   background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.12);
   padding: 12px;
-  min-width: 200px;
+  min-width: 220px;
   z-index: 1000;
-  display: none; 
+  display: none;
 }
 
 .account-menu:hover .dropdown,
@@ -63,7 +65,7 @@
 
 .account-menu .dropdown li,
 .support-menu .dropdown li {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .support-menu .dropdown li {
@@ -79,14 +81,14 @@
 .account-menu .dropdown a,
 .support-menu .dropdown a {
   text-decoration: none;
-  color: #333;
+  color: #334155;
   font-size: 14px;
   transition: color 0.2s;
 }
 
 .account-menu .dropdown a:hover,
 .support-menu .dropdown a:hover {
-  color: #007bff;
+  color: #1d4ed8;
 }
 
 .nav-actions > div > mat-icon {
@@ -97,14 +99,23 @@
 
 
 .support-menu .dropdown mat-icon {
-  font-size: 16px;       
+  font-size: 16px;
   color: #007bff;
-  flex-shrink: 0;       
-  width: 20px;          
-  height: 20px;         
-  display: flex;        
-  align-items: center;  
-  justify-content: center; 
-  line-height: 1;     
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
+.cart-item mat-icon {
+  color: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+  .nav-actions span {
+    display: none;
+  }
+}

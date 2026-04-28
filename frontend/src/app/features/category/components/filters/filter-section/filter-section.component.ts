@@ -10,6 +10,7 @@ export class FilterSectionComponent {
   @Input() items: { label: string; count: number }[] = [];
 
   showAll = false;
+  selectedLabels = new Set<string>();
 
   toggleShowAll() {
     this.showAll = !this.showAll;
@@ -17,5 +18,21 @@ export class FilterSectionComponent {
 
   get visibleItems() {
     return this.showAll ? this.items : this.items.slice(0, 5);
+  }
+
+  onToggleItem(label: string, checked: boolean): void {
+    if (checked) {
+      this.selectedLabels.add(label);
+      return;
+    }
+    this.selectedLabels.delete(label);
+  }
+
+  isChecked(label: string): boolean {
+    return this.selectedLabels.has(label);
+  }
+
+  clearSelection(): void {
+    this.selectedLabels.clear();
   }
 }

@@ -20,6 +20,12 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+}
+
+.color-item.selected .color-circle {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px #3b82f6;
 }
 
 .color-circle {

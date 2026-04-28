@@ -1,0 +1,58 @@
+.location-picker {
+  position: relative;
+}
+
+.location-trigger {
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.location-trigger mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+.expand-icon {
+  color: #64748b;
+}
+
+.location-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 210px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.12);
+  padding: 6px;
+  z-index: 20;
+}
+
+.location-option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.location-option:hover,
+.location-option.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+}

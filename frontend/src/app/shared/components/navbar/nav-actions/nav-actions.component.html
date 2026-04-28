@@ -19,10 +19,10 @@
           <p>{{ auth.userResponse?.email }}</p>
         </li>
         <li><a href="javascript:void(0)">{{ auth.userResponse?.totalPoints }} điểm</a></li>
-        <li><a routerLink="/profile">Tài khoản</a></li>
-        <li><a routerLink="/profile/address">Địa chỉ của tôi</a></li>
-        <li><a routerLink="/orders/history">Lịch sử mua hàng</a></li>
-        <li><a routerLink="/points/manage">Quản lý điểm tích lũy</a></li>
+        <li><a routerLink="/account/my-account">Tài khoản</a></li>
+        <li><a routerLink="/account/address">Địa chỉ của tôi</a></li>
+        <li><a routerLink="/account/order-history">Lịch sử mua hàng</a></li>
+        <li><a routerLink="/account/wallet">Ví của tôi</a></li>
         <li>
           <a href="javascript:void(0)"class="logout-link" (click)="handleLogout()">
             Đăng xuất
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div class="nav-item" routerLink="/shop">
+  <div class="nav-item" routerLink="/home">
     <mat-icon>shop</mat-icon>
     <span>Cửa hàng</span>
   </div>
@@ -58,8 +58,8 @@
     </div>
   </div>
 
-  <div (click)="goCart()" class="nav-item">
-    <mat-icon>add_shopping_cart</mat-icon>
+  <div (click)="goCart()" class="nav-item cart-item">
+    <mat-icon [matBadge]="cartCount" matBadgeColor="warn" matBadgeSize="small">add_shopping_cart</mat-icon>
     <span>Giỏ hàng</span>
   </div>
 </div>

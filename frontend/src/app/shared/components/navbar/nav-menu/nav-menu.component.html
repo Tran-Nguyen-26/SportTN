@@ -2,6 +2,7 @@
     <app-nav-menu-item
         *ngFor="let item of menuItems"
         [label]="item.label"
+        [isActive]="activeCategoryId === item.categoryId"
         [highlight]="item.highlight"
         [hasChildren]="item.hasChildren"
         [categoryId]="item.categoryId"

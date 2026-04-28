@@ -2,14 +2,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  padding: 0 40px;
+  background: #ffffff;
+  border-bottom: 1px solid #dbeafe;
+  padding: 0 24px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
 .nav-menu::-webkit-scrollbar {
   display: none;
+}
+
+@media (max-width: 900px) {
+  .nav-menu {
+    padding: 0 10px;
+  }
 }
 

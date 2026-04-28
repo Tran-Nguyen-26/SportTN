@@ -13,6 +13,7 @@ interface MenuItem {
   styleUrls: ['./nav-menu.component.css']
 })
 export class NavMenuComponent {
+  activeCategoryId: string | null = null;
   menuItems: MenuItem[] = [
     { label: 'Môn Thể Thao', highlight: null, hasChildren: true, categoryId: '1' },
     { label: 'Nam', highlight: null, hasChildren: true, categoryId: '11' },
@@ -28,6 +29,7 @@ export class NavMenuComponent {
   @Output() selectCategory = new EventEmitter<string | null>();
 
   onClickMenuItem(categoryId: string | null) {
+    this.activeCategoryId = categoryId;
     this.selectCategory.emit(categoryId);
   }
 }

@@ -29,4 +29,13 @@
            [(ngModel)]="selectedMax"
            (input)="updateMax($event)">
   </div>
+
+  <div class="price-values">
+    Đang áp dụng: {{ appliedMin | number }} - {{ appliedMax | number }} VND
+  </div>
+
+  <div class="price-actions">
+    <button (click)="applyPriceRange()">Áp dụng</button>
+    <button type="button" (click)="resetPriceRange()">Đặt lại</button>
+  </div>
 </div>

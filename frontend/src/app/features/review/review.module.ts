@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 import { ReviewRoutingModule } from './review-routing.module';
 import { ReviewPageComponent } from './pages/review-page/review-page.component';
@@ -11,7 +12,8 @@ import { ReviewPageComponent } from './pages/review-page/review-page.component';
   ],
   imports: [
     CommonModule,
-    ReviewRoutingModule
+    ReviewRoutingModule,
+    MatIconModule
   ]
 })
 export class ReviewModule { }

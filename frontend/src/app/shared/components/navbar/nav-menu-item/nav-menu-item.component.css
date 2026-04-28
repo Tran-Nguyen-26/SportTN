@@ -13,17 +13,17 @@
 }
 
 .menu-item:hover {
-  color: #0082c3;
-  border-bottom-color: #0082c3;
+  color: #2563eb;
+  border-bottom-color: #2563eb;
 }
 
 .menu-item.active {
-  color: #0082c3;
-  border-bottom-color: #0082c3;
+  color: #2563eb;
+  border-bottom-color: #2563eb;
 }
 
 .menu-item.is-new {
-  color: #0082c3;
+  color: #2563eb;
   font-weight: 700;
 }
 

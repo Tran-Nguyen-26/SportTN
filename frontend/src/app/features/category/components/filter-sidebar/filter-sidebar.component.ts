@@ -6,6 +6,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./filter-sidebar.component.css']
 })
 export class FilterSidebarComponent {
+  selectedCategoryLabel = '';
+
   categories = [
     { label: 'Dưới 199K', count: 26755, image: 'assets/duoi199k.jpg' },
     { label: 'Đồ mặc hàng ngày', count: 1752, image: 'assets/duoi199k.jpg' },
@@ -17,4 +19,12 @@ export class FilterSidebarComponent {
     { label: 'Phụ kiện thể thao nam', count: 3383, image: 'assets/duoi199k.jpg' },
     { label: 'Đồ lót thể thao', count: 141, image: 'assets/duoi199k.jpg' }
   ];
+
+  onSelectCategory(label: string): void {
+    this.selectedCategoryLabel = this.selectedCategoryLabel === label ? '' : label;
+  }
+
+  clearQuickCategory(): void {
+    this.selectedCategoryLabel = '';
+  }
 }

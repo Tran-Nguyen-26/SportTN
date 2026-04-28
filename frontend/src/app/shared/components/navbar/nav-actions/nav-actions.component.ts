@@ -8,6 +8,7 @@ import {AuthService} from "../../../../core/services/auth/auth.service";
   styleUrls: ['./nav-actions.component.css']
 })
 export class NavActionsComponent {
+  cartCount = 2;
 
   constructor(private router: Router, private authService: AuthService) {}
 

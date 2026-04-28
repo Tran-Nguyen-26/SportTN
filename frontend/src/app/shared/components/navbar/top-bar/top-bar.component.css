@@ -3,9 +3,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 30px;
+  padding: 10px 26px;
   background: #fff;
-  min-height: 60px;
+  min-height: 66px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .top-bar app-search-bar {
@@ -23,7 +24,17 @@
 .v-divider {
   width: 1px;
   height: 32px;
-  background: #eee;
+  background: #dbeafe;
   flex-shrink: 0;
 }
 
+@media (max-width: 900px) {
+  .top-bar {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .v-divider {
+    display: none;
+  }
+}

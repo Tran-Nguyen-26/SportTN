@@ -59,7 +59,24 @@
 .price-values {
   display: flex;
   justify-content: space-between;
-  margin-top: 40px;
+  margin-top: 12px;
   font-size: 0.9rem;
   color: #333;
+}
+
+.price-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.price-actions button {
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
 }

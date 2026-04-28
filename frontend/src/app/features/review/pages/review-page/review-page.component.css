@@ -1,0 +1,280 @@
+.review-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  margin-top: 150px;
+  padding: 28px 18px 48px;
+  background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 40%);
+  border-radius: 20px;
+}
+
+.page-title {
+  margin: 0 0 16px;
+  color: #0f172a;
+}
+
+.review-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.review-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 96px;
+}
+
+.product-brief-card,
+.rating-summary-card {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.product-brief-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.product-brief-card img {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.product-brief-card h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.product-brief-card p {
+  margin: 6px 0 0;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.summary-score {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.summary-score strong {
+  font-size: 32px;
+  color: #0f172a;
+}
+
+.summary-score span {
+  color: #f59e0b;
+}
+
+.rating-summary-card small {
+  color: #64748b;
+}
+
+.rating-summary-card p {
+  margin: 6px 0 12px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.rating-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 42px;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: #334155;
+}
+
+.bar-track {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #1d4ed8;
+}
+
+.review-main {
+  min-width: 0;
+}
+
+.review-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.review-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.review-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.filter-row {
+  margin: 16px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  border: 1px solid #dbeafe;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filter-chip.active,
+.filter-chip:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.review-list {
+  display: grid;
+  gap: 12px;
+}
+
+.review-card {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.review-top {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.review-top h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.stars-inline mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  color: #f59e0b;
+}
+
+.review-card h4 {
+  margin: 10px 0 6px;
+  color: #1e293b;
+}
+
+.review-card p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.product-ref {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #1e3a8a;
+  font-size: 13px;
+}
+
+.product-ref mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.pagination-row {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.page-btn {
+  border: 1px solid #dbeafe;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #334155;
+}
+
+.page-btn.active,
+.page-btn:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+  .review-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .review-sidebar {
+    position: static;
+  }
+}

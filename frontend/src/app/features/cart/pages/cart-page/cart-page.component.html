@@ -1,47 +1,120 @@
-<div class="cart-container">
-  <mat-progress-spinner *ngIf="isLoading" diameter="50" mode="indeterminate"></mat-progress-spinner>
+<div class="cart-page">
 
-  <div *ngIf="!isLoading && isEmpty" class="empty-cart">
-    <mat-card>
-      <mat-card-content>
-        <div class="empty-state">
-          <mat-icon class="empty-icon">shopping_cart</mat-icon>
-          <h2>Your Cart is Empty</h2>
-          <p>You haven't added any items to your cart yet.</p>
-          <button mat-raised-button color="primary" (click)="continueShopping()">
-            Continue Shopping
-          </button>
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="skeleton-header"></div>
+    <div class="skeleton-layout">
+      <div class="skeleton-items">
+        <div class="skeleton-item" *ngFor="let n of [1,2,3]"></div>
+      </div>
+      <div class="skeleton-summary"></div>
+    </div>
   </div>
 
-  <div *ngIf="!isLoading && !isEmpty" class="cart-content">
-    <div class="cart-header">
-      <h1>Shopping Cart</h1>
-      <p class="items-count">{{ cart.totalItems }} items in your cart</p>
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!isLoading && isEmpty" [@fadeUp]>
+    <div class="empty-inner">
+      <div class="empty-icon-wrap">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+      </div>
+      <h2 class="empty-title">Giỏ hàng trống</h2>
+      <p class="empty-desc">Bạn chưa thêm sản phẩm nào. Khám phá ngay bộ sưu tập đồ thể thao mới nhất!</p>
+      <button class="shop-now-btn" (click)="continueShopping()">
+        Mua sắm ngay
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cart content -->
+  <div class="cart-content" *ngIf="!isLoading && !isEmpty" [@fadeUp]>
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Giỏ hàng</h1>
+        <span class="item-count-badge">{{ cart.totalItems }} sản phẩm</span>
+      </div>
+      <button class="clear-all-btn" (click)="clearCart()" *ngIf="cart.items.length > 0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+        </svg>
+        Xóa tất cả
+      </button>
     </div>
 
-    <div class="cart-main">
-      <div class="items-section">
-        <mat-card>
-          <mat-card-content>
-            <div class="cart-items-list">
-              <app-cart-item 
-                *ngFor="let item of cart.items" 
-                [item]="item"
-                (quantityChanged)="updateQuantity($event.itemId, $event.quantity)"
-                (itemRemoved)="removeItem($event)">
-              </app-cart-item>
-            </div>
-          </mat-card-content>
-        </mat-card>
+    <!-- Two-column layout -->
+    <div class="cart-layout">
+
+      <!-- Left: items list -->
+      <div class="items-col">
+        <div class="items-card">
+          <div class="items-card-head">
+            <span class="col-label product-col">Sản phẩm</span>
+            <span class="col-label qty-col">Số lượng</span>
+            <span class="col-label price-col">Thành tiền</span>
+          </div>
+
+          <div class="items-list">
+            <app-cart-item
+              *ngFor="let item of cart.items; trackBy: trackByItemId"
+              [item]="item"
+              (quantityChanged)="updateQuantity($event.itemId, $event.quantity)"
+              (itemRemoved)="removeItem($event)">
+            </app-cart-item>
+          </div>
+        </div>
+
+        <!-- Continue shopping link -->
+        <div class="back-row">
+          <button class="back-link" (click)="continueShopping()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Tiếp tục mua sắm
+          </button>
+        </div>
       </div>
 
-      <div class="summary-section">
-        <app-coupon-input></app-coupon-input>
-        <app-order-summary [cart]="cart" (checkout)="proceedToCheckout()"></app-order-summary>
+      <!-- Right: coupon + summary -->
+      <div class="summary-col">
+        <app-coupon-input
+          (couponApplied)="onCouponApplied($event)"
+          (couponRemoved)="onCouponRemoved()">
+        </app-coupon-input>
+
+        <div class="payment-method-card">
+          <div class="payment-head">
+            <h3>Phương thức thanh toán</h3>
+            <span>{{ selectedPaymentMethodId | uppercase }}</span>
+          </div>
+
+          <button
+            class="payment-method-item"
+            *ngFor="let method of paymentMethods"
+            [class.active]="selectedPaymentMethodId === method.id"
+            (click)="selectPaymentMethod(method.id)">
+            <span class="radio-dot"></span>
+            <span class="payment-text">
+              <strong>{{ method.label }}</strong>
+              <small>{{ method.description }}</small>
+            </span>
+          </button>
+        </div>
+
+        <app-order-summary
+          [cart]="cart"
+          [discountPercent]="discountPercent"
+          (checkout)="proceedToCheckout()">
+        </app-order-summary>
       </div>
+
     </div>
   </div>
 </div>

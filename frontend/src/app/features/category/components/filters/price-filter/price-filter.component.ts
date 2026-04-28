@@ -11,12 +11,32 @@ export class PriceFilterComponent {
 
   selectedMin = this.minPrice;
   selectedMax = this.maxPrice;
+  appliedMin = this.minPrice;
+  appliedMax = this.maxPrice;
 
   updateMin(event: any) {
-    this.selectedMin = event.target.value;
+    this.selectedMin = Number(event.target.value);
+    if (this.selectedMin > this.selectedMax) {
+      this.selectedMax = this.selectedMin;
+    }
   }
 
   updateMax(event: any) {
-    this.selectedMax = event.target.value;
+    this.selectedMax = Number(event.target.value);
+    if (this.selectedMax < this.selectedMin) {
+      this.selectedMin = this.selectedMax;
+    }
+  }
+
+  applyPriceRange(): void {
+    this.appliedMin = this.selectedMin;
+    this.appliedMax = this.selectedMax;
+  }
+
+  resetPriceRange(): void {
+    this.selectedMin = this.minPrice;
+    this.selectedMax = this.maxPrice;
+    this.appliedMin = this.minPrice;
+    this.appliedMax = this.maxPrice;
   }
 }
