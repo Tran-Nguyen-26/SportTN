@@ -29,6 +29,28 @@ export interface InvoiceItem {
   totalPrice: number;
 }
 
+export interface InvoiceForm {
+  customerId:     number | null;
+  customerName:   string;
+  customerEmail:  string;
+  customerPhone:  string;
+  customerAddress: string;
+  paymentMethod:  string;
+  dueDate:        string;
+  note:           string;
+  items:          InvoiceFormItem[];
+  shippingFee:    number;
+  discount:       number;
+  taxPercent:     number;
+}
+
+export interface InvoiceFormItem {
+  productName: string;
+  sku:         string;
+  quantity:    number;
+  unitPrice:   number;
+}
+
 @Component({
   selector: 'app-invoices',
   templateUrl: './invoices.component.html',
@@ -198,4 +220,162 @@ export class InvoicesComponent {
       .filter(i => i.status === 'PENDING')
       .reduce((s, i) => s + i.amount, 0);
   });
+
+  // ── CREATE DRAWER ──────────────────────────────
+  createVisible = false;
+
+  form: InvoiceForm = this.emptyForm();
+
+  paymentMethods = ['VNPay', 'COD', 'Momo', 'Banking'];
+
+  // Danh sách khách hàng mẫu để chọn
+  customerList = [
+    { id: 1, name: 'Nguyễn Văn An',  email: 'an.nguyen@gmail.com',  phone: '0901 234 567', address: '123 Nguyễn Huệ, Q.1, TP.HCM'             },
+    { id: 2, name: 'Trần Thị Bình',  email: 'binh.tran@gmail.com',  phone: '0912 345 678', address: '456 Lê Lợi, Q.3, TP.HCM'                  },
+    { id: 3, name: 'Lê Văn Cường',   email: 'cuong.le@gmail.com',   phone: '0923 456 789', address: '789 Trần Hưng Đạo, Q.5, TP.HCM'            },
+    { id: 4, name: 'Phạm Thị Dung',  email: 'dung.pham@gmail.com',  phone: '0934 567 890', address: '321 Đinh Tiên Hoàng, Q.Bình Thạnh, TP.HCM' },
+  ];
+
+  // Sản phẩm mẫu để chọn nhanh
+  productList = [
+    { name: 'Giày Nike Air Zoom Pegasus', sku: 'RUN-NK-PG-42', price: 850000  },
+    { name: 'Áo thun chạy bộ Run Dry',   sku: 'RUN-SHIRT-M',  price: 199000  },
+    { name: 'Tất chạy bộ Run 100 x3',    sku: 'RUN-SOCK-M',   price: 79000   },
+    { name: 'Balo chạy bộ Trail 10L',    sku: 'RUN-BAG-10L',  price: 890000  },
+    { name: 'Kính bơi Nabaiji Ready',    sku: 'GOG-NAB-GRAY', price: 129000  },
+    { name: 'Mũ bơi silicon',            sku: 'CAP-SIL-PINK', price: 199000  },
+    { name: 'Mũ lưỡi trai Travel 100',   sku: 'SUN-HAT-ONE',  price: 59000   },
+    { name: 'Kính mát hiking MH100',     sku: 'SUN-GLASS-BK', price: 99000   },
+  ];
+
+  private emptyForm(): InvoiceForm {
+    return {
+      customerId:      null,
+      customerName:    '',
+      customerEmail:   '',
+      customerPhone:   '',
+      customerAddress: '',
+      paymentMethod:   'COD',
+      dueDate:         '',
+      note:            '',
+      items:           [this.emptyItem()],
+      shippingFee:     0,
+      discount:        0,
+      taxPercent:      10,
+    };
+  }
+
+  private emptyItem(): InvoiceFormItem {
+    return { productName: '', sku: '', quantity: 1, unitPrice: 0 };
+  }
+
+  // ── COMPUTED TOTALS ────────────────────────────
+  get formSubtotal(): number {
+    return this.form.items.reduce(
+      (s, item) => s + item.quantity * item.unitPrice, 0
+    );
+  }
+
+  get formTax(): number {
+    return Math.round(this.formSubtotal * this.form.taxPercent / 100);
+  }
+
+  get formTotal(): number {
+    return this.formSubtotal
+      + this.form.shippingFee
+      - this.form.discount
+      + this.formTax;
+  }
+
+  // ── OPEN / CLOSE ───────────────────────────────
+  openCreate(): void {
+    this.form          = this.emptyForm();
+    this.createVisible = true;
+  }
+
+  closeCreate(): void {
+    this.createVisible = false;
+  }
+
+  onCreateOverlayClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('create-overlay')) {
+      this.closeCreate();
+    }
+  }
+
+  // ── CUSTOMER SELECTION ─────────────────────────
+  onSelectCustomer(customerId: number): void {
+    const cust = this.customerList.find(c => c.id === +customerId);
+    if (!cust) return;
+    this.form.customerId      = cust.id;
+    this.form.customerName    = cust.name;
+    this.form.customerEmail   = cust.email;
+    this.form.customerPhone   = cust.phone;
+    this.form.customerAddress = cust.address;
+  }
+
+  // ── ITEMS ──────────────────────────────────────
+  addItem(): void {
+    this.form.items.push(this.emptyItem());
+  }
+
+  removeItem(index: number): void {
+    if (this.form.items.length > 1) {
+      this.form.items.splice(index, 1);
+    }
+  }
+
+  onSelectProduct(index: number, productName: string): void {
+    const prod = this.productList.find(p => p.name === productName);
+    if (!prod) return;
+    this.form.items[index].productName = prod.name;
+    this.form.items[index].sku         = prod.sku;
+    this.form.items[index].unitPrice   = prod.price;
+  }
+
+  // ── SAVE ──────────────────────────────────────
+  isFormValid(): boolean {
+    return !!(
+      this.form.customerName &&
+      this.form.paymentMethod &&
+      this.form.items.length > 0 &&
+      this.form.items.every(i => i.productName && i.quantity > 0 && i.unitPrice > 0)
+    );
+  }
+
+  saveInvoice(): void {
+    if (!this.isFormValid()) return;
+
+    const newInvoice: AdminInvoice = {
+      id:              `INV-${String(this.invoices().length + 1).padStart(3, '0')}`,
+      orderId:         `#DH${String(Date.now()).slice(-4)}`,
+      customer:        this.form.customerName,
+      initials:        this.form.customerName.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase(),
+      issueDate:       new Date().toLocaleDateString('vi-VN'),
+      dueDate:         this.form.dueDate || '—',
+      amount:          this.formTotal,
+      paymentMethod:   this.form.paymentMethod,
+      status:          'PENDING',
+      customerEmail:   this.form.customerEmail,
+      customerPhone:   this.form.customerPhone,
+      customerAddress: this.form.customerAddress,
+      subtotal:        this.formSubtotal,
+      shippingFee:     this.form.shippingFee,
+      discount:        this.form.discount,
+      tax:             this.formTax,
+      note:            this.form.note,
+      items:           this.form.items.map(i => ({
+        productName: i.productName,
+        sku:         i.sku,
+        quantity:    i.quantity,
+        unitPrice:   i.unitPrice,
+        totalPrice:  i.quantity * i.unitPrice,
+      })),
+    };
+
+    this.invoices.update(list => [newInvoice, ...list]);
+    this.closeCreate();
+  }
+
+  protected readonly Math = Math;
 }

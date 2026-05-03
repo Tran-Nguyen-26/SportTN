@@ -19,23 +19,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username; // Map với "name" trong FE
+    @Column(nullable = false, unique = true, length = 100)
+    private String username;
 
+    @Column(length = 150)
     private String fullname;
 
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(length = 20)
     private String phone;
+
+    @Column(nullable = false)
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     private AuthProvider provider = AuthProvider.LOCAL;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @Column(nullable = false, length = 30)
+    private UserRole role = UserRole.CUSTOMER;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private UserStatus status = UserStatus.ACTIVE;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -51,18 +58,43 @@ public class User {
     private Set<Permission> permissions = new HashSet<>();
 
     private LocalDateTime lastLogin;
+
+    @Column(length = 100)
     private String lastDevice;
 
-    @Column(name = "avatar_color")
+    @Column(name = "avatar_color", length = 20)
     private String avatarColor;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ActivityLog> activityLogs;
 
-    @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "total_points", nullable = false)
     private Integer totalPoints = 0;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        if (this.totalPoints == null) {
+            this.totalPoints = 0;
+        }
+        if (this.role == null) {
+            this.role = UserRole.CUSTOMER;
+        }
+        if (this.status == null) {
+            this.status = UserStatus.ACTIVE;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

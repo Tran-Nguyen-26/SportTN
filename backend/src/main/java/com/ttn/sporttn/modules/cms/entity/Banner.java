@@ -39,4 +39,9 @@ public class Banner {
 
     private Boolean active = true;
 
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
 }

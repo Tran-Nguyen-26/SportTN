@@ -4,7 +4,8 @@
     title="Hóa đơn"
     subtitle="Quản lý hóa đơn và thanh toán"
     btnLabel="Tạo hóa đơn"
-    btnIcon="add">
+    btnIcon="add"
+    (btnClick)="openCreate()">
   </app-page-header>
 
   <!-- Stats -->
@@ -330,6 +331,309 @@
           (click)="selectedInvoice.status = 'PAID'">
           <mat-icon>check_circle</mat-icon>
           Đánh dấu đã thanh toán
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CREATE INVOICE DRAWER
+══════════════════════════════════════════ -->
+<div
+  class="create-overlay"
+  *ngIf="createVisible"
+  (click)="onCreateOverlayClick($event)">
+
+  <div class="create-drawer">
+
+    <!-- Header -->
+    <div class="create-header">
+      <div class="create-header-left">
+        <div class="create-icon">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div>
+          <div class="create-title">Tạo hóa đơn mới</div>
+          <div class="create-sub">Điền thông tin để tạo hóa đơn</div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeCreate()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="create-body">
+
+      <!-- ── KHÁCH HÀNG ───────────────────────── -->
+      <div class="c-section">
+        <div class="c-section-label">Thông tin khách hàng</div>
+
+        <!-- Chọn từ danh sách -->
+        <div class="c-field">
+          <label class="c-label">Chọn khách hàng có sẵn</label>
+          <select
+            class="c-select"
+            (change)="onSelectCustomer(+$any($event.target).value)">
+            <option value="">— Chọn hoặc nhập tay —</option>
+            <option *ngFor="let c of customerList" [value]="c.id">
+              {{ c.name }} — {{ c.phone }}
+            </option>
+          </select>
+        </div>
+
+        <div class="c-divider-or">
+          <span>hoặc nhập tay</span>
+        </div>
+
+        <div class="c-row">
+          <div class="c-field">
+            <label class="c-label required">Họ và tên</label>
+            <input
+              class="c-input"
+              type="text"
+              [(ngModel)]="form.customerName"
+              placeholder="Nguyễn Văn An">
+          </div>
+          <div class="c-field">
+            <label class="c-label">Số điện thoại</label>
+            <input
+              class="c-input"
+              type="tel"
+              [(ngModel)]="form.customerPhone"
+              placeholder="0912 345 678">
+          </div>
+        </div>
+
+        <div class="c-field">
+          <label class="c-label">Email</label>
+          <input
+            class="c-input"
+            type="email"
+            [(ngModel)]="form.customerEmail"
+            placeholder="email@example.com">
+        </div>
+
+        <div class="c-field">
+          <label class="c-label">Địa chỉ giao hàng</label>
+          <input
+            class="c-input"
+            [(ngModel)]="form.customerAddress"
+            placeholder="123 Đường ABC, Quận X, TP.HCM">
+        </div>
+      </div>
+
+      <!-- ── THANH TOÁN ───────────────────────── -->
+      <div class="c-section">
+        <div class="c-section-label">Thanh toán & Hạn</div>
+
+        <div class="c-row">
+          <div class="c-field">
+            <label class="c-label required">Phương thức</label>
+            <div class="payment-methods-grid">
+              <div
+                class="pm-option"
+                *ngFor="let pm of paymentMethods"
+                [class.selected]="form.paymentMethod === pm"
+                (click)="form.paymentMethod = pm">
+                <mat-icon>
+                  {{ pm === 'COD' ? 'local_shipping'
+                  : pm === 'VNPay' ? 'credit_card'
+                    : pm === 'Momo' ? 'account_balance_wallet'
+                      : 'account_balance' }}
+                </mat-icon>
+                {{ pm }}
+              </div>
+            </div>
+          </div>
+
+          <div class="c-field">
+            <label class="c-label">Hạn thanh toán</label>
+            <input
+              class="c-input"
+              type="text"
+              [(ngModel)]="form.dueDate"
+              placeholder="DD/MM/YYYY">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SẢN PHẨM ─────────────────────────── -->
+      <div class="c-section">
+        <div class="c-section-header">
+          <div class="c-section-label">Danh sách sản phẩm</div>
+          <button class="btn-add-item" (click)="addItem()">
+            <mat-icon>add</mat-icon>
+            Thêm dòng
+          </button>
+        </div>
+
+        <!-- Header bảng -->
+        <div class="items-form-header">
+          <span class="if-col-product">Sản phẩm</span>
+          <span class="if-col-qty">SL</span>
+          <span class="if-col-price">Đơn giá</span>
+          <span class="if-col-total">Thành tiền</span>
+          <span class="if-col-del"></span>
+        </div>
+
+        <!-- Items -->
+        <div class="items-form-list">
+          <div
+            class="item-form-row"
+            *ngFor="let item of form.items; let i = index">
+
+            <!-- Tên sản phẩm -->
+            <div class="if-col-product">
+              <select
+                class="c-select"
+                [(ngModel)]="item.productName"
+                (change)="onSelectProduct(i, item.productName)">
+                <option value="">— Chọn sản phẩm —</option>
+                <option *ngFor="let p of productList" [value]="p.name">
+                  {{ p.name }}
+                </option>
+              </select>
+              <input
+                class="c-input sku-display"
+                [(ngModel)]="item.sku"
+                placeholder="SKU"
+                readonly>
+            </div>
+
+            <!-- Số lượng -->
+            <div class="if-col-qty">
+              <div class="qty-wrap">
+                <button class="qty-btn" (click)="item.quantity = Math.max(1, item.quantity - 1)">−</button>
+                <input
+                  class="qty-input"
+                  type="number"
+                  [(ngModel)]="item.quantity"
+                  min="1">
+                <button class="qty-btn" (click)="item.quantity = item.quantity + 1">+</button>
+              </div>
+            </div>
+
+            <!-- Đơn giá -->
+            <div class="if-col-price">
+              <input
+                class="c-input price-input"
+                type="number"
+                [(ngModel)]="item.unitPrice"
+                placeholder="0">
+            </div>
+
+            <!-- Thành tiền -->
+            <div class="if-col-total">
+              <span class="line-total">
+                {{ formatPrice(item.quantity * item.unitPrice) }}
+              </span>
+            </div>
+
+            <!-- Xóa -->
+            <div class="if-col-del">
+              <button
+                class="btn-del-item"
+                (click)="removeItem(i)"
+                [disabled]="form.items.length === 1"
+                title="Xóa dòng">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── PHÍ & GIẢM GIÁ ───────────────────── -->
+      <div class="c-section">
+        <div class="c-section-label">Phí & Giảm giá</div>
+
+        <div class="c-row">
+          <div class="c-field">
+            <label class="c-label">Phí vận chuyển (đ)</label>
+            <input
+              class="c-input"
+              type="number"
+              [(ngModel)]="form.shippingFee"
+              min="0"
+              placeholder="0">
+          </div>
+          <div class="c-field">
+            <label class="c-label">Giảm giá (đ)</label>
+            <input
+              class="c-input"
+              type="number"
+              [(ngModel)]="form.discount"
+              min="0"
+              placeholder="0">
+          </div>
+          <div class="c-field">
+            <label class="c-label">Thuế VAT (%)</label>
+            <input
+              class="c-input"
+              type="number"
+              [(ngModel)]="form.taxPercent"
+              min="0"
+              max="100">
+          </div>
+        </div>
+
+        <!-- Tổng kết -->
+        <div class="form-summary">
+          <div class="fs-row">
+            <span class="fs-label">Tạm tính</span>
+            <span class="fs-value">{{ formatPrice(formSubtotal) }}</span>
+          </div>
+          <div class="fs-row" *ngIf="form.shippingFee > 0">
+            <span class="fs-label">Phí vận chuyển</span>
+            <span class="fs-value">{{ formatPrice(form.shippingFee) }}</span>
+          </div>
+          <div class="fs-row" *ngIf="form.discount > 0">
+            <span class="fs-label">Giảm giá</span>
+            <span class="fs-value fs-discount">-{{ formatPrice(form.discount) }}</span>
+          </div>
+          <div class="fs-row">
+            <span class="fs-label">Thuế VAT ({{ form.taxPercent }}%)</span>
+            <span class="fs-value">{{ formatPrice(formTax) }}</span>
+          </div>
+          <div class="fs-divider"></div>
+          <div class="fs-row fs-total">
+            <span class="fs-label-total">Tổng cộng</span>
+            <span class="fs-value-total">{{ formatPrice(formTotal) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GHI CHÚ ───────────────────────────── -->
+      <div class="c-section">
+        <div class="c-section-label">Ghi chú</div>
+        <textarea
+          class="c-textarea"
+          rows="3"
+          [(ngModel)]="form.note"
+          placeholder="Ghi chú thêm cho hóa đơn này...">
+        </textarea>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="create-footer">
+      <div class="footer-total">
+        Tổng: <strong>{{ formatPrice(formTotal) }}</strong>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-cancel-c" (click)="closeCreate()">Hủy</button>
+        <button
+          class="btn-save-c"
+          [disabled]="!isFormValid()"
+          (click)="saveInvoice()">
+          <mat-icon>save</mat-icon>
+          Tạo hóa đơn
         </button>
       </div>
     </div>

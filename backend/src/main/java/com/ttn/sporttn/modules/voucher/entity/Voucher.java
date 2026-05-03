@@ -58,4 +58,26 @@ public class Voucher {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        if (this.usedCount == null) this.usedCount = 0;
+        if (this.usageLimit == null) this.usageLimit = 1;
+        if (this.minOrderValue == null) this.minOrderValue = BigDecimal.ZERO;
+        if (this.isActive == null) this.isActive = true;
+    }
+
+    @jakarta.persistence.PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

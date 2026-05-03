@@ -37,7 +37,7 @@
 .support-menu .dropdown,
 .account-menu .dropdown {
   position: absolute;
-  top: calc(100% + 10px);
+  top: 25px;
   left: 0;
   background: #fff;
   border: 1px solid #dbeafe;

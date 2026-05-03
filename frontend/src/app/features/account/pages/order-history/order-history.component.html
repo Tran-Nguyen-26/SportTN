@@ -1,140 +1,311 @@
 <div class="order-history-container">
-  <header class="page-header">
-    <div class="header-text">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
       <h2>Lịch sử đơn hàng</h2>
       <p>Theo dõi quá trình vận chuyển và quản lý các đơn hàng của bạn tại SportTN</p>
     </div>
-  </header>
-
-  <div class="loader-container" *ngIf="isLoading">
-    <mat-progress-spinner diameter="45" mode="indeterminate" color="primary"></mat-progress-spinner>
   </div>
 
-  <div *ngIf="!isLoading && dataSource.data.length > 0" class="orders-wrapper">
-    <div *ngFor="let order of dataSource.data" class="modern-order-card" (click)="viewOrderDetails(order)">
-      <div class="card-main-info">
-        <div class="order-id-section">
-          <div class="icon-wrap">
-            <mat-icon>package_2</mat-icon>
+  <!-- Stat Cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="stat-label">Tổng đơn hàng</span>
+      <span class="stat-value">{{ totalOrders }}</span>
+      <span class="stat-sub">Tất cả trạng thái</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Đã hoàn tất</span>
+      <span class="stat-value">{{ deliveredCount }}</span>
+      <span class="stat-sub delivered">Giao thành công</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Đang giao</span>
+      <span class="stat-value">{{ shippedCount }}</span>
+      <span class="stat-sub shipped">Đang vận chuyển</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Tổng chi tiêu</span>
+      <span class="stat-value">{{ totalSpent | currency:'VND':'':'1.0-0' }}đ</span>
+      <span class="stat-sub">Tất cả đơn hàng</span>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-tabs">
+      <button
+        *ngFor="let tab of statusTabs"
+        class="filter-tab"
+        [class.active]="activeFilter === tab.value"
+        (click)="setFilter(tab.value)">
+        <mat-icon>{{ tab.icon }}</mat-icon>
+        {{ tab.label }}
+        <span class="tab-count" *ngIf="getCountByStatus(tab.value) > 0">
+          {{ getCountByStatus(tab.value) }}
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loader-container" *ngIf="isLoading">
+    <mat-progress-spinner diameter="44" mode="indeterminate" color="primary"></mat-progress-spinner>
+    <span class="loading-text">Đang tải đơn hàng...</span>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredOrders.length === 0">
+    <div class="empty-icon">
+      <mat-icon>inbox</mat-icon>
+    </div>
+    <h3>Không có đơn hàng nào</h3>
+    <p *ngIf="activeFilter === 'ALL'">Bạn chưa có đơn hàng nào. Hãy khám phá sản phẩm!</p>
+    <p *ngIf="activeFilter !== 'ALL'">Không có đơn hàng nào với trạng thái này.</p>
+  </div>
+
+  <!-- Order List -->
+  <div class="orders-wrapper" *ngIf="!isLoading && filteredOrders.length > 0">
+    <div
+      class="order-card"
+      *ngFor="let order of pagedOrders"
+      (click)="viewOrderDetails(order)">
+      <div class="card-row">
+
+        <!-- Mã đơn -->
+        <div class="order-id-col">
+          <div class="order-icon">
+            <mat-icon>inventory_2</mat-icon>
           </div>
-          <div class="id-details">
-            <span class="id-label">Mã đơn hàng</span>
-            <span class="id-value">#{{ order.id }}</span>
+          <div class="order-id-info">
+            <span class="order-id-label">Mã đơn hàng</span>
+            <span class="order-id-value">#{{ order.id }}</span>
           </div>
         </div>
 
-        <div class="order-date-section">
-          <span class="label">Ngày đặt</span>
-          <span class="value">{{ order.createdAt | date:'dd/MM/yyyy' }}</span>
+        <!-- Ngày đặt -->
+        <div class="order-meta-col">
+          <span class="meta-label">Ngày đặt</span>
+          <span class="meta-value">{{ order.createdAt | date:'dd/MM/yyyy' }}</span>
         </div>
 
-        <div class="order-status-section">
-          <span class="status-pill" [ngClass]="order.status.toLowerCase()">
+        <!-- Trạng thái -->
+        <div class="order-status-col">
+          <span class="status-pill" [ngClass]="getStatusClass(order.status)">
             <mat-icon>{{ getStatusIcon(order.status) }}</mat-icon>
-            {{ order.status }}
+            {{ getStatusLabel(order.status) }}
           </span>
         </div>
 
-        <div class="order-total-section">
-          <span class="label">Tổng thanh toán</span>
-          <span class="amount">{{ order.totalPrice | currency:'VND':'symbol':'1.0-0' }}</span>
+        <!-- Số lượng SP -->
+        <div class="order-meta-col hide-sm">
+          <span class="meta-label">Sản phẩm</span>
+          <span class="meta-value">{{ order.items.length }} sản phẩm</span>
         </div>
 
-        <div class="order-action-section">
-          <button mat-icon-button class="btn-expand">
+        <!-- Tổng tiền -->
+        <div class="order-total-col">
+          <span class="meta-label">Tổng thanh toán</span>
+          <span class="order-amount">{{ order.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+        </div>
+
+        <!-- Arrow -->
+        <div class="order-arrow-col">
+          <div class="arrow-btn">
             <mat-icon>chevron_right</mat-icon>
-          </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Paginator -->
+    <div class="paginator-row">
+      <span class="pag-info">
+        Hiển thị {{ pageStart }}–{{ pageEnd }} trong {{ filteredOrders.length }} đơn hàng
+      </span>
+      <mat-paginator
+        [length]="filteredOrders.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+        class="custom-paginator">
+      </mat-paginator>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== MODAL OVERLAY ===== -->
+<div class="details-overlay" *ngIf="showDetails && selectedOrder()" (click)="closeDetails()">
+  <div class="details-modal" (click)="$event.stopPropagation()" [@slideUp]>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <span class="status-pill sm" [ngClass]="getStatusClass(selectedOrder()!.status)">
+          <mat-icon>{{ getStatusIcon(selectedOrder()!.status) }}</mat-icon>
+          {{ getStatusLabel(selectedOrder()!.status) }}
+        </span>
+        <h3>Đơn hàng #{{ selectedOrder()?.id }}</h3>
+        <span class="order-timestamp">
+          <mat-icon>schedule</mat-icon>
+          {{ selectedOrder()?.createdAt | date:'HH:mm - dd/MM/yyyy' }}
+        </span>
+      </div>
+      <button mat-icon-button class="close-btn" (click)="closeDetails()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-section">
+      <div class="timeline-track">
+        <div class="timeline-line">
+          <div class="timeline-line-fill" [style.width]="getTimelineProgress(selectedOrder()!.status)"></div>
+        </div>
+        <div
+          class="timeline-step"
+          *ngFor="let step of timelineSteps; let i = index"
+          [class.done]="isStepDone(i, selectedOrder()!.status)"
+          [class.active]="isStepActive(i, selectedOrder()!.status)">
+          <div class="step-node">
+            <mat-icon>{{ step.icon }}</mat-icon>
+          </div>
+          <div class="step-info">
+            <span class="step-label">{{ step.label }}</span>
+            <span class="step-time" *ngIf="isStepDone(i, selectedOrder()!.status) || isStepActive(i, selectedOrder()!.status)">
+              {{ getStepTime(i, selectedOrder()!) }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons class="custom-paginator"></mat-paginator>
-  </div>
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="body-grid">
 
-  <div *ngIf="showDetails && selectedOrder()" class="details-overlay" (click)="closeDetails()">
-    <div class="details-modal" (click)="$event.stopPropagation()" [@fadeIn]>
-      <div class="modal-header">
-        <div class="title-group">
-          <h3>Chi tiết đơn hàng #{{ selectedOrder()?.id }}</h3>
-          <span class="order-timestamp">Ngày đặt: {{ selectedOrder()?.createdAt | date:'HH:mm - dd/MM/yyyy' }}</span>
-        </div>
-        <button mat-icon-button (click)="closeDetails()"><mat-icon>close</mat-icon></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="order-timeline-horizontal">
-          <div class="step" [class.completed]="true">
-            <div class="node"><mat-icon>shopping_cart</mat-icon></div>
-            <span>Đã đặt</span>
+        <!-- Products -->
+        <div class="products-section">
+          <div class="section-header">
+            <h4>Sản phẩm ({{ selectedOrder()?.items?.length }})</h4>
           </div>
-          <div class="step" [class.completed]="selectedOrder()?.status !== 'PENDING'">
-            <div class="node"><mat-icon>verified</mat-icon></div>
-            <span>Xác nhận</span>
-          </div>
-          <div class="step" [class.completed]="['SHIPPED', 'DELIVERED'].includes(selectedOrder()?.status)">
-            <div class="node"><mat-icon>local_shipping</mat-icon></div>
-            <span>Đang giao</span>
-          </div>
-          <div class="step" [class.completed]="selectedOrder()?.status === 'DELIVERED'">
-            <div class="node"><mat-icon>inventory_2</mat-icon></div>
-            <span>Hoàn tất</span>
+          <div class="product-list">
+            <div class="product-item" *ngFor="let item of selectedOrder()?.items">
+              <div class="product-img-wrap">
+                <img [src]="item.product.mainImageUrl" [alt]="item.product.name" (error)="onImgError($event)">
+              </div>
+              <div class="product-info">
+                <span class="product-brand">{{ item.product.brandName }}</span>
+                <span class="product-name">{{ item.product.name }}</span>
+                <span class="product-qty">x{{ item.quantity }}</span>
+              </div>
+              <div class="product-price">
+                {{ item.price | currency:'VND':'':'1.0-0' }}đ
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="details-grid">
-          <div class="items-list">
-            <h4>Sản phẩm ({{ selectedOrder()?.items.length }})</h4>
-            <div *ngFor="let item of selectedOrder()?.items" class="product-item">
-              <div class="p-image-wrap">
-                <img [src]="item.product.mainImageUrl" [alt]="item.product.name">
+        <!-- Right Panel -->
+        <div class="right-panel">
+
+          <!-- Shipping Info -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <mat-icon>local_shipping</mat-icon>
+              <h5>Thông tin giao hàng</h5>
+            </div>
+            <div class="info-card-body">
+              <p class="recipient-name">{{ selectedOrder()?.deliveryAddress?.name }}</p>
+              <div class="info-row">
+                <mat-icon>phone</mat-icon>
+                <span>{{ selectedOrder()?.deliveryAddress?.phoneNumber }}</span>
               </div>
-              <div class="p-info">
-                <span class="p-brand">{{ item.product.brandName }}</span>
-                <span class="p-name">{{ item.product.name }}</span>
-                <span class="p-qty">Số lượng: {{ item.quantity }}</span>
-              </div>
-              <div class="p-pricing">
-                <span class="p-price">{{ item.price | currency:'VND':'':'1.0-0' }}đ</span>
+              <div class="info-row">
+                <mat-icon>location_on</mat-icon>
+                <span>
+                  {{ selectedOrder()?.deliveryAddress?.address }},
+                  {{ selectedOrder()?.deliveryAddress?.city }}
+                </span>
               </div>
             </div>
           </div>
 
-          <div class="shipping-summary">
-            <div class="info-card">
-              <h4>Thông tin giao hàng</h4>
-              <div class="info-content">
-                <p class="user-name">{{ selectedOrder()?.deliveryAddress.name }}</p>
-                <p class="user-phone"><mat-icon>phone</mat-icon> {{ selectedOrder()?.deliveryAddress.phoneNumber }}</p>
-                <p class="user-address"><mat-icon>location_on</mat-icon> {{ selectedOrder()?.deliveryAddress.address }}, {{ selectedOrder()?.deliveryAddress.city }}</p>
-              </div>
+          <!-- Payment Summary -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <mat-icon>receipt_long</mat-icon>
+              <h5>Chi tiết thanh toán</h5>
             </div>
-
-            <div class="summary-card">
-              <h4>Chi tiết thanh toán</h4>
-              <div class="s-row">
-                <span>Tạm tính</span>
-                <span>{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+            <div class="info-card-body">
+              <div class="pay-row">
+                <span class="pay-label">Tạm tính</span>
+                <span class="pay-val">{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
               </div>
-              <div class="s-row">
-                <span>Phí vận chuyển</span>
-                <span class="free-ship">Miễn phí</span>
+              <div class="pay-row">
+                <span class="pay-label">Phí vận chuyển</span>
+                <span class="free-badge">Miễn phí</span>
+              </div>
+              <div class="pay-row" *ngIf="selectedOrder()?.discountAmount">
+                <span class="pay-label">Giảm giá</span>
+                <span class="discount-val">-{{ selectedOrder()?.discountAmount | currency:'VND':'':'1.0-0' }}đ</span>
               </div>
               <mat-divider></mat-divider>
-              <div class="s-row total">
+              <div class="pay-row total">
                 <span>Tổng cộng</span>
                 <span class="total-amount">{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
               </div>
             </div>
           </div>
+
+          <!-- Payment Method -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <mat-icon>payment</mat-icon>
+              <h5>Phương thức thanh toán</h5>
+            </div>
+            <div class="info-card-body">
+              <div class="payment-method">
+                <mat-icon>account_balance_wallet</mat-icon>
+                <span>{{ selectedOrder()?.paymentMethod || 'Thanh toán khi nhận hàng (COD)' }}</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-
-      <div class="modal-footer">
-        <button mat-stroked-button color="primary" (click)="downloadInvoice()">
-          <mat-icon>download_for_offline</mat-icon> Xuất hóa đơn (PDF)
-        </button>
-        <button mat-raised-button color="accent" (click)="closeDetails()">Đóng cửa sổ</button>
-      </div>
     </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button mat-stroked-button class="btn-download" (click)="downloadInvoice()">
+        <mat-icon>download_for_offline</mat-icon>
+        Xuất hóa đơn PDF
+      </button>
+      <button
+        mat-stroked-button
+        class="btn-reorder"
+        *ngIf="selectedOrder()?.status === 'DELIVERED'"
+        (click)="reorder(selectedOrder()!)">
+        <mat-icon>replay</mat-icon>
+        Mua lại
+      </button>
+      <button
+        mat-stroked-button
+        class="btn-cancel"
+        *ngIf="selectedOrder()?.status === 'PENDING'"
+        (click)="cancelOrder(selectedOrder()!)">
+        <mat-icon>cancel</mat-icon>
+        Hủy đơn
+      </button>
+      <button mat-raised-button class="btn-close" (click)="closeDetails()">
+        Đóng
+      </button>
+    </div>
+
   </div>
 </div>
