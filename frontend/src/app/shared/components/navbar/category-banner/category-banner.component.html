@@ -1,70 +1,113 @@
 <div class="category-banner" *ngIf="currentLevel">
   <div class="banner-container">
+
     <!-- Header -->
     <div class="banner-header">
-      <div class="header-content">
-        <!-- Back button + Title -->
-        <div class="title-section">
-          <div class="title-with-back">
-            <button 
-              *ngIf="breadcrumbs.length > 0"
-              class="breadcrumb-btn back-btn"
-              (click)="onBreadcrumbClick(-1)"
-              aria-label="Go back">
-              <mat-icon>arrow_back</mat-icon>
-            </button>
-            <h2 *ngIf="currentLevel">{{ currentLevel.name }}</h2>
-          </div>
-        </div>
-        
-        <!-- Close button -->
-        <button class="close-btn" (click)="closeBanner()" aria-label="Close">
-          <mat-icon>close</mat-icon>
+      <div class="header-left">
+        <button
+          class="back-btn"
+          *ngIf="breadcrumbs.length > 0"
+          (click)="goBack()"
+          aria-label="Quay lại">
+          <mat-icon>chevron_left</mat-icon>
         </button>
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <ng-container *ngFor="let b of breadcrumbs; let i = index">
+            <button class="bc-item" (click)="onBreadcrumbClick(i)">{{ b.name }}</button>
+            <span class="bc-sep">›</span>
+          </ng-container>
+          <span class="bc-current">{{ currentLevel.name }}</span>
+        </nav>
       </div>
+      <button class="close-btn" (click)="closeBanner()" aria-label="Đóng">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
 
-    <!-- Content - Single Panel that adapts to depth -->
-    <div class="banner-content">
-      <div class="category-items-container">
-        <h3>{{ currentLevel.children && currentLevel.children.length > 0 ? 'Chọn danh mục' : 'Danh mục' }}</h3>
-        
-        <!-- Category List -->
-        <ul class="category-list" *ngIf="currentItems.length > 0">
-          <li 
+    <!-- Body -->
+    <div class="banner-body">
+
+      <!-- Left: category list -->
+      <div class="left-panel">
+        <span class="panel-label">Danh mục</span>
+        <ul class="cat-list">
+          <li
             *ngFor="let item of currentItems"
-            (click)="onSelectItem(item)"
-            [class.has-children]="item.children && item.children.length > 0"
-            class="category-item">
-            <span class="cat-name">{{ item.name }}</span>
-            <span class="cat-indicator" *ngIf="item.children && item.children.length > 0">
-              <mat-icon>chevron_right</mat-icon>
-            </span>
+            class="cat-item"
+            [class.active]="hoveredId === item.id"
+            (mouseenter)="onHover(item)"
+            (click)="onSelectItem(item)">
+            <div class="cat-item-left">
+              <span class="cat-dot"></span>
+              <span class="cat-name">{{ item.name }}</span>
+            </div>
+            <mat-icon class="cat-arrow" *ngIf="item.children?.length">chevron_right</mat-icon>
           </li>
         </ul>
 
-        <!-- Empty State -->
         <div class="empty-state" *ngIf="currentItems.length === 0">
-          <mat-icon class="empty-icon">inbox</mat-icon>
-          <p>Không có danh mục con</p>
-          <p class="empty-hint">Đây là danh mục cuối cùng</p>
+          <mat-icon class="empty-icon">folder_open</mat-icon>
+          <p>Không có danh mục</p>
         </div>
       </div>
 
-      <!-- Advertisement Banner - Right Side -->
-      <div class="ad-banner">
-        <div class="ad-content">
-          <div class="ad-image-placeholder">
-            <mat-icon>sports</mat-icon>
+      <!-- Right: subcategory panel -->
+      <div class="right-panel">
+        <div class="right-scroll">
+
+          <!-- When a category is hovered: show its children -->
+          <ng-container *ngIf="hoveredCategory && hoveredCategory.children?.length; else overview">
+            <div class="sub-section">
+              <div class="sub-label">{{ hoveredCategory.name }}</div>
+              <div class="sub-grid">
+                <button
+                  *ngFor="let sub of hoveredCategory.children"
+                  class="sub-item"
+                  (click)="onSelectItem(sub)">
+                  {{ sub.name }}
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Default: show all children grouped by parent -->
+          <ng-template #overview>
+            <ng-container *ngFor="let item of currentItemsWithChildren">
+              <div class="sub-section">
+                <div class="sub-label">{{ item.name }}</div>
+                <div class="sub-grid">
+                  <button
+                    *ngFor="let sub of item.children"
+                    class="sub-item"
+                    (click)="onSelectItem(sub)">
+                    {{ sub.name }}
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <div class="empty-right" *ngIf="currentItemsWithChildren.length === 0">
+              <mat-icon>touch_app</mat-icon>
+              <p>Chọn danh mục bên trái để xem chi tiết</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Promo strip -->
+        <div class="promo-strip">
+          <div class="promo-left">
+            <div class="promo-icon">
+              <mat-icon>local_offer</mat-icon>
+            </div>
+            <div class="promo-text">
+              <span class="promo-title">Khuyến mãi đặc biệt hôm nay</span>
+              <span class="promo-sub">Giảm đến 30% toàn bộ sản phẩm thể thao</span>
+            </div>
           </div>
-          <div class="ad-text">
-            <h4>Khuyến Mãi Đặc Biệt</h4>
-            <p class="ad-discount">Giảm <span>30%</span></p>
-            <p class="ad-description">Cho tất cả sản phẩm thể thao</p>
-            <button class="ad-cta">Mua Ngay</button>
-          </div>
+          <button class="promo-cta" routerLink="/sale">Xem ngay</button>
         </div>
       </div>
+
     </div>
   </div>
 </div>

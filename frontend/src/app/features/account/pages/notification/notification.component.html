@@ -1,62 +1,106 @@
 <div class="notification-container">
+
   <header class="page-header">
     <div class="header-text">
       <h2>Thông báo</h2>
-      <p>Chào Nguyên, bạn có <span class="unread-count">{{ unreadCount() }} thông báo mới</span> chưa đọc</p>
+      <p>Bạn có <span class="unread-hl">{{ unreadCount() }} thông báo mới</span> chưa đọc</p>
     </div>
-    <div class="header-actions">
-      <button mat-flat-button color="primary" class="btn-read-all" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
-        <mat-icon>done_all</mat-icon>
-        Đánh dấu tất cả đã đọc
-      </button>
-    </div>
+    <button class="btn-readall" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15">
+        <polyline points="20 6 9 17 4 12"/>
+        <polyline points="20 12 9 23 4 18"/>
+      </svg>
+      Đánh dấu tất cả đã đọc
+    </button>
   </header>
 
-  <div *ngIf="notifications().length === 0" class="empty-state-glass">
-    <div class="icon-circle">
-      <mat-icon>notifications_none</mat-icon>
-    </div>
-    <h3>Mọi thứ đã gọn gàng!</h3>
-    <p>Hiện tại bạn không có thông báo nào mới. Hãy quay lại sau nhé.</p>
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="notifications().length === 0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <p>Không có thông báo nào</p>
   </div>
 
+  <!-- Feed -->
   <div class="notification-feed" *ngIf="notifications().length > 0">
     <div
-      *ngFor="let notify of notifications()"
+      *ngFor="let n of notifications()"
       class="notify-card"
-      [class.unread]="!notify.isRead"
-      (click)="markAsRead(notify.id)"
-    >
-      <div class="notify-body">
-        <div class="status-indicator" [ngClass]="notify.type">
-          <mat-icon>{{ getIcon(notify.type) }}</mat-icon>
-        </div>
+      [class.unread]="!n.isRead"
+      (click)="onCardClick(n)">
 
-        <div class="notify-content">
-          <div class="notify-top">
-            <h4 class="notify-title">{{ notify.title }}</h4>
-            <span class="notify-time">{{ notify.createdAt | date:'HH:mm, dd/MM' }}</span>
-          </div>
-          <p class="notify-msg">{{ notify.message }}</p>
-
-          <div class="notify-footer">
-            <span class="type-tag" [ngClass]="notify.type">#{{ notify.type }}</span>
-          </div>
-        </div>
-
-        <div class="unread-pulse" *ngIf="!notify.isRead"></div>
+      <!-- Icon -->
+      <div class="icon-wrap" [ngClass]="n.type">
+        <mat-icon>{{ getIcon(n.type) }}</mat-icon>
       </div>
 
-      <button mat-icon-button [matMenuTriggerFor]="menu" class="action-btn" (click)="$event.stopPropagation()">
-        <mat-icon>more_horiz</mat-icon>
-      </button>
+      <!-- Body -->
+      <div class="notify-body">
+        <div class="notify-top">
+          <span class="notify-title">{{ n.title }}</span>
+          <span class="notify-time">{{ n.createdAt | date:'HH:mm, dd/MM' }}</span>
+        </div>
+        <p class="notify-msg">{{ n.message }}</p>
+        <div class="notify-footer">
+          <span class="ntag" [ngClass]="n.type">{{ n.type }}</span>
+          <div class="unread-dot" *ngIf="!n.isRead"></div>
+        </div>
+      </div>
 
-      <mat-menu #menu="matMenu" class="modern-menu">
-        <button mat-menu-item (click)="deleteNotification(notify.id)">
-          <mat-icon class="text-danger">delete_outline</mat-icon>
-          <span class="text-danger">Xóa thông báo</span>
+      <!-- 3-dot menu -->
+      <div class="menu-wrap" (click)="$event.stopPropagation()">
+        <button
+          class="three-dot-btn"
+          [class.open]="openMenuId === n.id"
+          [matMenuTriggerFor]="notifMenu"
+          (menuOpened)="openMenuId = n.id"
+          (menuClosed)="openMenuId = null"
+          title="Tuỳ chọn">
+          <mat-icon>more_horiz</mat-icon>
         </button>
-      </mat-menu>
+
+        <mat-menu #notifMenu="matMenu" class="notif-dropdown">
+
+          <!-- Section: thao tác -->
+          <div class="menu-section-label">Thao tác</div>
+
+          <button mat-menu-item class="menu-item info" *ngIf="!n.isRead" (click)="markAsRead(n.id)">
+            <mat-icon>done</mat-icon>
+            <span>Đánh dấu đã đọc</span>
+          </button>
+
+          <button mat-menu-item class="menu-item" *ngIf="n.isRead" (click)="markAsUnread(n.id)">
+            <mat-icon>mark_email_unread</mat-icon>
+            <span>Đánh dấu chưa đọc</span>
+          </button>
+
+          <button mat-menu-item class="menu-item" (click)="copyContent(n)">
+            <mat-icon>content_copy</mat-icon>
+            <span>Sao chép nội dung</span>
+          </button>
+
+          <button mat-menu-item class="menu-item" (click)="pinNotification(n.id)">
+            <mat-icon>push_pin</mat-icon>
+            <span>Ghim thông báo</span>
+          </button>
+
+          <mat-divider></mat-divider>
+
+          <!-- Section: nguy hiểm -->
+          <button mat-menu-item class="menu-item danger" (click)="deleteNotification(n.id)">
+            <mat-icon>delete_outline</mat-icon>
+            <span>Xóa thông báo</span>
+          </button>
+
+        </mat-menu>
+      </div>
+
     </div>
   </div>
+
+  <!-- Toast -->
+  <div class="toast" [class.show]="toastVisible">{{ toastMsg }}</div>
+
 </div>

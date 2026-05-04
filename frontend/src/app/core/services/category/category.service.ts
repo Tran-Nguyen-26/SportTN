@@ -4,6 +4,20 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ApiResponse} from "../../models/home-response/home-response";
 
+export interface CategoryCreateRequest {
+  name: string;
+  slug: string;
+  parentId: number;
+  description: string;
+  sectionTitle: string;
+  linkUrl: string;
+  imageUrl: string;
+  displayOrder: number;
+  showOnHome: boolean;
+  active: boolean;
+}
+
+
 export interface CategoryAdminResponse {
   id: number;
   name: string;
