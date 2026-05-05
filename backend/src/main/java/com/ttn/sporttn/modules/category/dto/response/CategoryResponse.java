@@ -19,7 +19,11 @@ public class CategoryResponse {
     private String slug;
     private String description;
     private String imageUrl;
+    private String sectionTitle;
     private String linkUrl;
+    private String parentName;
+    private Integer displayOrder;
+    private Boolean showOnHome;
     private Boolean active;
 
     public static CategoryResponse from(Category category) {
@@ -27,6 +31,10 @@ public class CategoryResponse {
             .id(category.getId())
             .name(category.getName())
             .slug(category.getSlug())
+            .sectionTitle(category.getSectionTitle())
+            .parentName(category.getParent() != null ? category.getParent().getName() : null)
+            .showOnHome(category.isShowOnHome())
+            .displayOrder(category.getDisplayOrder())
             .description(category.getDescription())
             .imageUrl(category.getImageUrl())
             .linkUrl(category.getLinkUrl())

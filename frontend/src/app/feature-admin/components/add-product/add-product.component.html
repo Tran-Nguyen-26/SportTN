@@ -89,8 +89,19 @@
               type="text"
               class="form-input"
               placeholder="VD: Áo thun chạy bộ nam thoáng khí - Run Dry"
-              [(ngModel)]="form.name">
+              [(ngModel)]="form.name"
+              (ngModelChange)="onNameChange()">
             <span class="form-hint">{{ form.name.length }}/200 ký tự</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Slug</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="VD: ao-thun-chay-bo-nam"
+              [(ngModel)]="form.slug"
+              name="slug">
           </div>
 
           <div class="form-group">
@@ -113,7 +124,7 @@
               <label class="form-label required">Danh mục</label>
               <select class="form-select" [(ngModel)]="form.categoryId">
                 <option [ngValue]="null" disabled>Chọn danh mục</option>
-                <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                <option *ngFor="let cat of categories()" [ngValue]="cat.id">
                   {{ cat.name }}
                 </option>
               </select>
@@ -123,7 +134,7 @@
               <label class="form-label required">Thương hiệu</label>
               <select class="form-select" [(ngModel)]="form.brandId">
                 <option [ngValue]="null" disabled>Chọn thương hiệu</option>
-                <option *ngFor="let brand of brands" [ngValue]="brand.id">
+                <option *ngFor="let brand of brands()" [ngValue]="brand.id">
                   {{ brand.name }}
                 </option>
               </select>
@@ -162,6 +173,12 @@
               <span class="summary-key">Tên SP</span>
               <span class="summary-val">
                 {{ form.name || '—' }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Slug</span>
+              <span class="summary-val">
+                {{ form.slug || '—' }}
               </span>
             </div>
             <div class="summary-item">

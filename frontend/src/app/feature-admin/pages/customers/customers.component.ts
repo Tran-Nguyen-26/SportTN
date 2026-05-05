@@ -10,7 +10,6 @@ export interface AdminCustomer {
   joinDate: string;
   status: string;
   initials: string;
-  // Thêm chi tiết
   address?: string;
   gender?: string;
   birthday?: string;

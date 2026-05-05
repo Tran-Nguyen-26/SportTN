@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../../../../enviroments/enviroment";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {map, Observable} from "rxjs";
 import {ApiResponse} from "../../models/home-response/home-response";
 import {BrandAddRequest, BrandResponse} from "../../models/brand/brand";
+
+export interface BrandOption {
+  id: number;
+  name: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -24,5 +29,17 @@ export class BrandService {
 
   updateBrand(id: number, request: BrandAddRequest): Observable<ApiResponse<BrandResponse>> {
     return this.http.put<ApiResponse<BrandResponse>>(`${this.apiUrl}/id/${id}`, request);
+  }
+
+  getBrandOption(): Observable<ApiResponse<BrandOption[]>> {
+    return this.getBrands().pipe(
+      map(res => ({
+        ...res,
+        data: res.data.map(brand => ({
+          id: brand.id,
+          name: brand.name
+        }))
+      }))
+    );
   }
 }

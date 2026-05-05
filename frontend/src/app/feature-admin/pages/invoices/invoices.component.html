@@ -52,7 +52,7 @@
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)">
       </div>
-      <select class="filter-select" [(ngModel)]="selectedStatus">
+      <select class="filter-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
         <option *ngFor="let s of statusOptions" [value]="s.value">
           {{ s.label }}
         </option>

@@ -2,10 +2,7 @@ package com.ttn.sporttn.modules.product.entity;
 
 import com.ttn.sporttn.modules.category.entity.Category;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +25,7 @@ public class Product {
     @Column(unique = true, length = 100)
     private String slug;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
     @Column(name = "main_image_url")
@@ -47,15 +45,19 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "float default 0")
     private Double rating = 0.0;
 
+    @Builder.Default
     @Column(name = "review_count", nullable = false, columnDefinition = "int default 0")
     private Integer reviewCount = 0;
 
+    @Builder.Default
     @Column(name = "sold_count", nullable = false, columnDefinition = "int default 0")
     private Integer soldCount = 0;
 
+    @Builder.Default
     @Column(name = "search_count", nullable = false, columnDefinition = "int default 0")
     private Integer searchCount = 0;
 

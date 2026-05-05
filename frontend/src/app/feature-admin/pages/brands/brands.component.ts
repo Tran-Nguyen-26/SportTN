@@ -13,7 +13,6 @@ export class BrandsComponent implements OnInit {
 
   }
 
-
   brands = signal<BrandResponse[]>([]);
   searchQuery = signal('');
   drawerVisible = false;

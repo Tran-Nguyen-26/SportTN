@@ -42,9 +42,6 @@ public class CategoryService {
         return CategoryResponse.from(category);
     }
 
-    /**
-     * Create new category (Admin only)
-     */
     @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
         log.info("[CATEGORY] Tạo danh mục mới. name={}", request.getName());
@@ -55,11 +52,23 @@ public class CategoryService {
                 throw new BusinessException(ErrorCode.INVALID_REQUEST);
             });
 
+        Category parent = null;
+        if (request.getParentId() != null) {
+            parent = categoryRepository.findById(request.getParentId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+        }
+
         Category category = Category.builder()
             .name(request.getName())
+            .slug(request.getSlug())
+            .displayOrder(request.getDisplayOrder())
+            .parent(parent)
+            .sectionTitle(request.getSectionTitle())
             .description(request.getDescription())
             .imageUrl(request.getImageUrl())
-            .active(true)
+            .linkUrl(request.getLinkUrl())
+            .showOnHome(request.isShowOnHome())
+            .active(request.isActive())
             .build();
 
         Category saved = categoryRepository.save(category);
@@ -67,33 +76,64 @@ public class CategoryService {
         return CategoryResponse.from(saved);
     }
 
-    /**
-     * Update category (Admin only)
-     */
     @Transactional
     public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
         log.info("[CATEGORY] Cập nhật danh mục. id={}, name={}", id, request.getName());
-        
-        Category category = categoryRepository.findById(id)
-            .orElseThrow(() -> {
-                log.warn("[CATEGORY] Danh mục không tìm thấy. id={}", id);
-                return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
-            });
 
-        // Check if new name conflicts with other categories
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("[CATEGORY] Danh mục không tìm thấy. id={}", id);
+                    return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+                });
+
+        // Kiểm tra trùng lặp tên
         if (!category.getName().equals(request.getName())) {
             categoryRepository.findByName(request.getName())
-                .ifPresent(cat -> {
-                    log.warn("[CATEGORY] Tên danh mục đã tồn tại. name={}", request.getName());
-                    throw new BusinessException(ErrorCode.INVALID_REQUEST);
-                });
+                    .ifPresent(cat -> {
+                        log.warn("[CATEGORY] Tên danh mục đã tồn tại. name={}", request.getName());
+                        throw new BusinessException(ErrorCode.INVALID_REQUEST);
+                    });
+        }
+
+        // Kiểm tra trùng lặp slug (nếu có)
+        if (request.getSlug() != null && !category.getSlug().equals(request.getSlug())) {
+            categoryRepository.findBySlug(request.getSlug())
+                    .ifPresent(cat -> {
+                        log.warn("[CATEGORY] Slug đã tồn tại. slug={}", request.getSlug());
+                        throw new BusinessException(ErrorCode.INVALID_REQUEST);
+                    });
         }
 
         category.setName(request.getName());
+        category.setSlug(request.getSlug());
         category.setDescription(request.getDescription());
+        category.setSectionTitle(request.getSectionTitle());
+        category.setLinkUrl(request.getLinkUrl());
         category.setImageUrl(request.getImageUrl());
+
+        if (request.getDisplayOrder() != null) {
+            category.setDisplayOrder(request.getDisplayOrder());
+        }
+        if (request.getShowOnHome() != null) {
+            category.setShowOnHome(request.getShowOnHome());
+        }
         if (request.getActive() != null) {
             category.setActive(request.getActive());
+        }
+
+        if (request.getParentId() != null) {
+            if (id.equals(request.getParentId())) {
+                throw new BusinessException(ErrorCode.INVALID_REQUEST);
+            }
+
+            Category parentCategory = categoryRepository.findById(request.getParentId())
+                    .orElseThrow(() -> {
+                        log.warn("[CATEGORY] Không tìm thấy danh mục cha. parentId={}", request.getParentId());
+                        return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+                    });
+            category.setParent(parentCategory);
+        } else {
+            category.setParent(null);
         }
 
         Category updated = categoryRepository.save(category);

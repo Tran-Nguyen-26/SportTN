@@ -347,7 +347,7 @@
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
   min-width: 180px;
-  z-index: 999;
+  z-index: 10000;
   padding: 4px;
   animation: dropIn 0.12s ease;
 }

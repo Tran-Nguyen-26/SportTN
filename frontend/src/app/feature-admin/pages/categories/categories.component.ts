@@ -1,6 +1,10 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { CategoryForm } from '../../components/add-category-drawer/add-category-drawer.component';
-import { CategoryAdminResponse, CategoryService } from '../../../core/services/category/category.service';
+import {
+  CategoryAdminResponse,
+  CategoryCreateRequest,
+  CategoryService, CategoryUpdateRequest
+} from '../../../core/services/category/category.service';
 
 @Component({
   selector: 'app-categories',
@@ -18,7 +22,7 @@ export class CategoriesComponent implements OnInit {
 
   showDrawer       = false;
   editMode         = false;
-  editingCategory: CategoryForm | null = null;   // đổi sang CategoryForm
+  editingCategory: CategoryForm | null = null;
 
   typeOptions = [
     { value: '',       label: 'Tất cả' },
@@ -33,17 +37,20 @@ export class CategoriesComponent implements OnInit {
 
   loadCategories(): void {
     this.categoryService.getCategoryAdminResponse().subscribe({
-      next: (response: any) => this.categories.set(response.data),
+      next: (response: any) => {
+        this.categories.set(response.data);
+        console.log("Danh mục: ", response.data);
+      },
       error: (err) => console.error('Lỗi khi lấy danh mục:', err),
     });
   }
 
   // ── Computed stats ─────────────────────────────────────────────
   categoryLength = computed(() => this.categories().length);
-  parentCount    = computed(() => this.categories().filter(c => !c.parent).length);
-  childCount     = computed(() => this.categories().filter(c =>  c.parent).length);
+  parentCount    = computed(() => this.categories().filter(c => !c.parentName).length);
+  childCount     = computed(() => this.categories().filter(c =>  c.parentName).length);
   homeCount      = computed(() => this.categories().filter(c =>  c.showOnHome).length);
-  parentList     = computed(() => this.categories().filter(c => !c.parent));
+  parentList     = computed(() => this.categories().filter(c => !c.parentName));
 
   // ── Filter ─────────────────────────────────────────────────────
   get filteredCategories(): CategoryAdminResponse[] {
@@ -53,8 +60,8 @@ export class CategoriesComponent implements OnInit {
 
     return data.filter(c => {
       const matchType = !type
-        || (type === 'parent' && !c.parent)
-        || (type === 'child'  &&  c.parent);
+        || (type === 'parent' && !c.parentName)
+        || (type === 'child'  &&  c.parentName);
       const matchSearch = !query
         || c.name.toLowerCase().includes(query)
         || c.slug.toLowerCase().includes(query);
@@ -73,9 +80,11 @@ export class CategoriesComponent implements OnInit {
   openEditDrawer(cat: CategoryAdminResponse): void {
     this.editMode = true;
     this.editingCategory = {
+      categoryId: cat.categoryId,
       name:         cat.name,
       slug:         cat.slug,
       parentId:     cat.parentId     ?? null,
+      parentName: cat.parentName ?? null,
       description:  cat.description  ?? '',
       sectionTitle: cat.sectionTitle ?? '',
       linkUrl:      cat.linkUrl      ?? '',
@@ -90,13 +99,62 @@ export class CategoriesComponent implements OnInit {
   // ── Lưu (tạo mới hoặc cập nhật) ───────────────────────────────
   onCategorySaved(form: CategoryForm): void {
     if (this.editMode) {
-      // TODO: this.categoryService.update(id, form).subscribe(...)
       console.log('Cập nhật danh mục:', form);
+
+      const request: CategoryUpdateRequest = {
+        name: form.name,
+        slug: form.slug,
+        parentId: form.parentId,
+        description: form.description,
+        sectionTitle: form.sectionTitle,
+        linkUrl: form.linkUrl,
+        imageUrl: form.imageUrl,
+        displayOrder: form.displayOrder,
+        showOnHome: form.showOnHome,
+        active: form.active,
+      }
+
+      this.categoryService.updateCategory(form.categoryId!, request).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.categories.update(list =>
+              list.map(c => c.categoryId === form.categoryId ? {...c, ...res.data!} : c)
+            );
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi tạo category:', err);
+        }
+      })
+
     } else {
-      // TODO: this.categoryService.create(form).subscribe(...)
-      console.log('Tạo danh mục mới:', form);
+      //create
+      const request: CategoryCreateRequest = {
+        name:         form.name,
+        slug:         form.slug,
+        parentId:     form.parentId     ?? null,
+        description:  form.description  ?? '',
+        sectionTitle: form.sectionTitle ?? '',
+        linkUrl:      form.linkUrl      ?? '',
+        imageUrl:     form.imageUrl     ?? '',
+        displayOrder: form.displayOrder ?? 1,
+        showOnHome:   form.showOnHome   ?? false,
+        active:       form.active       ?? true,
+      }
+
+      this.categoryService.createCategory(request).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.categories.update(list =>
+              [...list, {...res.data!}]
+            )
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi tạo category:', err);
+        }
+      })
     }
-    this.loadCategories();
   }
 
   // ── Toggle hiện home ───────────────────────────────────────────
@@ -109,6 +167,6 @@ export class CategoriesComponent implements OnInit {
   onDelete(cat: CategoryAdminResponse): void {
     if (!confirm(`Xóa danh mục "${cat.name}"?`)) return;
     // TODO: this.categoryService.delete(cat.id).subscribe(() => this.loadCategories())
-    console.log('Xóa danh mục:', cat.id);
+    console.log('Xóa danh mục:', cat.categoryId);
   }
 }

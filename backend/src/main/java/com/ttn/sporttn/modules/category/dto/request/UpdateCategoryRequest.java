@@ -17,10 +17,23 @@ public class UpdateCategoryRequest {
     @Size(min = 3, max = 100, message = "Tên danh mục phải từ 3-100 ký tự")
     private String name;
 
+    @NotBlank(message = "Slug không được để trống")
+    private String slug;
+
+    private Long parentId;
+
     @Size(max = 500, message = "Mô tả không quá 500 ký tự")
     private String description;
 
+    private String sectionTitle;
+
+    private String linkUrl;
+
     private String imageUrl;
+
+    private Integer displayOrder;
+
+    private Boolean showOnHome;
 
     private Boolean active;
 }

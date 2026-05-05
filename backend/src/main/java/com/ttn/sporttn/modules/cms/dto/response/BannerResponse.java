@@ -18,6 +18,7 @@ public class BannerResponse {
     private String linkUrl;
     private String position;
     private Boolean active;
+    private Long categoryId;
 
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;

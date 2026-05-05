@@ -16,6 +16,8 @@ public class BannerCreateRequest {
     private Integer displayOrder;
     private Boolean active;
 
+    private Long categoryId;
+
     @JsonFormat(pattern = "dd-MM-yyyy")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate startDate;

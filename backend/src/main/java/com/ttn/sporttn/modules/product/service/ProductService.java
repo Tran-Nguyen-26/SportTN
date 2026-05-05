@@ -1,17 +1,15 @@
 package com.ttn.sporttn.modules.product.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.ttn.sporttn.modules.product.dto.request.admin.ProductUpdateRequest;
-import com.ttn.sporttn.modules.product.dto.request.admin.VariantUpdateRequest;
+import com.ttn.sporttn.modules.product.dto.request.admin.*;
 import com.ttn.sporttn.modules.product.dto.response.*;
-import com.ttn.sporttn.modules.product.dto.response.admin.ProductAdminResponse;
-import com.ttn.sporttn.modules.product.dto.response.admin.ProductDetailFromUpdateResponse;
-import com.ttn.sporttn.modules.product.dto.response.admin.VariantDetailResponse;
+import com.ttn.sporttn.modules.product.dto.response.admin.*;
 import com.ttn.sporttn.modules.product.entity.*;
 import com.ttn.sporttn.modules.product.mapper.ProductMapper;
 import com.ttn.sporttn.modules.product.repository.ProductVariantRepository;
@@ -80,83 +78,134 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDetailResponse createProduct(ProductRequest productRequest) {
-        log.info("[PRODUCT] Tạo sản phẩm mới. name={}", productRequest.getName());
-        
-        // Validate input
-        if (productRequest == null || productRequest.getName() == null || productRequest.getName().isEmpty()) {
-            log.warn("[PRODUCT] Tên sản phẩm không hợp lệ");
-            throw new BusinessException(ErrorCode.INVALID_REQUEST);
-        }
+    public ProductResponse createProduct(ProductCreateRequest request) {
+        log.info("[PRODUCT] Tạo sản phẩm mới. name={}", request.getName());
 
         // Fetch category
-        Category category = null;
-        if (productRequest.getCategoryId() != null) {
-            category = categoryRepository.findById(productRequest.getCategoryId())
-                    .orElseThrow(() -> {
-                        log.warn("[PRODUCT] Danh mục không tìm thấy. categoryId={}", productRequest.getCategoryId());
-                        return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
-                    });
-        }
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> {
+                    log.warn("[PRODUCT] Danh mục không tìm thấy. categoryId={}", request.getCategoryId());
+                    return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+                });
 
         // Fetch brand
-        Brand brand = null;
-        if (productRequest.getBrandId() != null) {
-            brand = brandRepository.findById(productRequest.getBrandId())
-                    .orElseThrow(() -> {
-                        log.warn("[PRODUCT] Thương hiệu không tìm thấy. brandId={}", productRequest.getBrandId());
-                        return new BusinessException(ErrorCode.BRAND_NOT_FOUND);
-                    });
-        }
+        Brand brand = brandRepository.findById(request.getBrandId())
+                .orElseThrow(() -> {
+                    log.warn("[PRODUCT] Thương hiệu không tìm thấy. brandId={}", request.getBrandId());
+                    return new BusinessException(ErrorCode.BRAND_NOT_FOUND);
+                });
 
-        // Create product entity
-        Product product = new Product();
-        product.setName(productRequest.getName());
-        product.setDescription(productRequest.getDescription());
-        product.setCategory(category);
-        product.setBrand(brand);
+        // Build product entity
+        Product product = Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .slug(request.getSlug())
+                .mainImageUrl(request.getMainImageUrl())
+                .category(category)
+                .brand(brand)
+                .active(request.getActive() != null ? request.getActive() : true)
+                .variants(new ArrayList<>())
+                .build();
 
-        // Add images
-        if (productRequest.getImages() != null && !productRequest.getImages().isEmpty()) {
-            product.setImages(new ArrayList<>());
-            for (ImageRequest imageRequest : productRequest.getImages()) {
-                ProductImage image = new ProductImage();
-                image.setImageUrl(imageRequest.getImageUrl());
-                image.setMain(imageRequest.isMain());
-                image.setProduct(product);
-                product.getImages().add(image);
-            }
-            log.debug("[PRODUCT] Thêm {} ảnh cho sản phẩm", productRequest.getImages().size());
-        } else {
-            product.setImages(new ArrayList<>());
-        }
+        // Build variants
+        if (request.getVariants() != null) {
+            for (ProductVariantRequest variantRequest : request.getVariants()) {
 
-        // Add variants
-        if (productRequest.getVariants() != null && !productRequest.getVariants().isEmpty()) {
-            product.setVariants(new ArrayList<>());
-            for (VariantRequest variantRequest : productRequest.getVariants()) {
-                ProductVariant variant = new ProductVariant();
-                variant.setSku(variantRequest.getSku());
-                variant.setColor(variantRequest.getColor());
-                variant.setSize(variantRequest.getSize());
-                variant.setOriginalPrice(variantRequest.getOriginalPrice());
-                variant.setSalePrice(variantRequest.getSalePrice());
-                variant.setStockQuantity(variantRequest.getStockQuantity());
-                variant.setWeightGram(variantRequest.getWeightGram());
-                variant.setProduct(product);
+                ProductVariant variant = ProductVariant.builder()
+                        .sku(variantRequest.getSku())
+                        .color(variantRequest.getColor())
+                        .size(variantRequest.getSize())
+                        .originalPrice(variantRequest.getOriginalPrice())
+                        .salePrice(variantRequest.getSalePrice())
+                        .stockQuantity(variantRequest.getStockQuantity())
+                        .weightGram(variantRequest.getWeightGram())
+                        .product(product)
+                        .variantImages(new ArrayList<>())
+                        .build();
+
+                // Build variant images
+                if (variantRequest.getImages() != null) {
+                    for (VariantImageRequest imageRequest : variantRequest.getImages()) {
+                        ProductVariantImage image = ProductVariantImage.builder()
+                                .imageUrl(imageRequest.getImageUrl())
+                                .displayOrder(imageRequest.getDisplayOrder())
+                                .variant(variant)
+                                .build();
+                        variant.getVariantImages().add(image);
+                    }
+                }
+
                 product.getVariants().add(variant);
             }
-            log.debug("[PRODUCT] Thêm {} biến thể cho sản phẩm", productRequest.getVariants().size());
-        } else {
-            product.setVariants(new ArrayList<>());
+            log.debug("[PRODUCT] Thêm {} biến thể", request.getVariants().size());
         }
 
-        // Save product
-        Product savedProduct = productRepository.save(product);
-        log.info("[PRODUCT] Tạo sản phẩm thành công. id={}, name={}", savedProduct.getId(), savedProduct.getName());
+        Product saved = productRepository.save(product);
+        log.info("[PRODUCT] Tạo thành công. id={}, name={}", saved.getId(), saved.getName());
 
-        // Convert to response
-        return buildProductDetailResponse(savedProduct);
+        return buildProductResponse(saved);
+    }
+
+// ── Map entity → response ────────────────────────────────────────────────────
+
+    private ProductResponse buildProductResponse(Product product) {
+        List<ProductVariantResponse> variantResponses = product.getVariants().stream()
+                .map(v -> ProductVariantResponse.builder()
+                        .id(v.getId())
+                        .sku(v.getSku())
+                        .color(v.getColor())
+                        .size(v.getSize())
+                        .originalPrice(v.getOriginalPrice())
+                        .salePrice(v.getSalePrice())
+                        .stockQuantity(v.getStockQuantity())
+                        .weightGram(v.getWeightGram())
+                        .images(v.getVariantImages().stream()
+                                .map(img -> VariantImageResponse.builder()
+                                        .id(img.getId())
+                                        .imageUrl(img.getImageUrl())
+                                        .displayOrder(img.getDisplayOrder())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .createdAt(v.getCreatedAt())
+                        .updatedAt(v.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        int totalStock = variantResponses.stream()
+                .mapToInt(v -> v.getStockQuantity() != null ? v.getStockQuantity() : 0)
+                .sum();
+
+        BigDecimal minPrice = product.getVariants().stream()
+                .map(v -> v.getSalePrice() != null ? v.getSalePrice() : v.getOriginalPrice())
+                .filter(Objects::nonNull)
+                .min(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+
+        BigDecimal maxPrice = product.getVariants().stream()
+                .map(ProductVariant::getOriginalPrice)
+                .filter(Objects::nonNull)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .slug(product.getSlug())
+                .description(product.getDescription())
+                .mainImageUrl(product.getMainImageUrl())
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .brandId(product.getBrand() != null ? product.getBrand().getId() : null)
+                .brandName(product.getBrand() != null ? product.getBrand().getName() : null)
+                .active(product.isActive())
+                .totalStock(totalStock)
+                .minPrice(minPrice)
+                .maxPrice(maxPrice)
+                .variantCount(variantResponses.size())
+                .variants(variantResponses)
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
+                .build();
     }
 
     private ProductDetailResponse buildProductDetailResponse(Product product) {

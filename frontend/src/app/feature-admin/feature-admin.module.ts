@@ -31,6 +31,7 @@ import { AddProductComponent } from './components/add-product/add-product.compon
 import { AddCategoryDrawerComponent } from './components/add-category-drawer/add-category-drawer.component';
 import { ChartsComponent } from './pages/charts/charts.component';
 import { OrderModalComponent } from './components/order-modal/order-modal.component';
+import {SharedModule} from "../shared/shared.module";
 
 
 @NgModule({
@@ -63,11 +64,12 @@ import { OrderModalComponent } from './components/order-modal/order-modal.compon
     ChartsComponent,
     OrderModalComponent,
   ],
-  imports: [
-    CommonModule,
-    FeatureAdminRoutingModule,
-    FormsModule,
-    MatIconModule
-  ]
+    imports: [
+        CommonModule,
+        FeatureAdminRoutingModule,
+        FormsModule,
+        MatIconModule,
+        SharedModule
+    ]
 })
 export class FeatureAdminModule { }

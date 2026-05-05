@@ -1,5 +1,9 @@
 package com.ttn.sporttn.modules.cms.service;
 
+import com.ttn.sporttn.common.exception.BusinessException;
+import com.ttn.sporttn.common.exception.ErrorCode;
+import com.ttn.sporttn.modules.category.entity.Category;
+import com.ttn.sporttn.modules.category.repository.CategoryRepository;
 import com.ttn.sporttn.modules.cms.dto.request.BannerCreateRequest;
 import com.ttn.sporttn.modules.cms.dto.response.BannerResponse;
 import com.ttn.sporttn.modules.cms.entity.Banner;
@@ -15,6 +19,7 @@ import java.util.stream.Collectors;
 public class BannerService {
 
     private final BannerRepository bannerRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<Banner> getBannerByPos(String pos) {
         return bannerRepository.findByPositionAndActiveTrueOrderByDisplayOrderAsc(pos);
@@ -27,10 +32,16 @@ public class BannerService {
                 .linkUrl(request.getLinkUrl())
                 .position(request.getPosition())
                 .displayOrder(request.getDisplayOrder())
-                .active(request.getActive() != null ? request.getActive() : true) // Mặc định active = true nếu không truyền
+                .active(request.getActive() != null ? request.getActive() : true)
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .build();
+
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+            banner.setCategory(category);
+        }
 
         Banner savedBanner = bannerRepository.save(banner);
 
@@ -42,6 +53,7 @@ public class BannerService {
                 .position(savedBanner.getPosition())
                 .displayOrder(savedBanner.getDisplayOrder())
                 .active(savedBanner.getActive())
+                .categoryId(savedBanner.getCategory() != null ? savedBanner.getCategory().getId() : null)
                 .startDate(savedBanner.getStartDate())
                 .endDate(savedBanner.getEndDate())
                 .build();
@@ -59,6 +71,7 @@ public class BannerService {
                         .position(banner.getPosition())
                         .displayOrder(banner.getDisplayOrder())
                         .active(banner.getActive())
+                        .categoryId(banner.getCategory() != null ? banner.getCategory().getId() : null)
                         .startDate(banner.getStartDate())
                         .endDate(banner.getEndDate())
                         .build())

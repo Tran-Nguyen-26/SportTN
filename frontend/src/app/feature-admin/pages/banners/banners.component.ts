@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {BannerCreateRequest, BannerResponse, BannerService} from '../../../core/services/banner/banner.service';
+import {CategoryService} from "../../../core/services/category/category.service";
 
 export type BannerPosition = 'HERO' | 'SUB_LEFT' | 'SUB_RIGHT' | 'CATEGORY' | 'POPUP';
 
@@ -15,7 +16,7 @@ export interface Banner {
   startDate: string;
   endDate: string;
   active: boolean;
-  previewColor: string;
+  previewColor: string
 }
 
 export interface BannerForm {
@@ -31,7 +32,16 @@ export interface BannerForm {
   previewUrl: string | null;
   imageWidth: number | null;
   imageHeight: number | null;
+  categoryId: number | null;
 }
+
+export interface CategoryOption {
+  id: number;
+  name: string;
+  slug: string;
+  // imageUrl?: string;
+}
+
 
 @Component({
   selector: 'app-banners',
@@ -46,6 +56,13 @@ export class BannersComponent implements OnInit {
   drawerVisible    = false;
   editingBanner: BannerResponse | null = null;
   isSaving = false;
+
+  // Category selector
+  categories: CategoryOption[] = [];
+  isCategoryLoading = false;
+  categorySearchQuery = '';
+  selectedCategory: CategoryOption | null = null;
+
 
   positionTabs = [
     { value: '',          label: 'Tất cả'     },
@@ -68,7 +85,11 @@ export class BannersComponent implements OnInit {
 
   form: BannerForm = this.emptyForm();
 
-  constructor(private router: Router, private bannerService: BannerService) {}
+  constructor(
+    private router: Router,
+    private bannerService: BannerService,
+    private categoryService: CategoryService
+  ) {}
 
   ngOnInit(): void {
     this.loadBanners();
@@ -92,6 +113,25 @@ export class BannersComponent implements OnInit {
       error: (err) => console.error('Lỗi tải banner:', err)
     });
   }
+
+  loadCategories(): void {
+    if (this.categories.length > 0) return;
+
+    this.isCategoryLoading = true;
+
+    this.categoryService.getCategoryOption().subscribe({
+      next: (res) => {
+        this.categories = res.data;
+        console.log("category options: ", this.categories);
+        this.isCategoryLoading = false;
+      },
+      error: (err) => {
+        console.error("Lỗi load categories:", err);
+        this.isCategoryLoading = false;
+      }
+    });
+  }
+
 
   // ── Computed ────────────────────────────────────────────────────────────────
 
@@ -192,11 +232,20 @@ export class BannersComponent implements OnInit {
         previewUrl:   null,
         imageWidth:   null,
         imageHeight:  null,
+        categoryId:   banner.categoryId ?? null,
       };
+
+      if (banner.categoryId) {
+        this.selectedCategory = this.categories.find(c => c.id === banner.categoryId) ?? null;
+      }
+
     } else {
       this.editingBanner = null;
+      this.selectedCategory = null;
       this.form = this.emptyForm();
     }
+    this.categorySearchQuery = '';
+    this.loadCategories();
     this.drawerVisible = true;
   }
 
@@ -238,7 +287,6 @@ export class BannersComponent implements OnInit {
 
   save(): void {
     if (!this.isFormValid()) return;
-    // TODO: gọi API create/update rồi reload
     this.isSaving = true;
 
     const request: BannerCreateRequest = {
@@ -252,6 +300,7 @@ export class BannersComponent implements OnInit {
       startDate:    this.toDateTime(this.form.startDate),
       endDate:      this.toDateTime(this.form.endDate),
       // previewColor: '#E8F2FF', // default, có thể để user chọn sau
+      categoryId: this.form.position === 'CATEGORY' ? this.form.categoryId : null,
     };
 
     if (this.editingBanner) {
@@ -310,7 +359,27 @@ export class BannersComponent implements OnInit {
       title: '', altText: '', imageUrl: '', linkUrl: '',
       position: 'HERO', displayOrder: 1,
       startDate: '', endDate: '', active: true,
-      previewUrl: null, imageWidth: null, imageHeight: null,
+      previewUrl: null, imageWidth: null, imageHeight: null, categoryId: null
     };
   }
+
+  get filteredCategories(): CategoryOption[] {
+    const q = this.categorySearchQuery.toLowerCase();
+    if (!q) return this.categories;
+    return this.categories.filter(c => c.name.toLowerCase().includes(q));
+  }
+
+  selectCategory(cat: CategoryOption): void {
+    this.form.categoryId  = cat.id;
+    this.selectedCategory = cat;
+    if (!this.form.linkUrl) {
+      this.form.linkUrl = `/category/${cat.slug}`;
+    }
+  }
+
+  clearCategory(): void {
+    this.form.categoryId  = null;
+    this.selectedCategory = null;
+  }
+
 }

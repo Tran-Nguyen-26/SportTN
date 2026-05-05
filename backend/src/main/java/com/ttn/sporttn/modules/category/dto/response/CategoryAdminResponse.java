@@ -4,7 +4,9 @@ public interface CategoryAdminResponse {
     Long getCategoryId();
     String getName();
     String getSlug();
-    String getParent();
+    String getSectionTitle();
+    Long getParentId();
+    String getParentName();
     Long getProductCount();
     Integer getDisplayOrder();
     boolean getShowOnHome();

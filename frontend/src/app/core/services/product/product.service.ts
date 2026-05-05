@@ -11,6 +11,23 @@ import {
 } from "../../models/product/product.model";
 import {ListRange} from "@angular/cdk/collections";
 import {PageResponse} from "../../models/page-response";
+import {ProductCreateRequest} from "../../../feature-admin/components/add-product/add-product.component";
+
+
+export interface ProductResponse {
+  id: number;
+  name: string;
+  slug: string;
+  mainImageUrl: string;
+  categoryId: number;
+  categoryName: string;
+  brandId: number;
+  brandName: string;
+  active: boolean;
+  totalStock: number;
+  minPrice: number;
+  createdAt: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -45,4 +62,9 @@ export class ProductService {
   getEditDetail(id: number): Observable<ApiResponse<ProductDetail>> {
     return this.http.get<ApiResponse<ProductDetail>>(`${this.apiUrl}/${id}/detail`);
   }
+
+  createProduct(request: ProductCreateRequest): Observable<ApiResponse<ProductResponse>> {
+    return this.http.post<ApiResponse<ProductResponse>>(this.apiUrl, request);
+  }
+
 }

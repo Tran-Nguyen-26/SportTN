@@ -51,7 +51,10 @@
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)">
       </div>
-      <select class="filter-select" [(ngModel)]="selectedStatus">
+      <select
+        class="filter-select"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="selectedStatus.set($event)">
         <option *ngFor="let s of statusOptions" [value]="s.value">
           {{ s.label }}
         </option>
@@ -93,7 +96,7 @@
           <td class="spent">{{ formatPrice(customer.totalSpent) }}</td>
           <td class="date">{{ customer.joinDate }}</td>
           <td>
-            <app-status-badge [status]="customer.status"></app-status-badge>
+            <app-status-badge [status]="customer.status" type="customer"></app-status-badge>
           </td>
           <td>
             <div class="action-btns">
@@ -112,7 +115,7 @@
 
     <div class="table-footer">
       <span class="result-count">
-        Hiển thị {{ filteredCustomers.length }} / {{ customers.length }} khách hàng
+        Hiển thị {{ filteredCustomers().length }} / {{ totalCustomers() }} khách hàng
       </span>
       <div class="pagination">
         <button class="page-btn" disabled><mat-icon>chevron_left</mat-icon></button>
@@ -151,7 +154,7 @@
             Thành viên từ {{ detailCustomer.joinDate }}
           </div>
         </div>
-        <app-status-badge [status]="detailCustomer.status"></app-status-badge>
+        <app-status-badge [status]="detailCustomer.status" type="customer"></app-status-badge>
       </div>
       <button class="close-btn" (click)="closeDetail()">
         <mat-icon>close</mat-icon>

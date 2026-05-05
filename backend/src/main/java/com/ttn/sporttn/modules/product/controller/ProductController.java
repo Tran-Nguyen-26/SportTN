@@ -2,12 +2,14 @@ package com.ttn.sporttn.modules.product.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
+import com.ttn.sporttn.modules.product.dto.request.admin.ProductCreateRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.ProductUpdateRequest;
 import com.ttn.sporttn.modules.product.dto.response.admin.ProductAdminResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductCardResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductPageResponse;
 import com.ttn.sporttn.modules.product.dto.response.admin.ProductDetailFromUpdateResponse;
+import com.ttn.sporttn.modules.product.dto.response.admin.ProductResponse;
 import com.ttn.sporttn.modules.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -59,11 +61,10 @@ public class ProductController {
      * POST /api/v1/products
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<ProductDetailResponse>> createProduct(
-        @Valid @RequestBody ProductRequest request
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
+        @Valid @RequestBody ProductCreateRequest request
     ) {
-        ProductDetailResponse product = productService.createProduct(request);
+        ProductResponse product = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.ok(product, "Tạo sản phẩm thành công"));
     }

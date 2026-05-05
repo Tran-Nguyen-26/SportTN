@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../../../../enviroments/enviroment";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {map, Observable} from "rxjs";
 import {ApiResponse} from "../../models/home-response/home-response";
+import {CategoryOption} from "../../../feature-admin/pages/banners/banners.component";
 
 export interface CategoryCreateRequest {
   name: string;
   slug: string;
-  parentId: number;
-  description: string;
-  sectionTitle: string;
+  parentId: number | null;
+  description: string | null;
+  sectionTitle: string | null;
   linkUrl: string;
   imageUrl: string;
   displayOrder: number;
@@ -17,13 +18,17 @@ export interface CategoryCreateRequest {
   active: boolean;
 }
 
+export interface CategoryUpdateRequest extends CategoryCreateRequest {
+
+}
+
 
 export interface CategoryAdminResponse {
-  id: number;
+  categoryId: number;
   name: string;
   slug: string;
   parentId: number;
-  parent: string;
+  parentName: string;
   description: string;
   sectionTitle: string;
   linkUrl: string;
@@ -45,5 +50,30 @@ export class CategoryService {
 
   getCategoryAdminResponse(): Observable<ApiResponse<CategoryAdminResponse[]>> {
     return this.http.get<ApiResponse<CategoryAdminResponse[]>>(`${this.API_URL}/admin-list`);
+  }
+
+  getCategoryOption(): Observable<ApiResponse<CategoryOption[]>> {
+    return this.getCategoryAdminResponse().pipe(
+      map(res => {
+        const optionData = (res.data ?? []).map((item: CategoryAdminResponse) => ({
+          id: item.categoryId,
+          name: item.name,
+          slug: item.slug
+        }));
+
+        return {
+          ...res,
+          data: optionData
+        };
+      })
+    );
+  }
+
+  createCategory(request: CategoryCreateRequest): Observable<ApiResponse<CategoryAdminResponse>> {
+    return this.http.post<ApiResponse<CategoryAdminResponse>>(`${this.API_URL}`, request);
+  }
+
+  updateCategory(id: number, request: CategoryUpdateRequest): Observable<ApiResponse<CategoryAdminResponse>> {
+    return this.http.put<ApiResponse<CategoryAdminResponse>>(`${this.API_URL}/${id}`, request);
   }
 }

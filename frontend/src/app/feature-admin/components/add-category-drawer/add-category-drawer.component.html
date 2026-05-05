@@ -34,8 +34,12 @@
         <div class="field full">
           <label>Danh mục cha</label>
           <select [(ngModel)]="form.parentId">
-            <option [value]="null">— Không có (danh mục cha) —</option>
-            <option *ngFor="let p of parentCategories" [value]="p.id">{{ p.name }}</option>
+            <option [ngValue]="null">— Không có (danh mục cha) —</option>
+            <option
+              *ngFor="let p of parentCategories"
+              [ngValue]="p.categoryId">
+              {{ p.name }}
+            </option>
           </select>
         </div>
 
@@ -46,10 +50,7 @@
         </div>
       </div>
 
-      <!-- Dành cho danh mục cha -->
-      <div class="section" *ngIf="!form.parentId">
-        <div class="section-label">Dành cho danh mục cha</div>
-
+      <div class="section">
         <div class="field full">
           <label>Tiêu đề section</label>
           <input type="text" [(ngModel)]="form.sectionTitle"

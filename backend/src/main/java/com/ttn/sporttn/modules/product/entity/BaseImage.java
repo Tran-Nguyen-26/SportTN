@@ -5,12 +5,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Getter
 @Setter
+@NoArgsConstructor
+@SuperBuilder
 public class BaseImage {
 
     @Id
@@ -23,4 +28,7 @@ public class BaseImage {
 
     @Column(name = "is_main")
     private boolean isMain = false;
+
+    @Column(name = "display_order")
+    private Integer displayOrder;
 }

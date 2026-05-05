@@ -168,7 +168,6 @@
         </div>
 
         <!-- Toggle active -->
-        <!-- FIX: bỏ b.active = !b.active trực tiếp → dùng method toggleActive(b) -->
         <div class="banner-toggle">
           <div class="toggle-label-sm">{{ b.active ? 'Hiển thị' : 'Ẩn' }}</div>
           <div
@@ -293,6 +292,63 @@
               <span class="pos-option-desc">{{ p.desc }}</span>
             </div>
             <mat-icon class="pos-check" *ngIf="form.position === p.value">check_circle</mat-icon>
+          </div>
+        </div>
+
+        <!-- Chọn danh mục — chỉ hiện khi position = CATEGORY -->
+        <div class="category-selector" *ngIf="form.position === 'CATEGORY'">
+          <div class="category-selector-header">
+            <mat-icon>grid_view</mat-icon>
+            <span>Gán danh mục cho banner</span>
+          </div>
+
+          <!-- Loading -->
+          <div class="category-loading" *ngIf="isCategoryLoading">
+            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+            <span>Đang tải danh mục...</span>
+          </div>
+
+          <!-- Search -->
+          <div class="category-search-wrap" *ngIf="!isCategoryLoading">
+            <mat-icon>search</mat-icon>
+            <input
+              type="text"
+              [(ngModel)]="categorySearchQuery"
+              placeholder="Tìm tên danh mục..."
+              class="category-search-input">
+          </div>
+
+          <!-- Category list -->
+          <div class="category-list" *ngIf="!isCategoryLoading">
+            <div
+              class="category-item"
+              *ngFor="let cat of filteredCategories"
+              [class.selected]="form.categoryId === cat.id"
+              (click)="selectCategory(cat)">
+<!--              <div class="cat-img-wrap">-->
+<!--                <img *ngIf="cat.imageUrl" [src]="cat.imageUrl" [alt]="cat.name">-->
+<!--                <mat-icon *ngIf="!cat.imageUrl">category</mat-icon>-->
+<!--              </div>-->
+              <div class="cat-info">
+                <span class="cat-name">{{ cat.name }}</span>
+                <span class="cat-slug">{{ cat.slug }}</span>
+              </div>
+              <mat-icon class="cat-check" *ngIf="form.categoryId === cat.id">check_circle</mat-icon>
+            </div>
+
+            <div class="category-empty" *ngIf="filteredCategories.length === 0">
+              <mat-icon>search_off</mat-icon>
+              <span>Không tìm thấy danh mục</span>
+            </div>
+          </div>
+
+          <!-- Selected preview -->
+          <div class="selected-category-preview" *ngIf="selectedCategory">
+            <mat-icon>check_circle</mat-icon>
+            <span>Đã chọn: <strong>{{ selectedCategory.name }}</strong></span>
+            <button class="clear-cat-btn" (click)="clearCategory()">
+              <mat-icon>close</mat-icon>
+            </button>
           </div>
         </div>
 

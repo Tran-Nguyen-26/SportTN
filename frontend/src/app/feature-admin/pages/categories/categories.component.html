@@ -5,13 +5,16 @@
     subtitle="Quản lý danh mục sản phẩm"
     btnLabel="Thêm danh mục"
     btnIcon="add"
-    (btnClick)="showDrawer = true">
+    (btnClick)="openAddDrawer()">
   </app-page-header>
 
   <app-add-category-drawer
+    *ngIf="showDrawer"
     [(visible)]="showDrawer"
     [parentCategories]="parentList()"
-    (saved)="onCategorySaved($event)">
+    (saved)="onCategorySaved($event)"
+    [editMode]="editMode"
+    [initialData]="editingCategory">
   </app-add-category-drawer>
 
   <!-- Stats -->
@@ -73,6 +76,7 @@
         <tr>
           <th>Tên danh mục</th>
           <th>Slug</th>
+          <th>Tiêu đề</th>
           <th>Danh mục cha</th>
           <th>Số SP</th>
           <th>Thứ tự</th>
@@ -85,19 +89,22 @@
         <tr *ngFor="let cat of filteredCategories">
           <td>
             <div class="cat-name-cell">
-              <div class="cat-icon" [class.is-parent]="!cat.parent">
-                <mat-icon>{{ cat.parent ? 'folder_open' : 'account_tree' }}</mat-icon>
+              <div class="cat-icon" [class.is-parent]="!cat.parentName">
+                <mat-icon>{{ cat.parentName ? 'folder_open' : 'account_tree' }}</mat-icon>
               </div>
               <div>
                 <div class="cat-name">{{ cat.name }}</div>
-                <div class="cat-type">{{ cat.parent ? 'Danh mục con' : 'Danh mục cha' }}</div>
+                <div class="cat-type">{{ cat.parentName ? 'Danh mục con' : 'Danh mục cha' }}</div>
               </div>
             </div>
           </td>
           <td><code class="slug-text">{{ cat.slug }}</code></td>
           <td>
-            <span class="parent-tag" *ngIf="cat.parent">{{ cat.parent }}</span>
-            <span class="no-parent" *ngIf="!cat.parent">—</span>
+            {{ cat.sectionTitle }}
+          </td>
+          <td>
+            <span class="parent-tag" *ngIf="cat.parentName">{{ cat.parentName }}</span>
+            <span class="no-parent" *ngIf="!cat.parentName">—</span>
           </td>
           <td class="count">{{ cat.productCount }}</td>
           <td class="order">{{ cat.displayOrder }}</td>
@@ -129,7 +136,7 @@
 
     <div class="table-footer">
       <span class="result-count">
-        Hiển thị {{ filteredCategories.length }} / {{ categories.length }} danh mục
+        Hiển thị {{ filteredCategories.length }} / {{ categoryLength() }} danh mục
       </span>
     </div>
 

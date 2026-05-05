@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ttn.sporttn.modules.category.dto.response.CategoryAdminResponse;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,12 +47,15 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "GROUP BY c.id, c.slug, p.name, c.displayOrder, c.showOnHome, c.active")
     Page<CategoryAdminResponse> findAllForAdmin(Pageable pageable);
 
-    @Query("SELECT c.id as categoryId, c.name as name,c.slug as slug, p.name as parent, " +
+    @Query("SELECT c.id as categoryId, c.name as name,c.slug as slug, " +
+            "c.sectionTitle as sectionTitle, p.id as parentId, p.name as parentName, " +
             "COUNT(prod.id) as productCount, c.displayOrder as displayOrder, " +
             "c.showOnHome as showOnHome, c.active as active " +
             "FROM Category c " +
             "LEFT JOIN c.parent p " +
             "LEFT JOIN Product prod ON prod.category.id = c.id " +
-            "GROUP BY c.id, c.name, c.slug, p.name, c.displayOrder, c.showOnHome, c.active")
+            "GROUP BY c.id, c.name, c.slug, c.sectionTitle, p.id, p.name, c.displayOrder, c.showOnHome, c.active")
     List<CategoryAdminResponse> findAllForAdmin();
+
+    Optional<Category> findBySlug(@NotBlank(message = "Slug không được để trống") String slug);
 }

@@ -15,6 +15,7 @@ export interface BannerCreateRequest {
   endDate: string;
   // previewColor: string;
   altText: string;
+  categoryId: number | null;
 }
 
 export interface BannerResponse {
@@ -29,6 +30,7 @@ export interface BannerResponse {
   endDate: string;
   previewColor: string;
   altText: string;
+  categoryId: number;
 }
 
 @Injectable({
