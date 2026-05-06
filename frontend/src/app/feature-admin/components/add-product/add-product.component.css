@@ -814,9 +814,18 @@
   box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
 }
 
-.url-field.small { padding: 0 8px; }
+.url-field.small {
+  padding: 0 8px;
+}
 
-.url-icon { font-size: 16px; color: #94a3b8; flex-shrink: 0; }
+.url-icon {
+  font-size: 16px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .url-input {
   flex: 1;

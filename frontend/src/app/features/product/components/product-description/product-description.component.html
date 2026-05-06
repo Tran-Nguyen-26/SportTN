@@ -1,29 +1,12 @@
-<div class="product-description">
-  <h3>Mô tả</h3>
-  <p>
-    Giữ cơ thể luôn khô thoáng với áo thun Artengo RN Dry với thiết kế thông minh,
-    được tin dùng bởi Gaël Monfils! Lưới thoáng khí giúp người mặc luôn khô thoáng.
-  </p>
-  <p>
-    Áo thun thể thao chơi tennis thoáng khí và có thể cả mặc khi chơi thể thao hay thường ngày.
-    • Mã sản phẩm 8903376
-  </p>
+<div class="desc-card">
+  <p class="card-title">Mô tả sản phẩm</p>
 
-  <h3>Lợi ích sản phẩm</h3>
-  <div class="benefits">
-    <div class="benefit">
-      <h4>Độ co giãn</h4>
-      <p>Chất liệu co giãn và phom dáng mang lại khả năng vận động hoàn hảo.</p>
-    </div>
-    <div class="benefit">
-      <h4>Khả năng khô nhanh</h4>
-      <p>Lưới thoáng khí giúp khô thoáng hơi ẩm hiệu quả.</p>
-    </div>
+  <div class="desc-body" [class.collapsed]="!expanded">
+    <p class="desc-p">{{ description }}</p>
   </div>
 
-  <h3>Chi tiết sản phẩm</h3>
-  <p>...</p>
-
-  <h3>Thành phần / Hướng dẫn</h3>
-  <p>...</p>
+  <button class="see-all-btn" (click)="toggleExpand()">
+    <mat-icon>{{ expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+    {{ expanded ? 'Thu gọn' : 'Xem thêm' }}
+  </button>
 </div>

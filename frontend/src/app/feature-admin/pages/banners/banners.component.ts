@@ -326,10 +326,24 @@ export class BannersComponent implements OnInit {
   }
 
   toggleActive(banner: BannerResponse): void {
+    const previousState = banner.active;
+
     this.banners.update(list =>
       list.map(b => b.id === banner.id ? { ...b, active: !b.active } : b)
     );
-    // TODO: gọi API update trạng thái
+
+    this.bannerService.toggleBannerStatus(banner.id).subscribe({
+      next: (response) => {
+        console.log('Cập nhật trạng thái banner thành công:', response);
+      },
+      error: (error) => {
+        console.error('Lỗi khi cập nhật trạng thái banner:', error);
+
+        this.banners.update(list =>
+          list.map(b => b.id === banner.id ? { ...b, active: previousState } : b)
+        );
+      }
+    });
   }
 
   onImgError(event: Event): void {
@@ -339,8 +353,20 @@ export class BannersComponent implements OnInit {
 
   deleteBanner(id: number): void {
     if (!confirm('Bạn chắc chắn muốn xóa banner này?')) return;
+
+    const previousList = this.banners();
+
     this.banners.update(list => list.filter(b => b.id !== id));
-    // TODO: gọi API delete
+
+    this.bannerService.deleteBanner(id).subscribe({
+      next: (response) => {
+        console.log('Xóa banner thành công:', response);
+      },
+      error: (error) => {
+        console.error('Lỗi khi xóa banner:', error);
+        this.banners.set(previousList);
+      }
+    });
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────

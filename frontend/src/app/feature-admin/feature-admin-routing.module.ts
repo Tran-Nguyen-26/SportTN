@@ -19,6 +19,7 @@ import {adminGuard} from "../core/guards/admin/admin.guard";
 import {FlashSaleComponent} from "./pages/flash-sale/flash-sale.component";
 import {AddProductComponent} from "./components/add-product/add-product.component";
 import {ChartsComponent} from "./pages/charts/charts.component";
+import {ProductDetailComponent} from "./components/product-detail/product-detail.component";
 
 const routes: Routes = [
   {
@@ -34,6 +35,7 @@ const routes: Routes = [
       { path: 'products',     component: ProductsComponent     },
       { path: 'products/add', component: AddProductComponent },
       { path: 'products/edit/:id', component: AddProductComponent },
+      { path: 'products/detail/:id', component: ProductDetailComponent},
       { path: 'customers',    component: CustomersComponent    },
       { path: 'invoices',     component: InvoicesComponent     },
       { path: 'inventory',    component: InventoryComponent    },

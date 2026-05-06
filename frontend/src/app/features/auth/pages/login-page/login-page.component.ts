@@ -66,7 +66,7 @@ export class LoginPageComponent implements OnInit {
           // this.router.navigateByUrl(returnUrl);
           if (returnUrl) {
             this.router.navigate(returnUrl);
-          } else if (role === 'ADMIN') {
+          } else if (role !== 'CUSTOMER') {
             this.router.navigate(['/admin']);
           } else {
             this.router.navigate(['/home']);

@@ -28,10 +28,11 @@ import { MatIconModule} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
 import { FlashSaleComponent } from './pages/flash-sale/flash-sale.component';
 import { AddProductComponent } from './components/add-product/add-product.component';
-import { AddCategoryDrawerComponent } from './components/add-category-drawer/add-category-drawer.component';
 import { ChartsComponent } from './pages/charts/charts.component';
 import { OrderModalComponent } from './components/order-modal/order-modal.component';
 import {SharedModule} from "../shared/shared.module";
+import {AddCategoryDrawerComponent} from "./components/add-category-drawer/add-category-drawer.component";
+import {ProductDetailComponent} from "./components/product-detail/product-detail.component";
 
 
 @NgModule({
@@ -60,16 +61,17 @@ import {SharedModule} from "../shared/shared.module";
     StatusBadgeComponent,
     FlashSaleComponent,
     AddProductComponent,
-    AddCategoryDrawerComponent,
     ChartsComponent,
     OrderModalComponent,
+    AddCategoryDrawerComponent,
+    ProductDetailComponent
   ],
-    imports: [
-        CommonModule,
-        FeatureAdminRoutingModule,
-        FormsModule,
-        MatIconModule,
-        SharedModule
-    ]
+  imports: [
+    CommonModule,
+    FeatureAdminRoutingModule,
+    FormsModule,
+    MatIconModule,
+    SharedModule
+  ]
 })
 export class FeatureAdminModule { }

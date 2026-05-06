@@ -1,5 +1,7 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import {UserService} from "../../../core/services/user/user.service";
+import {AuthService} from "../../../core/services/auth/auth.service";
 
 export interface TopbarNotif {
   id: number;
@@ -89,13 +91,13 @@ export class TopbarComponent {
 
 
   // Current user info
-  currentUser = {
-    name:      'Trần Minh Tuấn',
-    email:     'tuan.admin@sport.vn',
-    initials:  'TT',
-    roleLabel: 'Super Admin',
-    color:     '#7c3aed',
-  };
+  // currentUser = {
+  //   name:      'Trần Minh Tuấn',
+  //   email:     'tuan.admin@sport.vn',
+  //   initials:  'TT',
+  //   roleLabel: 'Super Admin',
+  //   color:     '#7c3aed',
+  // };
 
   // Recent notifications (tối đa 5)
   recentNotifs: TopbarNotif[] = [
@@ -192,7 +194,18 @@ export class TopbarComponent {
     return this.recentNotifs.filter(n => !n.read).length;
   }
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
+
+  currentUser$ = this.authService.currentUser$;
+  isLoggedIn$ = this.authService.isLoggedIn$;
+
+  currentUser = {
+    name:      'Trần Minh Tuấn',
+    email:     'tuan.admin@sport.vn',
+    initials:  'TT',
+    roleLabel: 'Super Admin',
+    color:     '#7c3aed',
+  };
 
   // ── Toggle handlers ──────────────────────────
   onToggle(): void {

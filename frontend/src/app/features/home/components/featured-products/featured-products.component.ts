@@ -26,6 +26,7 @@ export class FeaturedProductsComponent implements OnInit {
           id: 101,
           name: 'Kính bơi Ready xám',
           slug: '',
+          description: '',
           mainImageUrl: 'assets/kinhboi.jpg', // Tên trường mới
           brandName: 'DECATHLON',             // Tên trường mới
           rating: 4.5,
@@ -44,13 +45,13 @@ export class FeaturedProductsComponent implements OnInit {
     }, 800);
   }
 
-  addToCart(product: Product): void {
+  addToCart(product: ProductCardResponse): void {
     // TODO: Integrate with CartService
     console.log('Added to cart:', product);
     // Example: this.cartService.addToCart(product);
   }
 
-  addToWishlist(product: Product): void {
+  addToWishlist(product: ProductCardResponse): void {
     // TODO: Integrate with WishlistService
     console.log('Added to wishlist:', product);
     // Example: this.wishlistService.addToWishlist(product);

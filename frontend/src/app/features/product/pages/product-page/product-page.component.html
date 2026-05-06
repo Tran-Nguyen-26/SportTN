@@ -1,18 +1,169 @@
-<div class="product-page">
+<div class="product-page" *ngIf="!isLoading && productDetail">
+
+  <!-- Top section: image + info -->
   <div class="product-top">
-    <div class="product-left">
-      <img
-        *ngFor="let image of productDetail?.productImageResponses"
-        [src]="image.imageUrl"
-      >
+
+    <!-- Left: image gallery -->
+    <div class="img-col">
+      <div class="main-img">
+        <img [src]="activeImage" [alt]="productDetail.productCardResponse.name">
+      </div>
+      <div class="thumb-row">
+        <div
+          class="thumb"
+          *ngFor="let img of allImages; let i = index"
+          [class.active]="activeImage === img.imageUrl"
+          (click)="setActiveImage(img.imageUrl)">
+          <img [src]="img.imageUrl" [alt]="productDetail.productCardResponse.name + ' ' + (i+1)">
+        </div>
+      </div>
     </div>
-    <div class="product-right">
-      <app-product-detail [productDetail]="productDetail"></app-product-detail>
+
+    <!-- Right: info -->
+    <div class="info-col">
+
+      <!-- Brand tag -->
+      <span class="brand-tag">
+        <mat-icon>verified</mat-icon>
+        {{ productDetail.productCardResponse.brandName }} · Chính hãng
+      </span>
+
+      <!-- Title -->
+      <h1 class="product-title">{{ productDetail.productCardResponse.name }}</h1>
+
+      <!-- Meta: rating, sold, SKU -->
+      <div class="meta-row">
+        <div class="stars">
+          <mat-icon class="star-icon">star</mat-icon>
+          <span class="rating-val">{{ productDetail.productCardResponse.rating }}</span>
+          <span class="review-cnt">({{ totalReviewCount }} đánh giá)</span>
+        </div>
+        <div class="mdiv"></div>
+        <span class="sold-cnt">
+          <mat-icon style="font-size:14px;vertical-align:middle">shopping_bag</mat-icon>
+          {{ productDetail.productCardResponse.soldCount | number }} đã bán
+        </span>
+        <div class="mdiv"></div>
+        <span class="sku">SKU: {{ selectedVariant?.sku || 'N/A' }}</span>
+      </div>
+
+      <!-- Price card -->
+      <div class="price-card">
+        <div class="price-main">
+          <span class="price-new">
+            {{ effectivePrice | currency:'VND':'':'1.0-0' }}đ
+          </span>
+          <span class="price-old" *ngIf="selectedVariant?.salePrice">
+            {{ selectedVariant!.originalPrice | currency:'VND':'':'1.0-0' }}đ
+          </span>
+          <span class="disc-badge" *ngIf="discountPercent > 0">−{{ discountPercent }}%</span>
+        </div>
+        <div class="ship-row">
+          <mat-icon style="font-size:15px;color:#0EA5E9">local_shipping</mat-icon>
+          Miễn phí vận chuyển cho đơn từ 299.000đ
+        </div>
+      </div>
+
+      <!-- Color selector -->
+      <div class="selector-group">
+        <p class="section-lbl">
+          Màu sắc: <strong>{{ selectedColor || 'Chưa chọn' }}</strong>
+        </p>
+        <div class="chip-wrap">
+          <button
+            class="chip"
+            *ngFor="let color of availableColors"
+            [class.active]="selectedColor === color"
+            (click)="selectColor(color)">
+            {{ color }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Size selector -->
+      <div class="selector-group">
+        <p class="section-lbl">
+          Kích cỡ: <strong>{{ selectedSize || 'Chưa chọn' }}</strong>
+        </p>
+        <div class="chip-wrap">
+          <button
+            class="chip"
+            *ngFor="let size of availableSizes"
+            [class.active]="selectedSize === size"
+            [disabled]="!isSizeAvailable(size)"
+            (click)="selectSize(size)">
+            {{ size }}
+            <span *ngIf="!isSizeAvailable(size)" class="out-label"> (Hết)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quantity -->
+      <div class="selector-group">
+        <p class="section-lbl">Số lượng:</p>
+        <div class="qty-ctrl">
+          <button class="qty-btn" (click)="changeQty(-1)" [disabled]="quantity <= 1">−</button>
+          <span class="qty-val">{{ quantity }}</span>
+          <button class="qty-btn" (click)="changeQty(1)" [disabled]="quantity >= maxQty">+</button>
+        </div>
+        <span class="stock-hint" *ngIf="selectedVariant">
+          Còn {{ selectedVariant.stockQuantity }} sản phẩm
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button
+          class="btn-cart"
+          [disabled]="!canAddToCart"
+          (click)="addToCart()">
+          <mat-icon>shopping_cart</mat-icon>
+          {{ canAddToCart ? 'Thêm vào giỏ hàng' : 'Chọn màu & size' }}
+        </button>
+        <button
+          class="btn-wish"
+          [class.on]="isWishlisted"
+          (click)="toggleWishlist()"
+          [attr.aria-label]="isWishlisted ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'">
+          <mat-icon>{{ isWishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
+        </button>
+      </div>
+
+      <!-- Policy -->
+      <div class="policy-row">
+        <div class="pol">
+          <mat-icon>autorenew</mat-icon>
+          <span>Đổi trả 365 ngày</span>
+        </div>
+        <div class="pol">
+          <mat-icon>verified_user</mat-icon>
+          <span>Bảo hành 2 năm chính hãng</span>
+        </div>
+        <div class="pol">
+          <mat-icon>card_giftcard</mat-icon>
+          <span>Quà tặng từ 499k</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
+  <!-- Bottom: description + reviews -->
   <div class="product-bottom">
-    <app-product-description></app-product-description>
-    <app-product-review></app-product-review>
+    <app-product-description
+      [description]="productDetail.productCardResponse.description">
+    </app-product-description>
+
+    <app-product-review
+      [productId]="productId"
+      [rating]="productDetail.productCardResponse.rating"
+      [totalReviews]="totalReviewCount">
+    </app-product-review>
   </div>
+
+</div>
+
+<!-- Loading state -->
+<div class="page-loading" *ngIf="isLoading">
+  <mat-progress-spinner diameter="40" mode="indeterminate" color="primary"></mat-progress-spinner>
 </div>

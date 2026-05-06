@@ -12,22 +12,22 @@ export class ProductGridComponent {
 
   private readonly allProducts: ProductCardResponse[] = [
     {
-      id: 101, name: 'Giày chạy bộ Run Active Grip', slug: 'giay-chay-run-active-grip',
+      id: 101, name: 'Giày chạy bộ Run Active Grip', slug: 'giay-chay-run-active-grip', description: '',
       mainImageUrl: 'assets/giaychay.jpg', brandName: 'KALENJI', rating: 4.7, reviewCount: 215, soldCount: 1630,
       originalPrice: 990000, salePrice: 790000, effectivePrice: 790000, discountPercent: 20, isOnSale: true, isNew: false, isBestSeller: true
     },
     {
-      id: 102, name: 'Áo thun thể thao Dry 100', slug: 'ao-thun-dry-100',
+      id: 102, name: 'Áo thun thể thao Dry 100', slug: 'ao-thun-dry-100', description: '',
       mainImageUrl: 'assets/aothun.jpg', brandName: 'DOMYOS', rating: 4.5, reviewCount: 134, soldCount: 980,
       originalPrice: 199000, salePrice: 169000, effectivePrice: 169000, discountPercent: 15, isOnSale: true, isNew: true, isBestSeller: false
     },
     {
-      id: 103, name: 'Bình nước thể thao 1L', slug: 'binh-nuoc-the-thao-1l',
+      id: 103, name: 'Bình nước thể thao 1L', slug: 'binh-nuoc-the-thao-1l',description: '',
       mainImageUrl: 'assets/binhnuoc.jpg', brandName: 'QUECHUA', rating: 4.8, reviewCount: 286, soldCount: 2200,
       originalPrice: 129000, salePrice: 99000, effectivePrice: 99000, discountPercent: 23, isOnSale: true, isNew: false, isBestSeller: true
     },
     {
-      id: 104, name: 'Bóng đá F500 sân cỏ nhân tạo', slug: 'bong-da-f500',
+      id: 104, name: 'Bóng đá F500 sân cỏ nhân tạo', slug: 'bong-da-f500', description: '',
       mainImageUrl: 'assets/bongda.jpg', brandName: 'KIPSTA', rating: 4.4, reviewCount: 95, soldCount: 720,
       originalPrice: 349000, salePrice: 349000, effectivePrice: 349000, discountPercent: 0, isOnSale: false, isNew: false, isBestSeller: false
     }

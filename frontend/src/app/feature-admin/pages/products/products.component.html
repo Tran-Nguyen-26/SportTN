@@ -65,7 +65,12 @@
         <tr *ngFor="let p of filteredProducts">
           <td>
             <div class="product-cell">
-              <div class="product-thumb">{{ getInitials(p.name) }}</div>
+              <div class="product-thumb">
+                <img *ngIf="p.mainImageUrl; else defaultInitials" [src]="p.mainImageUrl" [alt]="p.name" class="product-img"/>
+                <ng-template #defaultInitials>
+                  {{ getInitials(p.name) }}
+                </ng-template>
+              </div>
               <span class="product-name">{{ p.name }}</span>
             </div>
           </td>

@@ -133,6 +133,9 @@
   font-size: 20px;
   flex-shrink: 0;
   color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-item.active .nav-icon {

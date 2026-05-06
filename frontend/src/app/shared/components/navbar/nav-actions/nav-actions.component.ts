@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import {AuthService} from "../../../../core/services/auth/auth.service";
+import {UserResponse} from "../../../../core/models/auth/auth.model";
+import {AdminUser} from "../../../../feature-admin/pages/users/users.component";
 
 @Component({
   selector: 'app-nav-actions',
@@ -35,5 +37,10 @@ export class NavActionsComponent {
   handleLogout(): void {
     this.authService.logout();
   }
+
+  isCustomer(user: UserResponse | AdminUser): user is UserResponse {
+    return (user as UserResponse).totalPoints !== undefined;
+  }
+
 
 }

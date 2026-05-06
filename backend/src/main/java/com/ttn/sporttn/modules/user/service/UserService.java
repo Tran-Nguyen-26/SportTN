@@ -59,15 +59,15 @@ public class UserService {
 
         UserResponse userResponse =
                 UserResponse.builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .email(user.getEmail())
-                    .phone(user.getPhone())
-                    .role(user.getRole())
-                    .status(user.getStatus())
-                    .totalPoints(user.getTotalPoints())
-                    .provider(user.getProvider())
-                    .build();
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .role(user.getRole())
+                        .status(user.getStatus())
+                        .totalPoints(user.getTotalPoints())
+                        .provider(user.getProvider())
+                        .build();
         AuthResponse authResponse = generateTokenPair(user);
         authResponse.setUserResponse(userResponse);
 
@@ -107,7 +107,6 @@ public class UserService {
             newUser.setRole(UserRole.CUSTOMER);
 
             Profile profile = new Profile();
-            profile.setFullName(name);
 //            profile.setAvatarUrl(picture);
             profile.setUser(newUser);
 

@@ -31,6 +31,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {LoadingSpinnerComponent} from "./components/loading-spinner/loading-spinner.component";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {AddToCartDrawerComponent} from "./components/add-to-cart-drawer/add-to-cart-drawer.component";
 
 const NAVBAR_COMPONENTS = [
   NavbarComponent,
@@ -51,7 +52,8 @@ const FOOTER_COMPONENTS = [
 const SHARED_COMPONENTS = [
   ProductCardComponent,
   RatingStarsComponent,
-  LoadingSpinnerComponent
+  LoadingSpinnerComponent,
+  AddToCartDrawerComponent
 ]
 
 @NgModule({
@@ -61,24 +63,24 @@ const SHARED_COMPONENTS = [
     ...SHARED_COMPONENTS,
   ],
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterModule,
-    // Material Modules
-    MatIconModule,
-    MatButtonModule,
-    MatCardModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatMenuModule,
-    MatDividerModule,
-    MatChipsModule,
-    MatBadgeModule,
-    MatTooltipModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule
+      CommonModule,
+      FormsModule,
+      ReactiveFormsModule,
+      RouterModule,
+      // Material Modules
+      MatIconModule,
+      MatButtonModule,
+      MatCardModule,
+      MatInputModule,
+      MatFormFieldModule,
+      MatSelectModule,
+      MatMenuModule,
+      MatDividerModule,
+      MatChipsModule,
+      MatBadgeModule,
+      MatTooltipModule,
+      MatProgressBarModule,
+      MatProgressSpinnerModule,
   ],
   exports: [
     ...NAVBAR_COMPONENTS,

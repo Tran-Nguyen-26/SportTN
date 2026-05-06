@@ -134,7 +134,7 @@ export class ProductsComponent implements OnInit {
   }
 
   goToDetail(id: number): void {
-    this.router.navigate(['/admin/products', id]);
+    this.router.navigate(['/admin/products/detail', id]);
     this.closeDropdown();
   }
 

@@ -70,6 +70,7 @@
         <thead>
         <tr>
           <th>Tài khoản</th>
+          <th>Họ và tên</th>
           <th>Vai trò</th>
           <th>Phân quyền</th>
           <th>Đăng nhập gần nhất</th>
@@ -79,21 +80,27 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let u of filteredUsers" [class.inactive-row]="!u.active">
+        <tr *ngFor="let u of filteredUsers" [class.inactive-row]="u.status === 'INACTIVE'">
 
           <!-- Tài khoản -->
           <td>
             <div class="user-cell">
               <div class="avatar" [style.background]="u.avatarColor + '22'" [style.color]="u.avatarColor">
-                {{ u.name[0].toUpperCase() }}
+                {{ u.username[0].toUpperCase() }}
               </div>
               <div class="user-info">
                 <div class="user-name">
-                  {{ u.name }}
+                  {{ u.username }}
                   <span class="you-badge" *ngIf="u.isCurrentUser">Bạn</span>
                 </div>
                 <div class="user-email">{{ u.email }}</div>
               </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="user-fullname">
+              {{ u.fullname }}
             </div>
           </td>
 
@@ -110,12 +117,12 @@
             <div class="perms-wrap">
                 <span
                   class="perm-tag"
-                  *ngFor="let p of u.permissions.slice(0, 3)"
+                  *ngFor="let p of u.permissions.slice(0, 6)"
                   [title]="p">
-                  {{ getPermShort(p) }}
+                  {{ getPermShort(p.name) }}
                 </span>
-              <span class="perm-more" *ngIf="u.permissions.length > 3">
-                  +{{ u.permissions.length - 3 }}
+              <span class="perm-more" *ngIf="u.permissions.length > 6">
+                  +{{ u.permissions.length - 6 }}
                 </span>
             </div>
           </td>
@@ -133,7 +140,7 @@
 
           <!-- Trạng thái -->
           <td>
-            <app-status-badge [status]="u.active ? 'ACTIVE' : 'INACTIVE'"></app-status-badge>
+            <app-status-badge [status]="u.status" type="customer"></app-status-badge>
           </td>
 
           <!-- Thao tác -->
@@ -154,12 +161,12 @@
               </button>
               <button
                 class="action-btn"
-                [class.toggle-on]="u.active"
-                [class.toggle-off]="!u.active"
+                [class.toggle-on]="u.status === 'ACTIVE'"
+                [class.toggle-off]="u.status !== 'ACTIVE'"
                 (click)="toggleUserStatus(u)"
-                [title]="u.active ? 'Vô hiệu hóa' : 'Kích hoạt'"
+                [title]="u.status === 'ACTIVE' ? 'Vô hiệu hóa' : 'Kích hoạt'"
                 [disabled]="u.isCurrentUser">
-                <mat-icon>{{ u.active ? 'block' : 'check_circle' }}</mat-icon>
+                <mat-icon>{{ u.status === 'ACTIVE' ? 'block' : 'check_circle' }}</mat-icon>
               </button>
             </div>
           </td>
@@ -172,7 +179,7 @@
     <!-- Footer -->
     <div class="table-footer">
       <span class="result-count">
-        Hiển thị {{ filteredUsers.length }} / {{ users.length }} tài khoản
+        Hiển thị {{ filteredUsers.length }} / {{ usersLength() }} tài khoản
       </span>
     </div>
 
@@ -283,7 +290,7 @@
             <span class="t-label">Kích hoạt tài khoản</span>
             <span class="t-desc">Tài khoản có thể đăng nhập vào hệ thống</span>
           </div>
-          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
+          <div class="toggle" [class.on]="form.status === 'ACTIVE'" (click)="toggleStatus()">
             <div class="toggle-thumb"></div>
           </div>
         </div>
@@ -311,10 +318,10 @@
     <div class="modal-header">
       <div class="modal-user-info">
         <div class="modal-avatar" [style.background]="detailUser.avatarColor + '22'" [style.color]="detailUser.avatarColor">
-          {{ detailUser.name[0].toUpperCase() }}
+          {{ detailUser.username[0].toUpperCase() }}
         </div>
         <div>
-          <div class="modal-name">{{ detailUser.name }}</div>
+          <div class="modal-name">{{ detailUser.username }}</div>
           <div class="modal-email">{{ detailUser.email }}</div>
         </div>
         <span class="role-badge" [ngClass]="'role-' + detailUser.role.toLowerCase()">
@@ -369,8 +376,8 @@
           <div
             class="perm-full-item"
             *ngFor="let p of allPermissions"
-            [class.has-perm]="detailUser.permissions.includes(p.value)">
-            <mat-icon>{{ detailUser.permissions.includes(p.value) ? 'check_circle' : 'cancel' }}</mat-icon>
+            [class.has-perm]="hasPermission(detailUser, p.value)">
+            <mat-icon>{{ hasPermission(detailUser, p.value) ? 'check_circle' : 'cancel' }}</mat-icon>
             <div class="pfl-info">
               <span class="pfl-label">{{ p.label }}</span>
               <span class="pfl-desc">{{ p.desc }}</span>

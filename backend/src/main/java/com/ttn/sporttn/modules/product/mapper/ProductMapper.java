@@ -48,6 +48,7 @@ public class ProductMapper {
                 .id(product.getId())
                 .name(product.getName())
                 .slug(product.getSlug())
+                .description(product.getDescription())
                 .mainImageUrl(product.getMainImageUrl())
                 .brandName(product.getBrand() != null ? product.getBrand().getName() : null)
                 .rating(product.getRating())

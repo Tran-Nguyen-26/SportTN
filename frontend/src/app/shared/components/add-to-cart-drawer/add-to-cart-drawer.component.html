@@ -1,0 +1,134 @@
+<!-- Backdrop overlay -->
+<div
+  class="drawer-backdrop"
+  [class.drawer-backdrop--visible]="isOpen"
+  (click)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Thay đổi lựa chọn"
+>
+  <!-- Drawer panel -->
+  <aside class="drawer-panel" [class.drawer-panel--open]="isOpen">
+
+    <!-- ── Header ── -->
+    <div class="drawer-header">
+      <button class="btn-back" (click)="close()" aria-label="Quay lại">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <span class="drawer-title">Thay đổi lựa chọn</span>
+    </div>
+
+    <!-- ── Scrollable body ── -->
+    <div class="drawer-body">
+
+      <!-- Product summary row -->
+      <div class="product-row" *ngIf="product">
+        <div class="product-thumb">
+          <img
+            [src]="product.imageUrl"
+            [alt]="product.name"
+            loading="lazy"
+            class="product-thumb-img"
+          />
+        </div>
+        <div class="product-info">
+          <p class="product-price">
+            {{ displayPrice | number:'1.0-0' }}&nbsp;đ
+          </p>
+          <p class="product-price--original" *ngIf="displayOriginalPrice">
+            {{ displayOriginalPrice | number:'1.0-0' }}&nbsp;đ
+          </p>
+          <p class="product-brand">{{ product.brand }}</p>
+          <p class="product-name">{{ product.name }}</p>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- ── Size section ── -->
+      <div class="size-section">
+        <div class="section-header">
+          <span class="section-label">Kích cỡ</span>
+          <a href="#" class="size-guide-link" (click)="$event.preventDefault()">
+            Hướng dẫn chọn cỡ
+          </a>
+        </div>
+
+        <!-- Error hint -->
+        <p class="error-hint" *ngIf="sizeError">
+          <mat-icon class="error-icon">error_outline</mat-icon>
+          Vui lòng chọn kích cỡ trước khi thêm vào giỏ
+        </p>
+
+        <!-- Size chips -->
+        <div class="size-chips">
+          <button
+            *ngFor="let size of sizes"
+            class="size-chip"
+            [class.size-chip--selected]="selectedSize === size.value"
+            [class.size-chip--disabled]="!size.available"
+            [disabled]="!size.available"
+            (click)="selectSize(size)"
+            [attr.aria-pressed]="selectedSize === size.value"
+            [attr.aria-label]="size.label + (size.available ? '' : ' (hết hàng)')"
+          >
+            {{ size.label }}
+            <span class="size-chip--sold-out-line" *ngIf="!size.available"></span>
+          </button>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- ── Quantity section ── -->
+      <div class="qty-section">
+        <span class="section-label">Số lượng</span>
+        <div class="qty-control">
+          <button
+            class="qty-btn"
+            (click)="decreaseQty()"
+            [disabled]="quantity <= 1"
+            aria-label="Giảm số lượng"
+          >
+            <mat-icon>remove</mat-icon>
+          </button>
+
+          <input
+            class="qty-input"
+            type="number"
+            [value]="quantity"
+            min="1"
+            [max]="maxQty"
+            (change)="onQtyInput($event)"
+            aria-label="Số lượng"
+          />
+
+          <button
+            class="qty-btn"
+            (click)="increaseQty()"
+            [disabled]="quantity >= maxQty"
+            aria-label="Tăng số lượng"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /drawer-body -->
+
+    <!-- ── Footer CTA ── -->
+    <div class="drawer-footer">
+      <button
+        class="btn-add-to-cart"
+        [class.btn-add-to-cart--success]="addSuccess"
+        (click)="addToCart()"
+        [disabled]="addSuccess"
+      >
+        <mat-icon *ngIf="!addSuccess">shopping_cart</mat-icon>
+        <mat-icon *ngIf="addSuccess">check_circle</mat-icon>
+        <span>{{ addSuccess ? 'ĐÃ THÊM VÀO GIỎ' : 'THÊM VÀO GIỎ' }}</span>
+      </button>
+    </div>
+
+  </aside>
+</div>

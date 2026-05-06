@@ -177,7 +177,12 @@
   transition: background 0.15s;
 }
 
-.action-btn mat-icon { font-size: 15px; }
+.action-btn mat-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .action-btn.view   { background: #eff6ff; color: #3b82f6; }
 .action-btn.view:hover { background: #dbeafe; }
 .action-btn.edit   { background: #f0fdf4; color: #16a34a; }
@@ -215,7 +220,12 @@
 .page-btn:hover:not(:disabled):not(.active) { background: #f1f5f9; }
 .page-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
 .page-btn:disabled { color: #cbd5e1; cursor: not-allowed; }
-.page-btn mat-icon { font-size: 16px; }
+.page-btn mat-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 
 /* ══════════════════════════════════════════
@@ -430,6 +440,8 @@
   color: #94a3b8;
   flex-shrink: 0;
   margin-top: 1px;
+  display: flex;
+  justify-content: center;
 }
 
 .info-label {

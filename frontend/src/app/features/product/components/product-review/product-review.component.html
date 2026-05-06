@@ -1,77 +1,68 @@
-<div class="product-review">
-  <div class="review-header">
-    <h3>Đánh giá từ khách hàng</h3>
-    <div class="review-stats">
-      <div class="main-score">
-        <span class="score-number">4.8</span>
-        <div class="stars-wrap">
-          <mat-icon>star</mat-icon><mat-icon>star</mat-icon><mat-icon>star</mat-icon><mat-icon>star</mat-icon><mat-icon>star_half</mat-icon>
-        </div>
-        <p class="total-count">2,020 đánh giá</p>
-      </div>
+<div class="rev-card">
+  <p class="card-title">Đánh giá từ khách hàng</p>
 
-      <div class="rating-bars">
-        <div class="bar-item">
-          <span>5★</span>
-          <div class="progress-bg"><div class="progress-fill" style="width: 85%"></div></div>
-          <span>1,769</span>
+  <!-- Overview -->
+  <div class="rev-overview">
+    <div class="avg-block">
+      <div class="avg-num">{{ rating }}</div>
+      <div class="avg-stars">
+        <mat-icon
+          *ngFor="let s of stars"
+          class="star-ic"
+          [class.filled]="isStarFilled(s, rating)"
+          [class.half]="isStarHalf(s, rating)">
+          {{ isStarFilled(s, rating) ? 'star' : isStarHalf(s, rating) ? 'star_half' : 'star_border' }}
+        </mat-icon>
+      </div>
+      <span class="rev-cnt">{{ totalReviews | number }} đánh giá</span>
+    </div>
+
+    <div class="bar-list">
+      <div class="bar-item" *ngFor="let b of ratingBreakdown">
+        <span class="bar-star">{{ b.star }}★</span>
+        <div class="bar-bg">
+          <div class="bar-fill" [style.width.%]="b.pct"></div>
         </div>
-        <div class="bar-item">
-          <span>4★</span>
-          <div class="progress-bg"><div class="progress-fill" style="width: 10%"></div></div>
-          <span>201</span>
-        </div>
-        <div class="bar-item">
-          <span>3★</span>
-          <div class="progress-bg"><div class="progress-fill" style="width: 3%"></div></div>
-          <span>30</span>
-        </div>
-        <div class="bar-item">
-          <span>2★</span>
-          <div class="progress-bg"><div class="progress-fill" style="width: 1%"></div></div>
-          <span>14</span>
-        </div>
-        <div class="bar-item">
-          <span>1★</span>
-          <div class="progress-bg"><div class="progress-fill" style="width: 1%"></div></div>
-          <span>6</span>
-        </div>
+        <span class="bar-count">{{ b.count }}</span>
       </div>
     </div>
   </div>
 
-  <div class="review-reward">
-    <div class="reward-icon">
-      <mat-icon>card_giftcard</mat-icon>
-    </div>
-    <div class="reward-text">
-      <p class="reward-title">Đánh giá sản phẩm - Nhận ngay điểm thưởng</p>
-      <p class="reward-desc">Nhận <strong>50.000 điểm</strong> cho mỗi đánh giá kèm hình ảnh hợp lệ.</p>
-    </div>
-    <button class="join-btn">VIẾT ĐÁNH GIÁ</button>
-  </div>
-
-  <div class="review-list">
-    <div class="review-item" *ngFor="let item of [1,2,3]">
-      <div class="user-info">
-        <div class="user-avatar">D</div>
-        <div class="user-meta">
-          <strong>Trần Quốc Việt</strong>
-          <span class="verify-badge"><mat-icon>check_circle</mat-icon> Đã mua hàng</span>
+  <!-- Review list -->
+  <div class="rev-list">
+    <div class="rev-item" *ngFor="let r of visibleReviews">
+      <div class="rev-head">
+        <div class="av">{{ r.avatar }}</div>
+        <div class="rev-meta-group">
+          <span class="rev-name">{{ r.customerName }}</span>
+          <div class="rev-meta">
+            <mat-icon *ngIf="r.verified" class="verified-ic">verified</mat-icon>
+            <span *ngIf="r.verified">Đã mua hàng</span>
+          </div>
         </div>
-        <span class="review-date">21/03/2026</span>
+        <span class="rev-date">{{ r.date }}</span>
       </div>
-      <div class="item-rating">
-        <mat-icon *ngFor="let s of [1,2,3,4,5]">star</mat-icon>
+
+      <div class="rev-stars">
+        <mat-icon
+          *ngFor="let s of stars"
+          class="star-ic sm"
+          [class.filled]="s <= r.rating">
+          {{ s <= r.rating ? 'star' : 'star_border' }}
+        </mat-icon>
       </div>
-      <p class="review-content">Áo tennis dòng này mặc rất mát, thoát mồ hôi nhanh. Form ôm vừa vặn, rất phù hợp cho anh em chơi cường độ cao.</p>
+
+      <p class="rev-text">{{ r.comment }}</p>
     </div>
   </div>
 
-  <div class="see-all">
-    <a routerLink="/review" class="btn-more">
-      Xem tất cả 2,020 đánh giá
-      <mat-icon>chevron_right</mat-icon>
-    </a>
+  <!-- See more -->
+  <button class="see-all-btn" *ngIf="hasMore" (click)="loadMore()">
+    <mat-icon>chat_bubble_outline</mat-icon>
+    Xem thêm đánh giá ({{ reviews.length - displayCount }} còn lại)
+  </button>
+
+  <div class="no-more" *ngIf="!hasMore && reviews.length > 0">
+    Đã hiển thị tất cả {{ reviews.length }} đánh giá
   </div>
 </div>

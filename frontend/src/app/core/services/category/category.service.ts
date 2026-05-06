@@ -76,4 +76,12 @@ export class CategoryService {
   updateCategory(id: number, request: CategoryUpdateRequest): Observable<ApiResponse<CategoryAdminResponse>> {
     return this.http.put<ApiResponse<CategoryAdminResponse>>(`${this.API_URL}/${id}`, request);
   }
+
+  toggleShowOnHome(id: number): Observable<ApiResponse<any>> {
+    return this.http.patch<ApiResponse<any>>(`${this.API_URL}/${id}/toggle-show-on-home`, {});
+  }
+
+  deleteCategory(id: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`${this.API_URL}/${id}`);
+  }
 }

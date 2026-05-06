@@ -10,13 +10,11 @@ export const adminGuard: CanActivateFn = () => {
   return authService.currentUser$.pipe(
     map(authRes => {
 
-      // Chưa đăng nhập → về login
       if (!authRes) {
         return router.createUrlTree(['/auth/login']);
       }
 
-      // Không phải ADMIN → về trang chủ
-      if (authRes.userResponse.role !== 'ADMIN') {
+      if (authRes.userResponse.role === 'CUSTOMER') {
         return router.createUrlTree(['/']);
       }
 

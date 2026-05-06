@@ -28,4 +28,20 @@ public class BannerAdminController {
         BannerResponse response = bannerService.createBanner(request);
         return ResponseEntity.ok(ApiResponse.ok(response, "Thêm banner thành công"));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteBanner(
+            @PathVariable Long id
+    ) {
+        bannerService.deleteBanner(id);
+        return ResponseEntity.ok(ApiResponse.ok("Xóa banner thành công"));
+    }
+
+    @PatchMapping("/{id}/toggle-status")
+    public ResponseEntity<ApiResponse<BannerResponse>> toggleBannerStatus(
+            @PathVariable Long id
+    ) {
+        BannerResponse response = bannerService.toggleBannerStatus(id);
+        return ResponseEntity.ok(ApiResponse.ok(response, "Thay đổi trạng thái banner thành công"));
+    }
 }

@@ -49,4 +49,12 @@ export class BannerService {
   createBanner(request: BannerCreateRequest): Observable<ApiResponse<BannerResponse>> {
     return this.http.post<ApiResponse<BannerResponse>>(`${this.apiUrl}`, request);
   }
+
+  deleteBanner(id: number): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/${id}`);
+  }
+
+  toggleBannerStatus(id: number): Observable<ApiResponse<any>> {
+    return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/${id}/toggle-status`, {});
+  }
 }

@@ -37,7 +37,10 @@ public enum ErrorCode {
     INVALID_QUANTITY      ("INVENTORY_003", "Số lượng không hợp lệ",        HttpStatus.BAD_REQUEST),
 
     // ── Cart ────────────────────────────────────────
-    CART_ITEM_NOT_FOUND   ("CART_001", "Không tìm thấy sản phẩm trong giỏ hàng", HttpStatus.NOT_FOUND);
+    CART_ITEM_NOT_FOUND   ("CART_001", "Không tìm thấy sản phẩm trong giỏ hàng", HttpStatus.NOT_FOUND),
+
+    // ── Banner ─────────────────────────────────────
+    BANNER_NOT_FOUND      ("BANNER_001", "Không tìm thấy banner",           HttpStatus.NOT_FOUND);
 
     private final String code;
     private final String message;

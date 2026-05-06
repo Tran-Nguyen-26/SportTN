@@ -1,0 +1,279 @@
+<!-- Loading -->
+<div class="loading-wrap" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">Đang tải dữ liệu sản phẩm...</p>
+</div>
+
+<div class="add-product-page" *ngIf="!isLoading && product">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="page-title">Chi tiết sản phẩm</h1>
+        <p class="page-sub">Mã sản phẩm #{{ productId }}</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-cancel" (click)="goBack()">Quay lại</button>
+      <button class="btn-save" (click)="goToEdit()">
+        <mat-icon>edit</mat-icon>
+        Chỉnh sửa
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'info'"     (click)="activeTab = 'info'">
+      <mat-icon>info</mat-icon> Thông tin cơ bản
+    </button>
+    <button class="tab" [class.active]="activeTab === 'variants'" (click)="activeTab = 'variants'">
+      <mat-icon>style</mat-icon> Variants
+      <span class="tab-badge">{{ product.variants?.length || 0 }}</span>
+    </button>
+    <button class="tab" [class.active]="activeTab === 'images'"   (click)="activeTab = 'images'">
+      <mat-icon>photo_library</mat-icon> Hình ảnh
+    </button>
+  </div>
+
+  <!-- ── TAB: THÔNG TIN ─────────────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'info'">
+    <div class="form-grid">
+
+      <!-- Cột trái -->
+      <div class="form-col-main">
+        <div class="form-card">
+          <div class="form-card-title">Thông tin cơ bản</div>
+
+          <div class="form-group">
+            <label class="form-label">Tên sản phẩm</label>
+            <div class="view-field">{{ product.name }}</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mô tả sản phẩm</label>
+            <div class="view-field view-textarea">{{ product.description || '—' }}</div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-card-title">Phân loại</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Danh mục</label>
+              <div class="view-field">
+                <span class="category-tag">{{ getCategoryName(product.categoryId) }}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Thương hiệu</label>
+              <div class="view-field">{{ getBrandName(product.brandId) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cột phải -->
+      <div class="form-col-side">
+
+        <!-- Trạng thái -->
+        <div class="form-card">
+          <div class="form-card-title">Trạng thái</div>
+          <div class="toggle-row" style="pointer-events:none; opacity:.85">
+            <div class="toggle-info">
+              <span class="toggle-label">Đang kinh doanh</span>
+              <span class="toggle-sub">{{ product.active ? 'Hiển thị trên cửa hàng' : 'Đang ẩn' }}</span>
+            </div>
+            <div class="toggle" [class.on]="product.active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thống kê nhanh -->
+        <div class="form-card summary-card">
+          <div class="form-card-title">Thống kê nhanh</div>
+          <div class="summary-list">
+            <div class="summary-item">
+              <span class="summary-key">Tổng tồn kho</span>
+              <span class="summary-val">{{ totalStock }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Giá thấp nhất</span>
+              <span class="summary-val">{{ formatPrice(minPrice) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Số variants</span>
+              <span class="summary-val">{{ product.variants?.length || 0 }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-key">Ảnh phụ</span>
+              <span class="summary-val">{{ product.extraImageUrls?.length || 0 }} ảnh</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: VARIANTS ──────────────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'variants'">
+    <div class="form-card">
+      <div class="variant-header">
+        <div>
+          <div class="form-card-title">Danh sách variants</div>
+          <p class="form-card-sub">{{ product.variants?.length || 0 }} biến thể</p>
+        </div>
+      </div>
+
+      <div class="variant-empty" *ngIf="!product.variants?.length">
+        <mat-icon>style</mat-icon>
+        <p>Sản phẩm chưa có variant nào</p>
+      </div>
+
+      <div class="variant-list" *ngIf="product.variants?.length">
+        <div class="variant-item" *ngFor="let variant of product.variants; let i = index">
+
+          <div class="variant-index">{{ i + 1 }}</div>
+
+          <div class="variant-fields">
+
+            <!-- Row 1: SKU, màu, size -->
+            <div class="variant-row">
+              <div class="form-group">
+                <label class="form-label">SKU</label>
+                <div class="view-field slug-text">{{ variant.sku }}</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Màu sắc</label>
+                <div class="view-field">{{ variant.color }}</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Size</label>
+                <div class="view-field">{{ variant.size }}</div>
+              </div>
+            </div>
+
+            <!-- Row 2: giá, tồn kho, cân nặng -->
+            <div class="variant-row">
+              <div class="form-group">
+                <label class="form-label">Giá gốc</label>
+                <div class="view-field price-text">{{ formatPrice(variant.originalPrice) }}</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">
+                  Giá sale
+                  <span class="discount-badge"
+                        *ngIf="getDiscountPercent(variant.originalPrice, variant.salePrice) > 0">
+                    -{{ getDiscountPercent(variant.originalPrice, variant.salePrice) }}%
+                  </span>
+                </label>
+                <div class="view-field" [class.sale-price-text]="variant.salePrice">
+                  {{ variant.salePrice ? formatPrice(variant.salePrice) : '—' }}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tồn kho</label>
+                <div class="view-field"
+                     [class.low-stock]="variant.stockQuantity < 50"
+                     [class.no-stock]="variant.stockQuantity === 0">
+                  {{ variant.stockQuantity }}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cân nặng</label>
+                <div class="view-field">
+                  {{ variant.weightGram ? variant.weightGram + 'g' : '—' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Ảnh variant -->
+            <div class="variant-images-section" *ngIf="variant.imageUrls?.length">
+              <div class="variant-images-label">
+                <mat-icon>photo_library</mat-icon>
+                Hình ảnh variant ({{ variant.imageUrls.length }})
+              </div>
+              <div class="variant-images-grid">
+                <div class="variant-img-preview"
+                     *ngFor="let url of variant.imageUrls; let imgIdx = index">
+                  <img [src]="url" [alt]="variant.sku + ' ' + (imgIdx+1)">
+                  <div class="main-img-badge" *ngIf="imgIdx === 0">Chính</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Tổng -->
+      <div class="variant-summary" *ngIf="product.variants?.length">
+        <span class="vs-item">
+          <mat-icon>inventory</mat-icon>
+          Tổng tồn kho: <strong>{{ totalStock }}</strong>
+        </span>
+        <span class="vs-item">
+          <mat-icon>style</mat-icon>
+          Số variants: <strong>{{ product.variants.length }}</strong>
+        </span>
+        <span class="vs-item">
+          <mat-icon>payments</mat-icon>
+          Giá từ: <strong>{{ formatPrice(minPrice) }}</strong>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: HÌNH ẢNH ──────────────────────── -->
+  <div class="tab-content" *ngIf="activeTab === 'images'">
+    <div class="images-grid">
+
+      <!-- Ảnh chính -->
+      <div class="form-card">
+        <div class="form-card-title">Ảnh chính</div>
+        <p class="form-card-sub">Ảnh đại diện trong danh sách sản phẩm</p>
+        <div class="main-image-wrap">
+          <div class="image-preview main-preview" *ngIf="product.mainImageUrl">
+            <img [src]="product.mainImageUrl" [alt]="product.name">
+          </div>
+          <div class="view-field" *ngIf="!product.mainImageUrl" style="color:#94a3b8">
+            Chưa có ảnh chính
+          </div>
+        </div>
+      </div>
+
+      <!-- Ảnh phụ -->
+      <div class="form-card">
+        <div class="form-card-title">Ảnh phụ</div>
+        <p class="form-card-sub">
+          {{ product.extraImageUrls?.length || 0 }} ảnh — hiển thị trong trang chi tiết
+        </p>
+        <div class="extra-images-grid" *ngIf="product.extraImageUrls?.length">
+          <div class="image-preview extra-preview"
+               *ngFor="let url of product.extraImageUrls; let i = index">
+            <img [src]="url" [alt]="product.name + ' ' + (i+1)">
+          </div>
+        </div>
+        <div class="view-field" *ngIf="!product.extraImageUrls?.length"
+             style="color:#94a3b8">
+          Chưa có ảnh phụ
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Not found -->
+<div class="loading-wrap" *ngIf="!isLoading && !product">
+  <mat-icon style="font-size:48px;width:48px;height:48px;color:#cbd5e1">inventory_2</mat-icon>
+  <p class="loading-text">Không tìm thấy sản phẩm</p>
+  <button class="btn-cancel" (click)="goBack()" style="margin-top:12px">Quay lại danh sách</button>
+</div>

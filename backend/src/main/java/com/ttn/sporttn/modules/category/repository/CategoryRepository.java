@@ -47,14 +47,14 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "GROUP BY c.id, c.slug, p.name, c.displayOrder, c.showOnHome, c.active")
     Page<CategoryAdminResponse> findAllForAdmin(Pageable pageable);
 
-    @Query("SELECT c.id as categoryId, c.name as name,c.slug as slug, " +
+    @Query("SELECT c.id as categoryId, c.name as name,c.slug as slug, c.imageUrl as imageUrl," +
             "c.sectionTitle as sectionTitle, p.id as parentId, p.name as parentName, " +
             "COUNT(prod.id) as productCount, c.displayOrder as displayOrder, " +
             "c.showOnHome as showOnHome, c.active as active " +
             "FROM Category c " +
             "LEFT JOIN c.parent p " +
             "LEFT JOIN Product prod ON prod.category.id = c.id " +
-            "GROUP BY c.id, c.name, c.slug, c.sectionTitle, p.id, p.name, c.displayOrder, c.showOnHome, c.active")
+            "GROUP BY c.id, c.name, c.slug, c.sectionTitle, c.imageUrl, p.id, p.name, c.displayOrder, c.showOnHome, c.active")
     List<CategoryAdminResponse> findAllForAdmin();
 
     Optional<Category> findBySlug(@NotBlank(message = "Slug không được để trống") String slug);

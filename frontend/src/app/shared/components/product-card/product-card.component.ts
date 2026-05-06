@@ -1,11 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {Router} from "@angular/router";
-import {ProductCardResponse} from "../../../core/models/home-response/home-response";
+import { Router } from '@angular/router';
+import { ProductCardResponse } from '../../../core/models/home-response/home-response';
+// import {CartItem} from "../../../core/models/cart/cart.model";
+import {CartItem, DrawerProduct} from "../add-to-cart-drawer/add-to-cart-drawer.component";
 
-interface Spec {
-  icon: string;
-  text: string;
-}
+interface Spec { icon: string; text: string; }
 
 @Component({
   selector: 'app-product-card',
@@ -15,72 +14,68 @@ interface Spec {
 export class ProductCardComponent {
   @Input() product!: ProductCardResponse;
   @Input() specs: Spec[] = [];
-  @Output() addToCart = new EventEmitter<any>();
-  @Output() addToWishlist = new EventEmitter<any>();
+  @Output() addToCart     = new EventEmitter<ProductCardResponse>();
+  @Output() addToWishlist = new EventEmitter<ProductCardResponse>();
 
-  constructor(private router: Router) {
+  wishlisted = false;
+  drawerOpen = false;
+  selectedProduct: DrawerProduct | null = null;
+
+  constructor(private router: Router) {}
+
+  goToProduct(): void {
+    if (this.product?.slug) this.router.navigate(['/product', this.product.slug]);
   }
 
-  goToProduct(): void{
-    if (this.product.slug) {
-      this.router.navigate(['/product', this.product.slug]);
-    }
-  }
+  onAddToCart(): void { this.addToCart.emit(this.product); }
 
-  onAddToCart(): void {
-    this.addToCart.emit(this.product);
-  }
-
-  onAddToWishlist(): void {
+  toggleWish(e: Event): void {
+    e.stopPropagation();
+    this.wishlisted = !this.wishlisted;
     this.addToWishlist.emit(this.product);
   }
 
-  get name(): string {
-    return this.product?.name || '';
+  isSaleBadge(): boolean {
+    return !!this.label && this.label.startsWith('-');
   }
 
-  get brand(): string {
-    return this.product?.brandName || '';
-  }
+  get name(): string    { return this.product?.name ?? ''; }
+  get brand(): string   { return this.product?.brandName ?? ''; }
+  get image(): string   { return this.product?.mainImageUrl ?? ''; }
+  get rating(): number | undefined  { return this.product?.rating; }
+  get reviews(): number | undefined { return this.product?.reviewCount; }
 
   get newPrice(): number {
-    // Support both Product model (discountPrice) and simple data (newPrice)
     return this.product?.effectivePrice || this.product?.salePrice || 0;
   }
 
   get oldPrice(): number | null {
-    // Support both Product model and simple data (oldPrice)
-    return (this.product?.isOnSale) ? this.product.originalPrice : null;
-  }
-
-  get rating(): number | undefined {
-    return this.product?.rating;
-  }
-
-  get reviews(): number | undefined {
-    return this.product?.reviewCount;
+    return this.product?.isOnSale ? this.product.originalPrice : null;
   }
 
   get label(): string {
-    // 1. Ưu tiên số % giảm giá nếu sản phẩm đang sale
-    if (this.product?.isOnSale && this.product?.discountPercent > 0) {
+    if (this.product?.isOnSale && this.product?.discountPercent > 0)
       return `-${this.product.discountPercent}%`;
-    }
-
-    // 2. Nếu không sale thì check xem có phải hàng mới không
-    if (this.product?.isNew) {
-      return 'MỚI';
-    }
-
-    // 3. Cuối cùng là nhãn bán chạy
-    if (this.product?.isBestSeller) {
-      return 'BÁN CHẠY';
-    }
-
-    return ''; // Không có nhãn nào thì để trống
+    if (this.product?.isNew)        return 'MỚI';
+    if (this.product?.isBestSeller) return 'BÁN CHẠY';
+    return '';
   }
 
-  get image(): string {
-    return this.product?.mainImageUrl || '';
+
+  openDrawer(product: ProductCardResponse) {
+    this.selectedProduct = {
+      id: product.id,
+      name: product.name,
+      brand: product.brandName,
+      imageUrl: product.mainImageUrl,
+      price: product.effectivePrice,
+      originalPrice: product.originalPrice,
+      isOnSale: product.isOnSale,
+    };
+    this.drawerOpen = true;
+  }
+
+  onAddedToCart(item: CartItem) {
+    // gọi CartService.add(item)
   }
 }

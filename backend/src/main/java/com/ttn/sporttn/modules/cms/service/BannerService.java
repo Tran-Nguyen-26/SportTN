@@ -77,4 +77,34 @@ public class BannerService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public void deleteBanner(Long id) {
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BANNER_NOT_FOUND));
+
+        bannerRepository.delete(banner);
+    }
+
+    public BannerResponse toggleBannerStatus(Long id) {
+        Banner banner = bannerRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BANNER_NOT_FOUND));
+
+        Boolean currentActive = banner.getActive();
+        banner.setActive(currentActive == null || !currentActive);
+
+        Banner savedBanner = bannerRepository.save(banner);
+
+        return BannerResponse.builder()
+                .id(savedBanner.getId())
+                .title(savedBanner.getTitle())
+                .imageUrl(savedBanner.getImageUrl())
+                .linkUrl(savedBanner.getLinkUrl())
+                .position(savedBanner.getPosition())
+                .displayOrder(savedBanner.getDisplayOrder())
+                .active(savedBanner.getActive())
+                .categoryId(savedBanner.getCategory() != null ? savedBanner.getCategory().getId() : null)
+                .startDate(savedBanner.getStartDate())
+                .endDate(savedBanner.getEndDate())
+                .build();
+    }
 }

@@ -158,23 +158,28 @@ public class CategoryService {
         log.info("[CATEGORY] Xóa danh mục thành công. id={}", id);
     }
 
-    /**
-     * Toggle category active status (Admin only)
-     */
-    @Transactional
-    public CategoryResponse toggleCategoryStatus(Long id) {
-        log.info("[CATEGORY] Thay đổi trạng thái danh mục. id={}", id);
-        
-        Category category = categoryRepository.findById(id)
-            .orElseThrow(() -> {
-                log.warn("[CATEGORY] Danh mục không tìm thấy. id={}", id);
-                return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
-            });
+//    @Transactional
+//    public CategoryResponse toggleCategoryStatus(Long id) {
+//        log.info("[CATEGORY] Thay đổi trạng thái danh mục. id={}", id);
+//
+//        Category category = categoryRepository.findById(id)
+//            .orElseThrow(() -> {
+//                log.warn("[CATEGORY] Danh mục không tìm thấy. id={}", id);
+//                return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+//            });
+//
+//        category.setActive(!category.getActive());
+//        Category updated = categoryRepository.save(category);
+//        log.info("[CATEGORY] Thay đổi trạng thái thành công. id={}, active={}", updated.getId(), updated.getActive());
+//        return CategoryResponse.from(updated);
+//    }
 
-        category.setActive(!category.getActive());
-        Category updated = categoryRepository.save(category);
-        log.info("[CATEGORY] Thay đổi trạng thái thành công. id={}, active={}", updated.getId(), updated.getActive());
-        return CategoryResponse.from(updated);
+    @Transactional
+    public void toggleShowOnHome(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+        category.setShowOnHome(!category.isShowOnHome());
+        categoryRepository.save(category);
     }
 
     @Transactional(readOnly = true)

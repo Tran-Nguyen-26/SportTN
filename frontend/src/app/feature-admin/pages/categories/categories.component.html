@@ -90,7 +90,11 @@
           <td>
             <div class="cat-name-cell">
               <div class="cat-icon" [class.is-parent]="!cat.parentName">
-                <mat-icon>{{ cat.parentName ? 'folder_open' : 'account_tree' }}</mat-icon>
+                <img *ngIf="cat.imageUrl; else defaultIcon" [src]="cat.imageUrl" [alt]="cat.name" class="cat-img" />
+
+                <ng-template #defaultIcon>
+                  <mat-icon>{{ cat.parentName ? 'folder_open' : 'account_tree' }}</mat-icon>
+                </ng-template>
               </div>
               <div>
                 <div class="cat-name">{{ cat.name }}</div>

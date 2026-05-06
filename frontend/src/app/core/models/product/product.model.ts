@@ -70,7 +70,7 @@ export interface ProductAdminResponse {
 
 // variant-update-request.model.ts
 export interface VariantUpdateRequest {
-  id?: number; // Có id nếu là variant cũ, không có nếu là cái mới thêm ở FE
+  id?: number;
   sku: string;
   color: string;
   size: string;
@@ -78,7 +78,7 @@ export interface VariantUpdateRequest {
   salePrice: number;
   stockQuantity: number;
   weightGram: number;
-  imageUrls: string[]; // Danh sách URL ảnh cho variant
+  imageUrls: string[];
 }
 
 // product-update-request.model.ts

@@ -11,6 +11,7 @@ export interface ProductCardResponse {
   id: number;
   name: string;
   slug: string;
+  description: string;
   mainImageUrl: string;
   brandName: string;
   rating: number;

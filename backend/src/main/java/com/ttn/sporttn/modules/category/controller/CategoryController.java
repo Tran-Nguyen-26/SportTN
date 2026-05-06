@@ -14,14 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -103,16 +96,12 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.ok("Xóa danh mục thành công"));
     }
 
-    /**
-     * Toggle category active status (Admin only)
-     * PATCH /api/v1/categories/{id}/toggle-status
-     */
-    @PostMapping("/{id}/toggle-status")
+    @PatchMapping("/{id}/toggle-show-on-home")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<CategoryResponse>> toggleCategoryStatus(
+    public ResponseEntity<ApiResponse<Void>> toggleShowOnHome(
         @PathVariable Long id
     ) {
-        CategoryResponse category = categoryService.toggleCategoryStatus(id);
-        return ResponseEntity.ok(ApiResponse.ok(category, "Thay đổi trạng thái danh mục thành công"));
+        categoryService.toggleShowOnHome(id);
+        return ResponseEntity.ok(ApiResponse.ok("Thay đổi trạng thái danh mục thành công"));
     }
 }

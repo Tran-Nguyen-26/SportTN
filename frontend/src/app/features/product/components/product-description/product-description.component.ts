@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+// product-description.component.ts
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-product-description',
@@ -6,5 +7,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./product-description.component.css']
 })
 export class ProductDescriptionComponent {
+  @Input() description = '';
+  expanded = false;
 
+  toggleExpand(): void {
+    this.expanded = !this.expanded;
+  }
 }

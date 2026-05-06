@@ -18,7 +18,9 @@
           <strong>{{ auth.userResponse?.username }}</strong>
           <p>{{ auth.userResponse?.email }}</p>
         </li>
-        <li><a href="javascript:void(0)">{{ auth.userResponse?.totalPoints }} điểm</a></li>
+        <li *ngIf="auth.userResponse && isCustomer(auth.userResponse)">
+          <a href="javascript:void(0)">{{ auth.userResponse.totalPoints }} điểm</a>
+        </li>
         <li><a routerLink="/account/my-account">Tài khoản</a></li>
         <li><a routerLink="/account/address">Địa chỉ của tôi</a></li>
         <li><a routerLink="/account/order-history">Lịch sử mua hàng</a></li>

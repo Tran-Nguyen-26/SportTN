@@ -63,6 +63,17 @@ export interface ProductCreateRequest {
   variants: ProductVariantRequest[];
 }
 
+export interface ProductUpdateRequest {
+  name: string;
+  description: string;
+  slug: string;
+  categoryId: number;
+  brandId: number;
+  active: boolean;
+  mainImageUrl: string;
+  variants: ProductVariantRequest[];
+}
+
 export interface ProductReview {
   id: number;
   customerName: string;
@@ -154,7 +165,7 @@ export class AddProductComponent implements OnInit {
     private route: ActivatedRoute,
     private brandService: BrandService,
     private categoryService: CategoryService,
-    private productService: ProductService   // inject ProductService
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
@@ -191,6 +202,7 @@ export class AddProductComponent implements OnInit {
       this.mainImagePreview = 'assets/products/ao-chay-bo.jpg';
       this.isLoading = false;
     }, 500);
+
   }
 
   private loadBrands(): void {

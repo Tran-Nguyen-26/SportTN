@@ -7,11 +7,13 @@ import {
   ProductAdminResponse,
   ProductDetail,
   ProductPageResponse,
-  ProductUpdateRequest
 } from "../../models/product/product.model";
 import {ListRange} from "@angular/cdk/collections";
 import {PageResponse} from "../../models/page-response";
-import {ProductCreateRequest} from "../../../feature-admin/components/add-product/add-product.component";
+import {
+  ProductCreateRequest,
+  ProductUpdateRequest
+} from "../../../feature-admin/components/add-product/add-product.component";
 
 
 export interface ProductResponse {
@@ -66,5 +68,4 @@ export class ProductService {
   createProduct(request: ProductCreateRequest): Observable<ApiResponse<ProductResponse>> {
     return this.http.post<ApiResponse<ProductResponse>>(this.apiUrl, request);
   }
-
 }

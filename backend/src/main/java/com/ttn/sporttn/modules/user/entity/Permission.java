@@ -18,5 +18,7 @@ public class Permission {
     @Column(unique = true, nullable = false)
     private String name; // ví dụ: MANAGE_PRODUCTS
 
+    private String value;
+
     private String description;
 }

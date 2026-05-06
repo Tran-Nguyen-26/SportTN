@@ -1,48 +1,76 @@
-<div class="product-card" (click)="goToProduct()">
-  <!-- Old Price Badge -->
-  <div class="old-price-badge" *ngIf="oldPrice">
-    GIÁ CŨ {{ oldPrice | number:'1.0-0' }}<span class="k">K</span>
-  </div>
+<div class="pc" (click)="goToProduct()">
 
-  <!-- Image and Specs Container -->
-  <div class="image-specs-container">
-    <!-- Product Image -->
-    <div class="product-image">
-      <img [src]="image" alt="{{ name }}">
-      <span class="label" *ngIf="label">{{ label }}</span>
-    </div>
+  <!-- ── Image zone ── -->
+  <div class="pc-img-zone">
+    <img [src]="image" [alt]="name" loading="lazy" class="pc-img">
 
-    <!-- Specifications -->
-    <div class="specs-section" *ngIf="specs && specs.length > 0">
-      <div class="spec-item" *ngFor="let spec of specs">
-        <mat-icon class="spec-icon">{{ spec.icon }}</mat-icon>
-        <span class="spec-text">{{ spec.text }}</span>
-      </div>
-    </div>
-  </div>
+    <!-- Label badge -->
+    <span class="pc-badge pc-badge--sale"  *ngIf="isSaleBadge()">{{ label }}</span>
+    <span class="pc-badge pc-badge--new"   *ngIf="label === 'MỚI'">✦ MỚI</span>
+    <span class="pc-badge pc-badge--hot"   *ngIf="label === 'BÁN CHẠY'">🔥 BÁN CHẠY</span>
 
-  <!-- Product Info -->
-  <div class="product-info">
-    <!-- Price -->
-    <p class="price">
-      <span class="new-price">{{ newPrice | number:'1.0-0' }}đ</span>
-    </p>
+    <!-- Wishlist -->
+    <button class="pc-wish"
+            [class.pc-wish--active]="wishlisted"
+            (click)="toggleWish($event)"
+            title="Yêu thích">
+      <mat-icon>{{ wishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
 
-    <!-- Product Name -->
-    <h3 class="product-name">{{ name }}</h3>
-
-    <!-- Brand -->
-    <p class="brand">{{ brand }}</p>
-
-    <!-- Rating and Add to Cart -->
-    <div class="footer-section">
-      <div class="rating" *ngIf="rating">
-        <span class="stars">★ {{ rating }}</span>
-        <span class="review-count">({{ reviews }})</span>
-      </div>
-      <button mat-icon-button (click)="onAddToCart()" class="add-to-cart-btn" matTooltip="Thêm vào giỏ">
+    <!-- Quick-add overlay (hiện khi hover) -->
+    <div class="pc-quick">
+      <button class="pc-quick-btn" (click)="openDrawer(product); $event.stopPropagation()">
         <mat-icon>shopping_cart</mat-icon>
+        Thêm vào giỏ
       </button>
     </div>
   </div>
+
+  <!-- ── Specs strip ── -->
+  <div class="pc-specs" *ngIf="specs?.length">
+    <div class="pc-spec" *ngFor="let s of specs">
+      <mat-icon class="pc-spec-icon">{{ s.icon }}</mat-icon>
+      <span class="pc-spec-text">{{ s.text }}</span>
+    </div>
+  </div>
+
+  <!-- ── Info ── -->
+  <div class="pc-info">
+
+    <!-- Brand -->
+    <p class="pc-brand">{{ brand }}</p>
+
+    <!-- Name -->
+    <h3 class="pc-name">{{ name }}</h3>
+
+    <!-- Price row -->
+    <div class="pc-price-row">
+      <span class="pc-price-new">{{ newPrice | number:'1.0-0' }}đ</span>
+      <span class="pc-price-old" *ngIf="oldPrice">{{ oldPrice | number:'1.0-0' }}đ</span>
+    </div>
+
+    <!-- Footer: rating + cart -->
+    <div class="pc-footer">
+      <div class="pc-rating" *ngIf="rating">
+        <mat-icon class="pc-star">star</mat-icon>
+        <span class="pc-rating-val">{{ rating }}</span>
+        <span class="pc-review-count">({{ reviews }})</span>
+      </div>
+      <div class="pc-rating" *ngIf="!rating"></div>
+
+      <button class="pc-cart-btn"
+              (click)="openDrawer(product); $event.stopPropagation()"
+              title="Thêm vào giỏ hàng">
+        <mat-icon>shopping_cart</mat-icon>
+      </button>
+    </div>
+
+  </div>
 </div>
+
+<app-add-to-cart-drawer
+  [isOpen]="drawerOpen"
+  [product]="selectedProduct"
+  (closed)="drawerOpen = false"
+  (addedToCart)="onAddedToCart($event)"
+/>

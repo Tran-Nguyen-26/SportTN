@@ -1,40 +1,130 @@
-.product-description {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
+/* =====================================================================
+   product-description.component.css
+   ===================================================================== */
+
+.desc-card {
   background: #fff;
-  border: 1px solid #eee;
-  border-radius: 6px;
+  border: 0.5px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 20px;
 }
 
-.product-description h3 {
-  font-size: 1.2rem;
+.card-title {
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
+  color: #0F172A;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F1F5F9;
 }
 
-.product-description p {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: #555;
+/* ── Description body ────────────────────────────────────────────── */
+.desc-body {
+  overflow: hidden;
+  transition: max-height .35s ease;
+  max-height: 2000px; /* expanded */
 }
 
-.benefits {
+.desc-body.collapsed {
+  max-height: 90px;
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+}
+
+.desc-p {
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.75;
+  margin: 0 0 12px;
+  white-space: pre-wrap;
+}
+
+.desc-p:last-child { margin-bottom: 0; }
+
+/* ── Benefit grid ────────────────────────────────────────────────── */
+.benefit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.benefit-item {
+  background: #F8FAFC;
+  border: 0.5px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.benefit-item h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 4px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 5px;
 }
 
-.benefit h4 {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #0066cc;
+.benefit-item h4 mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: #0EA5E9;
 }
 
-.benefit p {
-  font-size: 0.9rem;
-  color: #444;
+.benefit-item p {
+  font-size: 11px;
+  color: #64748B;
+  line-height: 1.5;
+  margin: 0;
 }
+
+/* ── Specs table ─────────────────────────────────────────────────── */
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 12px 0;
+}
+
+.spec-table tr:nth-child(even) td { background: #F8FAFC; }
+
+.spec-table td {
+  padding: 8px 12px;
+  color: #64748B;
+  border-bottom: 0.5px solid #F1F5F9;
+}
+
+.spec-table td:first-child {
+  font-weight: 600;
+  color: #374151;
+  width: 40%;
+}
+
+/* ── Toggle button ───────────────────────────────────────────────── */
+.see-all-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 9px;
+  border: 0.5px solid #E2E8F0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  color: #64748B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background .14s, color .14s;
+  font-family: inherit;
+}
+
+.see-all-btn:hover {
+  background: #F8FAFC;
+  color: #0284C7;
+  border-color: #BAE2FD;
+}
+
+.see-all-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }

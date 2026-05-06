@@ -275,7 +275,12 @@
   transition: background 0.15s;
 }
 
-.action-btn mat-icon { font-size: 15px; }
+.action-btn mat-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .action-btn.view   { background: #eff6ff; color: #3b82f6; }
@@ -373,7 +378,12 @@
 }
 
 .close-btn:hover { background: #f1f5f9; color: #0f172a; }
-.close-btn mat-icon { font-size: 18px; }
+.close-btn mat-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Drawer body */
 .drawer-body {
@@ -508,7 +518,12 @@
   flex-shrink: 0;
 }
 
-.role-opt-icon mat-icon { font-size: 18px; }
+.role-opt-icon mat-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .ri-admin     { background: #faf5ff; color: #7c3aed; }
 .ri-staff     { background: #eff6ff; color: #2563eb; }
@@ -537,6 +552,9 @@
   font-size: 18px;
   color: #3b82f6;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── PERMISSIONS GRID ─────────────────────────── */
@@ -567,6 +585,9 @@
 .perm-checkbox mat-icon {
   font-size: 18px;
   color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .perm-item.checked .perm-checkbox mat-icon { color: #3b82f6; }
@@ -792,6 +813,9 @@
   color: #64748b;
   flex-shrink: 0;
   margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .act-label {
@@ -827,6 +851,9 @@
   color: #e2e8f0;
   flex-shrink: 0;
   margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .perm-full-item.has-perm mat-icon { color: #16a34a; }
@@ -867,7 +894,12 @@
   flex-shrink: 0;
 }
 
-.log-icon mat-icon { font-size: 15px; }
+.log-icon mat-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .log-icon.create { background: #f0fdf4; color: #16a34a; }
 .log-icon.update { background: #eff6ff; color: #2563eb; }

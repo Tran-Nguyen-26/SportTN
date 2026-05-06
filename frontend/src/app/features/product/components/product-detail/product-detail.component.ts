@@ -9,20 +9,17 @@ import { ProductPageResponse, VariantResponse } from "../../../../core/models/pr
 export class ProductDetailComponent {
   @Input() productDetail?: ProductPageResponse;
 
-  // Sử dụng biến thường hoặc Signal tùy theo thói quen của Nguyên
   selectedColor: string | null = null;
   selectedSizeName: string | null = null;
   selectedVariantId: number | null = null;
   selectedQty: number = 1;
 
-  // Lấy danh sách màu không trùng lặp
   getUniqueColors(): string[] {
     if (!this.productDetail) return [];
     const colors = this.productDetail.variantResponses.map(v => v.color);
     return [...new Set(colors)];
   }
 
-  // Khi người dùng click chọn Màu sắc
   selectColor(color: string) {
     this.selectedColor = color;
     // Reset size và variant khi đổi màu để tránh xung đột
@@ -30,7 +27,6 @@ export class ProductDetailComponent {
     this.selectedVariantId = null;
   }
 
-  // Khi người dùng click chọn Kích cỡ
   selectVariant(variant: VariantResponse) {
     if (variant.stockQuantity > 0) {
       this.selectedVariantId = variant.id;

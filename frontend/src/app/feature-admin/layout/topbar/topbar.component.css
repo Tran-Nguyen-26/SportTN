@@ -41,18 +41,19 @@
 }
 
 .bc-root {
-  font-size: 13px;
+  font-size: 18px;
   color: #94a3b8;
   font-weight: 500;
 }
 
 .bc-sep {
-  font-size: 16px;
+  font-size: 20px;
   color: #cbd5e1;
+  margin-top: 8px;
 }
 
 .bc-current {
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 600;
   color: #0f172a;
 }
@@ -85,7 +86,7 @@
   background: #fff;
 }
 
-.search-icon { font-size: 16px; color: #94a3b8; flex-shrink: 0; }
+.search-icon { font-size: 24px; color: #94a3b8; flex-shrink: 0;}
 
 .search-input {
   flex: 1;

@@ -1,21 +1,30 @@
-import { Component } from '@angular/core';
+import {Component, computed, OnInit, signal} from '@angular/core';
+import { Router } from '@angular/router';
+import {
+  UserService,
+  AdminUserCreateRequest,
+  AdminUserUpdateRequest,
+  PermissionOption
+} from '../../../core/services/user/user.service';
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'STAFF' | 'WAREHOUSE';
 
 export interface ActivityLog {
   type: 'create' | 'edit' | 'delete' | 'login' | 'order';
   action: string;
-  time: string;
+  time: Date;
 }
 
 export interface AdminUser {
   id: number;
-  name: string;
+  username: string;
+  fullname: string;
   email: string;
+  lastDevice: string;
   phone: string;
   role: UserRole;
-  permissions: string[];
-  active: boolean;
+  permissions: PermissionOption[];
+  status: string;
   lastLogin: string;
   createdAt: string;
   avatarColor: string;
@@ -32,10 +41,11 @@ export interface UserForm {
   phone: string;
   role: UserRole | '';
   permissions: string[];
-  active: boolean;
+  status: string;
 }
 
 export interface Permission {
+  id: number;
   value: string;
   label: string;
   desc: string;
@@ -46,174 +56,122 @@ export interface Permission {
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
-export class UsersComponent {
+export class UsersComponent implements OnInit {
 
-  searchQuery   = '';
-  selectedRole  = '';
+  searchQuery    = '';
+  selectedRole   = '';
   selectedStatus = '';
-  drawerVisible = false;
-  showPassword  = false;
+  drawerVisible  = false;
+  showPassword   = false;
+  isSaving       = false;
+  isLoading      = false;
+
   editingUser: AdminUser | null = null;
-  detailUser: AdminUser | null = null;
+  detailUser:  AdminUser | null = null;
 
   form: UserForm = this.emptyForm();
 
   roleOptions = [
-    { value: '',            label: 'Tất cả vai trò'    },
-    { value: 'SUPER_ADMIN', label: 'Super Admin'        },
-    { value: 'ADMIN',       label: 'Admin'              },
-    { value: 'STAFF',       label: 'Nhân viên'          },
-    { value: 'WAREHOUSE',   label: 'Thủ kho'            },
+    { value: '',            label: 'Tất cả vai trò' },
+    { value: 'SUPER_ADMIN', label: 'Super Admin'     },
+    { value: 'ADMIN',       label: 'Admin'           },
+    { value: 'STAFF',       label: 'Nhân viên'       },
+    { value: 'WAREHOUSE',   label: 'Thủ kho'         },
   ];
 
   roleDefinitions = [
-    {
-      value: 'SUPER_ADMIN' as UserRole,
-      label: 'Super Admin',
-      icon: 'security',
-      desc: 'Toàn quyền hệ thống, không thể bị giới hạn',
-    },
-    {
-      value: 'ADMIN' as UserRole,
-      label: 'Admin',
-      icon: 'admin_panel_settings',
-      desc: 'Quản lý sản phẩm, đơn hàng, khách hàng',
-    },
-    {
-      value: 'STAFF' as UserRole,
-      label: 'Nhân viên',
-      icon: 'support_agent',
-      desc: 'Xử lý đơn hàng, hỗ trợ khách hàng',
-    },
-    {
-      value: 'WAREHOUSE' as UserRole,
-      label: 'Thủ kho',
-      icon: 'warehouse',
-      desc: 'Quản lý tồn kho, nhập xuất hàng',
-    },
+    { value: 'SUPER_ADMIN' as UserRole, label: 'Super Admin', icon: 'security',
+      desc: 'Toàn quyền hệ thống, không thể bị giới hạn' },
+    { value: 'ADMIN' as UserRole, label: 'Admin', icon: 'admin_panel_settings',
+      desc: 'Quản lý sản phẩm, đơn hàng, khách hàng' },
+    { value: 'STAFF' as UserRole, label: 'Nhân viên', icon: 'support_agent',
+      desc: 'Xử lý đơn hàng, hỗ trợ khách hàng' },
+    { value: 'WAREHOUSE' as UserRole, label: 'Thủ kho', icon: 'warehouse',
+      desc: 'Quản lý tồn kho, nhập xuất hàng' },
   ];
 
-  allPermissions: Permission[] = [
-    { value: 'VIEW_DASHBOARD',  label: 'Xem Dashboard',    desc: 'Xem tổng quan và báo cáo' },
-    { value: 'MANAGE_PRODUCTS', label: 'Quản lý sản phẩm', desc: 'Thêm, sửa, xóa sản phẩm & danh mục' },
-    { value: 'MANAGE_ORDERS',   label: 'Quản lý đơn hàng', desc: 'Xem, xử lý, hủy đơn hàng' },
-    { value: 'MANAGE_CUSTOMERS',label: 'Quản lý khách hàng',desc: 'Xem và chỉnh sửa thông tin KH' },
-    { value: 'MANAGE_INVENTORY',label: 'Quản lý tồn kho',  desc: 'Nhập/xuất kho, cập nhật số lượng' },
-    { value: 'MANAGE_VOUCHERS', label: 'Quản lý voucher',  desc: 'Tạo, sửa, xóa mã giảm giá' },
-    { value: 'MANAGE_BANNERS',  label: 'Quản lý banner',   desc: 'Cập nhật hình ảnh trang chủ' },
-    { value: 'MANAGE_FLASH_SALE',label: 'Flash Sale',      desc: 'Tạo và quản lý flash sale' },
-    { value: 'VIEW_ANALYTICS',  label: 'Xem Analytics',    desc: 'Báo cáo doanh thu chi tiết' },
-    { value: 'MANAGE_USERS',    label: 'Quản lý Users',    desc: 'Tạo và phân quyền tài khoản' },
-    { value: 'SEND_NOTIFS',     label: 'Gửi thông báo',    desc: 'Push notification đến khách hàng' },
-    { value: 'MANAGE_SETTINGS', label: 'Cài đặt hệ thống', desc: 'Thông tin cửa hàng, cấu hình' },
-  ];
+  allPermissions: Permission[] = [];
 
-  // Preset permissions theo role
   private rolePermissions: Record<UserRole, string[]> = {
-    SUPER_ADMIN: this.allPermissions.map(p => p.value),
+    SUPER_ADMIN: [], // sẽ fill sau khi load permissions
     ADMIN: [
       'VIEW_DASHBOARD','MANAGE_PRODUCTS','MANAGE_ORDERS',
       'MANAGE_CUSTOMERS','MANAGE_VOUCHERS','MANAGE_BANNERS',
       'MANAGE_FLASH_SALE','VIEW_ANALYTICS','SEND_NOTIFS',
     ],
-    STAFF: [
-      'VIEW_DASHBOARD','MANAGE_ORDERS','MANAGE_CUSTOMERS',
-    ],
-    WAREHOUSE: [
-      'VIEW_DASHBOARD','MANAGE_INVENTORY','MANAGE_PRODUCTS',
-    ],
+    STAFF:     ['VIEW_DASHBOARD','MANAGE_ORDERS','MANAGE_CUSTOMERS'],
+    WAREHOUSE: ['VIEW_DASHBOARD','MANAGE_INVENTORY','MANAGE_PRODUCTS'],
   };
 
-  users: AdminUser[] = [
-    {
-      id: 1, name: 'Trần Minh Tuấn', email: 'tuan.admin@sport.vn',
-      phone: '0901 234 567', role: 'SUPER_ADMIN',
-      permissions: this.rolePermissions['SUPER_ADMIN'],
-      active: true, lastLogin: '18/07/2025 14:30', createdAt: '01/01/2024',
-      avatarColor: '#7c3aed', isCurrentUser: true,
-      actionCount: 2480, device: 'Chrome · MacOS',
-      activityLog: [
-        { type: 'edit',   action: 'Cập nhật banner trang chủ',           time: '14:28 hôm nay' },
-        { type: 'order',  action: 'Xác nhận đơn hàng #10284',            time: '14:10 hôm nay' },
-        { type: 'create', action: 'Tạo flash sale "Đồ Bơi Mùa Hè"',     time: '09:42 hôm nay' },
-        { type: 'edit',   action: 'Cập nhật giá sản phẩm #45',           time: 'Hôm qua 16:20'  },
-        { type: 'login',  action: 'Đăng nhập thành công',                time: 'Hôm qua 08:05'  },
-      ],
-    },
-    {
-      id: 2, name: 'Nguyễn Thị Hoa', email: 'hoa.staff@sport.vn',
-      phone: '0912 345 678', role: 'ADMIN',
-      permissions: this.rolePermissions['ADMIN'],
-      active: true, lastLogin: '18/07/2025 09:15', createdAt: '15/03/2024',
-      avatarColor: '#2563eb',
-      actionCount: 1240, device: 'Firefox · Windows',
-      activityLog: [
-        { type: 'order',  action: 'Xử lý đơn hàng #10282',              time: '09:20 hôm nay' },
-        { type: 'edit',   action: 'Sửa thông tin sản phẩm Kính Bơi TYR', time: '09:05 hôm nay' },
-        { type: 'create', action: 'Thêm voucher SUMMER25',               time: 'Hôm qua 14:30'  },
-        { type: 'login',  action: 'Đăng nhập thành công',                time: 'Hôm qua 08:00'  },
-      ],
-    },
-    {
-      id: 3, name: 'Lê Văn Khánh', email: 'khanh.staff@sport.vn',
-      phone: '0923 456 789', role: 'STAFF',
-      permissions: this.rolePermissions['STAFF'],
-      active: true, lastLogin: '17/07/2025 17:45', createdAt: '01/05/2024',
-      avatarColor: '#16a34a',
-      actionCount: 520, device: 'Chrome · Windows',
-      activityLog: [
-        { type: 'order',  action: 'Xác nhận 8 đơn hàng',                time: 'Hôm qua 17:40'  },
-        { type: 'order',  action: 'Hủy đơn hàng #10270 theo yêu cầu',   time: 'Hôm qua 15:10'  },
-        { type: 'login',  action: 'Đăng nhập thành công',                time: 'Hôm qua 08:00'  },
-      ],
-    },
-    {
-      id: 4, name: 'Phạm Thị Thu', email: 'thu.warehouse@sport.vn',
-      phone: '0934 567 890', role: 'WAREHOUSE',
-      permissions: this.rolePermissions['WAREHOUSE'],
-      active: true, lastLogin: '18/07/2025 07:30', createdAt: '10/06/2024',
-      avatarColor: '#ea580c',
-      actionCount: 380, device: 'Chrome · Android',
-      activityLog: [
-        { type: 'create', action: 'Nhập kho 200 Mũ Bơi Speedo',         time: '07:35 hôm nay' },
-        { type: 'edit',   action: 'Cập nhật tồn kho 12 SKU',            time: 'Hôm qua 16:00'  },
-        { type: 'login',  action: 'Đăng nhập thành công',                time: 'Hôm qua 07:00'  },
-      ],
-    },
-    {
-      id: 5, name: 'Hoàng Đức Nam', email: 'nam.admin@sport.vn',
-      phone: '0945 678 901', role: 'ADMIN',
-      permissions: ['VIEW_DASHBOARD','MANAGE_PRODUCTS','VIEW_ANALYTICS'],
-      active: false, lastLogin: '01/06/2025 10:00', createdAt: '20/02/2024',
-      avatarColor: '#0891b2',
-      actionCount: 890, device: 'Safari · iPhone',
-      activityLog: [
-        { type: 'login',  action: 'Đăng nhập thành công',  time: '01/06 10:00' },
-        { type: 'edit',   action: 'Chỉnh sửa danh mục',    time: '31/05 14:20' },
-      ],
-    },
-  ];
+  users = signal<AdminUser[]>([]);
 
-  // ── Computed ────────────────────────────────
-  activeCount() { return this.users.filter(u => u.active).length; }
+  constructor(private router: Router, private userService: UserService) {}
 
-  getRoleCount(role: string) {
-    return this.users.filter(u => u.role === role).length;
+  ngOnInit(): void {
+    this.loadPermissions();
+    this.loadAdminUsers();
+  }
+
+  // ── Load permissions từ DB ────────────────────────────────────────
+
+  loadPermissions(): void {
+    this.userService.getPermissions().subscribe({
+      next: (res) => {
+        if (res.data) {
+          this.allPermissions = res.data.map(p => ({
+            id: p.id,
+            value: p.name,
+            label: p.value,
+            desc:  p.description ?? '',
+          }));
+          // SUPER_ADMIN có tất cả permissions
+          this.rolePermissions.SUPER_ADMIN = this.allPermissions.map(p => p.value);
+          console.log('[Users] Permissions loaded:', this.allPermissions.length);
+        }
+      },
+      error: (err) => console.error('[Users] Lỗi tải permissions:', err)
+    });
+  }
+
+  // ── Load users ────────────────────────────────────────────────────
+
+  loadAdminUsers(): void {
+    this.isLoading = true;
+    this.userService.getAdminUsers().subscribe({
+      next: (res) => {
+        if (res.data) {
+          this.users.set(res.data);
+          console.log('[Users] Danh sách admin:', res.data);
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('[Users] Lỗi tải danh sách:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // ── Computed ──────────────────────────────────────────────────────
+
+  activeCount(): number { return this.users().filter(u => u.status).length; }
+
+  getRoleCount(role: string): number {
+    return this.users().filter(u => u.role === role).length;
   }
 
   get filteredUsers(): AdminUser[] {
-    return this.users.filter(u => {
-      const q = this.searchQuery.toLowerCase();
-      const matchQ = !q
-        || u.name.toLowerCase().includes(q)
-        || u.email.toLowerCase().includes(q);
-      const matchR = !this.selectedRole || u.role === this.selectedRole;
-      const matchS = !this.selectedStatus || u.active.toString() === this.selectedStatus;
+    return this.users().filter(u => {
+      const q      = this.searchQuery.toLowerCase();
+      const matchQ = !q || u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+      const matchR = !this.selectedRole   || u.role === this.selectedRole;
+      const matchS = !this.selectedStatus || u.status.toString() === this.selectedStatus;
       return matchQ && matchR && matchS;
     });
   }
 
-  // ── Role helpers ─────────────────────────────
+  // ── Role / Permission helpers ─────────────────────────────────────
+
   getRoleIcon(role: UserRole): string {
     const map: Record<UserRole, string> = {
       SUPER_ADMIN: 'security',
@@ -236,49 +194,50 @@ export class UsersComponent {
 
   getPermShort(perm: string): string {
     const map: Record<string, string> = {
-      VIEW_DASHBOARD:   'Dashboard',
-      MANAGE_PRODUCTS:  'Sản phẩm',
-      MANAGE_ORDERS:    'Đơn hàng',
-      MANAGE_CUSTOMERS: 'KH',
-      MANAGE_INVENTORY: 'Kho',
-      MANAGE_VOUCHERS:  'Voucher',
-      MANAGE_BANNERS:   'Banner',
-      MANAGE_FLASH_SALE:'Flash',
-      VIEW_ANALYTICS:   'Analytics',
-      MANAGE_USERS:     'Users',
-      SEND_NOTIFS:      'Notif',
-      MANAGE_SETTINGS:  'Settings',
+      VIEW_DASHBOARD:   'Dashboard', MANAGE_PRODUCTS:  'Sản phẩm',
+      MANAGE_ORDERS:    'Đơn hàng',  MANAGE_CUSTOMERS: 'KH',
+      MANAGE_INVENTORY: 'Kho',       MANAGE_VOUCHERS:  'Voucher',
+      MANAGE_BANNERS:   'Banner',    MANAGE_FLASH_SALE: 'Flash',
+      VIEW_ANALYTICS:   'Analytics', MANAGE_USERS:     'Users',
+      SEND_NOTIFS:      'Notif',     MANAGE_SETTINGS:  'Settings',
     };
     return map[perm] ?? perm;
   }
 
+  hasPermission(user: AdminUser | null, permValue: string): boolean {
+    if (!user || !user.permissions) return false;
+    return user.permissions.some(p =>
+      (p as any).name === permValue ||
+      (p as any).code === permValue ||
+      (p as any).value === permValue
+    );
+  }
+
   getLogIcon(type: string): string {
     const map: Record<string, string> = {
-      create: 'add_circle',
-      edit:   'edit',
-      delete: 'delete',
-      login:  'login',
-      order:  'shopping_bag',
+      create: 'add_circle', edit: 'edit', delete: 'delete',
+      login:  'login',      order: 'shopping_bag',
     };
     return map[type] ?? 'circle';
   }
 
-  // ── Drawer ────────────────────────────────────
+  // ── Drawer ────────────────────────────────────────────────────────
+
   openDrawer(user?: AdminUser): void {
     if (user) {
       this.editingUser = user;
       this.form = {
-        name:        user.name,
+        name:        user.username,
         email:       user.email,
         password:    '',
         phone:       user.phone,
         role:        user.role,
-        permissions: [...user.permissions],
-        active:      user.active,
+        permissions: user.permissions.map(p => (p as any).value || (p as any).name ||''),
+        status:      user.status,
       };
     } else {
       this.editingUser = null;
-      this.form = this.emptyForm();
+      this.form        = this.emptyForm();
     }
     this.showPassword  = false;
     this.drawerVisible = true;
@@ -289,6 +248,7 @@ export class UsersComponent {
     this.editingUser   = null;
     this.form          = this.emptyForm();
     this.showPassword  = false;
+    this.isSaving      = false;
   }
 
   onOverlayClick(e: MouseEvent): void {
@@ -308,49 +268,113 @@ export class UsersComponent {
 
   togglePerm(perm: string): void {
     const idx = this.form.permissions.indexOf(perm);
-    if (idx >= 0) {
-      this.form.permissions.splice(idx, 1);
-    } else {
-      this.form.permissions.push(perm);
-    }
+    if (idx >= 0) this.form.permissions.splice(idx, 1);
+    else          this.form.permissions.push(perm);
   }
+
+  // ── Save (create / update) ────────────────────────────────────────
 
   save(): void {
     if (!this.isFormValid()) return;
+    this.isSaving = true;
+
     if (this.editingUser) {
-      Object.assign(this.editingUser, {
+      // UPDATE
+      const request: AdminUserUpdateRequest = {
         name:        this.form.name,
         phone:       this.form.phone,
         role:        this.form.role as UserRole,
         permissions: [...this.form.permissions],
-        active:      this.form.active,
+        status:      this.form.status,
+      };
+
+      this.userService.updateAdminUser(this.editingUser.id, request).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.users.update(list =>
+              list.map(u => u.id === res.data!.id ? { ...u, ...res.data! } : u)
+            );
+          }
+          this.isSaving = false;
+          this.closeDrawer();
+        },
+        error: (err) => {
+          console.error('[Users] Lỗi cập nhật:', err);
+          this.isSaving = false;
+        }
       });
+
     } else {
-      this.users.push({
-        id:          Date.now(),
+      // CREATE
+      const request: AdminUserCreateRequest = {
         name:        this.form.name,
         email:       this.form.email,
+        password:    this.form.password,
         phone:       this.form.phone,
         role:        this.form.role as UserRole,
         permissions: [...this.form.permissions],
-        active:      this.form.active,
-        lastLogin:   '',
-        createdAt:   new Date().toLocaleDateString('vi-VN'),
-        avatarColor: this.randomColor(),
-        actionCount: 0,
-        device:      '',
-        activityLog: [],
+        status:      this.form.status,
+      };
+
+      this.userService.createAdminUser(request).subscribe({
+        next: (res) => {
+          if (res.data) {
+            // Thêm user mới vào đầu list
+            this.users.update(list => [res.data!, ...list]);
+          }
+          this.isSaving = false;
+          this.closeDrawer();
+        },
+        error: (err) => {
+          console.error('[Users] Lỗi tạo user:', err);
+          this.isSaving = false;
+        }
       });
     }
-    this.closeDrawer();
   }
+
+  // ── Toggle status ─────────────────────────────────────────────────
 
   toggleUserStatus(user: AdminUser): void {
     if (user.isCurrentUser) return;
-    user.active = !user.active;
+
+    this.userService.toggleAdminUserStatus(user.id, !user.status).subscribe({
+      next: (res) => {
+        if (res.data) {
+          this.users.update(list =>
+            list.map(u => u.id === user.id ? { ...u, active: res.data!.status } : u)
+          );
+        }
+      },
+      error: (err) => console.error('[Users] Lỗi toggle status:', err)
+    });
   }
 
-  // ── Detail modal ─────────────────────────────
+  toggleStatus() {
+    if (this.form.status === 'ACTIVE') {
+      this.form.status = 'INACTIVE';
+    } else {
+      this.form.status = 'ACTIVE';
+    }
+  }
+
+
+  // ── Delete ────────────────────────────────────────────────────────
+
+  deleteUser(user: AdminUser): void {
+    if (user.isCurrentUser) return;
+    if (!confirm(`Xóa tài khoản "${user.username}"? Hành động này không thể hoàn tác.`)) return;
+
+    this.userService.deleteAdminUser(user.id).subscribe({
+      next: () => {
+        this.users.update(list => list.filter(u => u.id !== user.id));
+      },
+      error: (err) => console.error('[Users] Lỗi xóa user:', err)
+    });
+  }
+
+  // ── Detail modal ──────────────────────────────────────────────────
+
   openDetail(user: AdminUser): void {
     this.detailUser    = user;
     this.drawerVisible = false;
@@ -368,7 +392,10 @@ export class UsersComponent {
     if (u) this.openDrawer(u);
   }
 
-  // ── Helpers ──────────────────────────────────
+  usersLength = computed(() => this.users().length);
+
+  // ── Helpers ───────────────────────────────────────────────────────
+
   private randomColor(): string {
     const colors = ['#2563eb','#7c3aed','#16a34a','#ea580c','#0891b2','#d97706','#dc2626'];
     return colors[Math.floor(Math.random() * colors.length)];
@@ -377,7 +404,7 @@ export class UsersComponent {
   private emptyForm(): UserForm {
     return {
       name: '', email: '', password: '', phone: '',
-      role: '', permissions: [], active: true,
+      role: '', permissions: [], status: 'ACTIVE',
     };
   }
 }

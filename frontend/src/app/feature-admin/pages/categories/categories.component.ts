@@ -160,13 +160,34 @@ export class CategoriesComponent implements OnInit {
   // ── Toggle hiện home ───────────────────────────────────────────
   toggleShowOnHomeStatus(cat: CategoryAdminResponse): void {
     cat.showOnHome = !cat.showOnHome;
-    // TODO: this.categoryService.updateShowOnHome(cat.id, cat.showOnHome).subscribe(...)
+    this.categoryService.toggleShowOnHome(cat.categoryId).subscribe({
+      next: (res) => {
+        console.log('Cập nhật trạng thái thành công:', res);
+      },
+      error: (err) => {
+        console.error('Lỗi khi cập nhật trạng thái:', err);
+        cat.showOnHome = !cat.showOnHome;
+      }
+    })
   }
 
   // ── Xóa ────────────────────────────────────────────────────────
   onDelete(cat: CategoryAdminResponse): void {
+    const categoryId = cat.categoryId;
+
     if (!confirm(`Xóa danh mục "${cat.name}"?`)) return;
-    // TODO: this.categoryService.delete(cat.id).subscribe(() => this.loadCategories())
-    console.log('Xóa danh mục:', cat.categoryId);
+
+    const previousList = this.categories();
+    this.categories.update(list => list.filter(c => (c.categoryId || c.categoryId) !== categoryId));
+
+    this.categoryService.deleteCategory(categoryId).subscribe({
+      next: (response) => {
+        console.log('Xóa danh mục thành công:', response);
+      },
+      error: (error) => {
+        console.error('Lỗi khi xóa danh mục:', error);
+        this.categories.set(previousList);
+      }
+    });
   }
 }

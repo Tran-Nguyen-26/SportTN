@@ -7,6 +7,7 @@ import { ProductDetailComponent } from './components/product-detail/product-deta
 import { ProductReviewComponent } from './components/product-review/product-review.component';
 import { ProductDescriptionComponent } from './components/product-description/product-description.component';
 import {MatIconModule} from "@angular/material/icon";
+import {SharedModule} from "../../shared/shared.module";
 
 
 @NgModule({
@@ -16,10 +17,11 @@ import {MatIconModule} from "@angular/material/icon";
     ProductReviewComponent,
     ProductDescriptionComponent
   ],
-  imports: [
-    CommonModule,
-    ProductRoutingModule,
-    MatIconModule
-  ]
+    imports: [
+        CommonModule,
+        ProductRoutingModule,
+        MatIconModule,
+        SharedModule
+    ]
 })
 export class ProductModule { }
