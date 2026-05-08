@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
-import { CartItem } from 'src/app/core/models/cart/cart.model';
+import { CartItemResponse } from "../../../../core/services/cart/cart.service";
 
 @Component({
   selector: 'app-cart-item',
@@ -11,7 +11,7 @@ import { CartItem } from 'src/app/core/models/cart/cart.model';
       state('in', style({ opacity: 1, transform: 'translateY(0)' })),
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(-10px)' }),
-        animate('200ms ease-out')
+        animate('240ms ease-out')
       ]),
       transition(':leave', [
         animate('160ms ease-in', style({ opacity: 0, transform: 'translateX(20px)' }))
@@ -20,45 +20,70 @@ import { CartItem } from 'src/app/core/models/cart/cart.model';
   ]
 })
 export class CartItemComponent {
-  @Input() item!: CartItem;
-  @Output() quantityChanged = new EventEmitter<{ itemId: string; quantity: number }>();
-  @Output() itemRemoved     = new EventEmitter<string>();
+  // 1. Tạo Signal nội bộ để chứa dữ liệu item
+  itemSignal = signal<CartItemResponse | null>(null);
+
+  @Input() set item(value: CartItemResponse) {
+    this.itemSignal.set(value);
+  }
+
+  @Output() quantityChanged = new EventEmitter<{ itemId: number; currentQty: number; delta: number }>();
+  @Output() itemRemoved = new EventEmitter<number>();
+
+  // --- 2. Computed Signals để tối ưu tính toán ---
+
+  savings = computed(() => {
+    const item = this.itemSignal();
+    if (!item) return 0;
+    const v = item.variant;
+    if (v.salePrice && v.salePrice < v.originalPrice) {
+      return (v.originalPrice - v.salePrice) * item.quantity;
+    }
+    return 0;
+  });
+
+  savingsPercent = computed(() => {
+    const item = this.itemSignal();
+    if (!item) return 0;
+    const v = item.variant;
+    if (!v.originalPrice || v.originalPrice === 0 || !v.salePrice) return 0;
+    return Math.round(((v.originalPrice - v.salePrice) / v.originalPrice) * 100);
+  });
+
+  totalPrice = computed(() => this.itemSignal()?.subTotal || 0);
+
+  originalTotal = computed(() => {
+    const item = this.itemSignal();
+    return item ? item.variant.originalPrice * item.quantity : 0;
+  });
+
+  // --- 3. Logic Methods ---
 
   increaseQuantity(): void {
-    if (this.item.quantity < this.item.variant.stock) {
-      this.quantityChanged.emit({ itemId: this.item.id, quantity: this.item.quantity + 1 });
+    const item = this.itemSignal();
+    if (item && item.quantity < item.variant.stockQuantity) {
+      this.quantityChanged.emit({ itemId: item.id, currentQty: item.quantity, delta: 1 });
     }
   }
 
   decreaseQuantity(): void {
-    if (this.item.quantity > 1) {
-      this.quantityChanged.emit({ itemId: this.item.id, quantity: this.item.quantity - 1 });
+    const item = this.itemSignal();
+    if (item && item.quantity > 1) {
+      this.quantityChanged.emit({ itemId: item.id, currentQty: item.quantity, delta: -1 });
     }
   }
 
   remove(): void {
-    this.itemRemoved.emit(this.item.id);
+    const item = this.itemSignal();
+    if (item) this.itemRemoved.emit(item.id);
   }
 
-  /** Tổng tiền = priceSnapshot (giá tại thời điểm thêm) x quantity */
-  getTotalPrice(): number {
-    return this.item.priceSnapshot * this.item.quantity;
-  }
+  // onImageError(event: Event): void {
+  //   (event.target as HTMLImageElement).src = 'assets/images/placeholder-product.png';
+  // }
 
-  /** Tiết kiệm so với giá gốc của variant */
-  getSavings(): number {
-    return (this.item.variant.originalPrice - this.item.priceSnapshot) * this.item.quantity;
-  }
-
-  /** Phần trăm giảm (làm tròn) */
-  getSavingsPercent(): number {
-    if (this.item.variant.originalPrice === 0) return 0;
-    return Math.round(
-      ((this.item.variant.originalPrice - this.item.priceSnapshot) / this.item.variant.originalPrice) * 100
-    );
-  }
-
-  onImageError(event: Event): void {
-    (event.target as HTMLImageElement).src = 'assets/images/placeholder-product.png';
-  }
+  displayImage = computed(() => {
+    const item = this.itemSignal();
+    return item?.variant?.mainImageUrl || 'assets/images/placeholder-product.png';
+  });
 }

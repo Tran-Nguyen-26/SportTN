@@ -5,7 +5,7 @@ export interface Category {
 }
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   description: string;
   brand: string;
@@ -20,30 +20,30 @@ export interface Product {
  * Mỗi variant có giá, stock và ảnh riêng.
  */
 export interface ProductVariant {
-  id: string;
+  id: number;
   productId: string;
-  size: string;           // VD: "S", "M", "L", "XL", "40", "41", "42"
-  color: string;          // VD: "Đen", "Trắng", "Đỏ"
-  colorHex: string;       // VD: "#1a1a1a" — dùng để render dot màu
-  image: string;          // ảnh riêng của variant
-  originalPrice: number;  // giá gốc (để tính tiết kiệm)
-  salePrice: number;      // giá bán thực tế
-  stock: number;          // tồn kho của variant này
+  size: string;
+  color: string;
+  colorHex: string;
+  image: string;
+  originalPrice: number;
+  salePrice: number;
+  stock: number;
   sku: string;
 }
 
 export interface CartItem {
-  id: string;             // cart-item id (khác product id)
+  id: number;
   product: Product;
   variant: ProductVariant;
   quantity: number;
-  priceSnapshot: number;  // = variant.salePrice lúc thêm vào giỏ
+  priceSnapshot: number;
 }
 
-export interface Cart {
-  id: string;
-  userId: string;
-  items: CartItem[];
-  totalPrice: number;
-  totalItems: number;
-}
+// export interface Cart {
+//   id: number;
+//   userId: number;
+//   items: CartItem[];
+//   totalPrice: number;
+//   totalItems: number;
+// }

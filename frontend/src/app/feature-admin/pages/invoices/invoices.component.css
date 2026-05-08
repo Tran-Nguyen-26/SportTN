@@ -404,7 +404,12 @@
 
 .btn-download:hover { background: #2563eb; }
 .btn-print mat-icon,
-.btn-download mat-icon { font-size: 15px; padding-top: 10px;}
+.btn-download mat-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── MODAL BODY ───────────────────────────────── */
 .modal-body {
@@ -738,7 +743,12 @@
 }
 
 .btn-mark-paid:hover { background: #15803d; }
-.btn-mark-paid mat-icon { font-size: 16px; }
+.btn-mark-paid mat-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── STATUS BADGES ────────────────────────────── */
 .status-badge {

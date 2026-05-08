@@ -164,7 +164,12 @@
   object-fit: cover;
 }
 
-.cat-icon mat-icon { font-size: 18px; }
+.cat-icon mat-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .cat-name { font-weight: 600; color: #0f172a; }
 .cat-type { font-size: 11px; color: #94a3b8; margin-top: 1px; }
 

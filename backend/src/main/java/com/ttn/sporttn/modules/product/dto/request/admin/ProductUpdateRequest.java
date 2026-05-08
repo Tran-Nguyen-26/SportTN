@@ -7,6 +7,7 @@ import java.util.List;
 @Getter
 public class ProductUpdateRequest {
     private String name;
+    private String slug;
     private String description;
     private Long categoryId;
     private Long brandId;

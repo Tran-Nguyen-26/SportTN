@@ -14,6 +14,7 @@ public class ProductVariantRequest {
     private BigDecimal salePrice;           // nullable
     private Integer stockQuantity;
     private Integer weightGram;       // nullable
+    private String mainImageUrl;
     private List<VariantImageRequest> images;
 }
 

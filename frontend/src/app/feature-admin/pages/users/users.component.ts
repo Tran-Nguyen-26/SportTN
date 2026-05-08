@@ -154,6 +154,7 @@ export class UsersComponent implements OnInit {
 
   // ── Computed ──────────────────────────────────────────────────────
 
+  adminTotalCount = computed(() => this.users().length);
   activeCount(): number { return this.users().filter(u => u.status).length; }
 
   getRoleCount(role: string): number {

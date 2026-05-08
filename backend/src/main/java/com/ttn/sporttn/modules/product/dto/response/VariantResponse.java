@@ -15,6 +15,7 @@ public class VariantResponse {
     private String sku;
     private String color;
     private String size;
+    private String mainImageUrl;
     private BigDecimal originalPrice;
     private BigDecimal salePrice;
     private BigDecimal effectivePrice; 
@@ -29,6 +30,7 @@ public class VariantResponse {
         response.setSku(variant.getSku());
         response.setColor(variant.getColor());
         response.setSize(variant.getSize());
+        response.setMainImageUrl(variant.getMainImageUrl());
         response.setOriginalPrice(variant.getOriginalPrice());
         response.setSalePrice(variant.getSalePrice());
         response.setEffectivePrice(variant.getEffectivePrice());

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {ProductPageResponse, VariantResponse} from "../../../../core/models/product/product.model";
 import {ImageResponse} from "../../../../core/models/image";
 import {ProductService} from "../../../../core/services/product/product.service";
+import {AddToCartRequest, CartService} from "../../../../core/services/cart/cart.service";
 
 
 @Component({
@@ -99,7 +100,7 @@ export class ProductPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    // private cartService: CartService,       // TODO: inject khi có service
+    private cartService: CartService,
     // private wishlistService: WishlistService // TODO: inject khi có service
   ) {}
 
@@ -116,11 +117,9 @@ export class ProductPageComponent implements OnInit {
       next: (res) => {
         if (res.data) {
           this.productDetail = res.data;
-          // Set ảnh chính đầu tiên
           this.activeImage = res.data.productImageResponses[0]?.imageUrl
             ?? res.data.productCardResponse.mainImageUrl
             ?? '';
-          // Tự chọn màu đầu tiên nếu chỉ có 1 màu
           if (this.availableColors.length === 1) {
             this.selectedColor = this.availableColors[0];
           }
@@ -138,7 +137,7 @@ export class ProductPageComponent implements OnInit {
 
   selectColor(color: string): void {
     this.selectedColor = color;
-    this.selectedSize  = ''; // reset size khi đổi màu
+    this.selectedSize  = '';
     this.quantity      = 1;
   }
 
@@ -152,8 +151,28 @@ export class ProductPageComponent implements OnInit {
   }
 
   addToCart(): void {
-    if (!this.canAddToCart || !this.selectedVariant) return;
-    // TODO: this.cartService.addItem({ variantId: this.selectedVariant.id, quantity: this.quantity })
+    if (!this.canAddToCart || !this.selectedVariant) {
+      alert('Vui lòng chọn màu sắc và kích cỡ!');
+      return;
+    }
+
+    const request: AddToCartRequest = {
+      variantId: this.selectedVariant.id,
+      quantity: this.quantity
+    };
+
+    this.cartService.addItemToCart(request).subscribe({
+      next: (res) => {
+        console.log('[ProductPage] Thêm vào giỏ hàng thành công:', res);
+        alert('Đã thêm sản phẩm vào giỏ hàng!');
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('[ProductPage] Lỗi thêm vào giỏ:', err);
+        alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+        this.isLoading = false;
+      }
+    })
     console.log('[ProductPage] Thêm vào giỏ:', {
       variantId: this.selectedVariant.id,
       quantity:  this.quantity

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.ttn.sporttn.modules.cart.entity.CartItem;
+import com.ttn.sporttn.modules.product.dto.response.ProductDtoForCart;
+import com.ttn.sporttn.modules.product.dto.response.VariantResponse;
 import com.ttn.sporttn.modules.product.entity.ProductImage;
 import com.ttn.sporttn.modules.product.entity.ProductVariant;
 
@@ -14,14 +16,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CartItemResponse {
     private Long cartItemId;
-    private Long variantId;
+    private VariantResponse variant;
     private Integer quantity;
     private LocalDateTime addedAt;
-    private BigDecimal unitPrice;
     private BigDecimal subTotal;
-    private String productName;
-    private String imageUrl;
-
+    private ProductDtoForCart product;
     // public static CartItemResponse from(CartItem cartItem) {
     //     ProductVariant variant = cartItem.getProductVariant();
     //     BigDecimal effectivePrice = variant.getEffectivePrice();

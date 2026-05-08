@@ -18,6 +18,7 @@ public class ProductVariantResponse {
     private BigDecimal salePrice;           // null nếu không có giá sale
     private Integer stockQuantity;
     private Integer weightGram;       // null nếu không khai báo
+    private String mainImageUrl;
     private List<VariantImageResponse> images;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -471,7 +471,14 @@
   color: #64748b;
 }
 
-.vs-item mat-icon { font-size: 15px; color: #94a3b8; }
+.vs-item mat-icon {
+  font-size: 15px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
 .vs-item strong { color: #0f172a; }
 
 /* ── IMAGES ───────────────────────────────────── */

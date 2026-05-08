@@ -4,6 +4,7 @@ import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.ProductCreateRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.ProductUpdateRequest;
+import com.ttn.sporttn.modules.product.dto.response.VariantResponse;
 import com.ttn.sporttn.modules.product.dto.response.admin.ProductAdminResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductCardResponse;
 import com.ttn.sporttn.modules.product.dto.response.ProductDetailResponse;
@@ -56,10 +57,6 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.ok(product, "Lấy sản phẩm theo slug"));
     }
 
-    /**
-     * Create new product (Admin only)
-     * POST /api/v1/products
-     */
     @PostMapping
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
         @Valid @RequestBody ProductCreateRequest request
@@ -68,20 +65,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.ok(product, "Tạo sản phẩm thành công"));
     }
-
-    /**
-     * Update product (Admin only)
-     * PUT /api/v1/products/{id}
-     */
-//    @PutMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<ApiResponse<ProductDetailResponse>> updateProduct(
-//        @PathVariable Long id,
-//        @Valid @RequestBody ProductRequest request
-//    ) {
-//        ProductDetailResponse product = productService.updateProduct(id, request);
-//        return ResponseEntity.ok(ApiResponse.ok(product, "Cập nhật sản phẩm thành công"));
-//    }
 
     /**
      * Delete product (Admin only)
@@ -110,15 +93,21 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> updateProduct(@PathVariable Long id, @Valid ProductUpdateRequest request) {
-        productService.updateProduct(id, request);
-        return ResponseEntity.ok(ApiResponse.ok("Cập nhật sản phẩm thành công: id: " + id));
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long id,@RequestBody @Valid ProductUpdateRequest request) {
+        ProductResponse product = productService.updateProduct(id, request);
+        return ResponseEntity.ok(ApiResponse.ok(product, "Cập nhật sản phẩm thành công: id: " + id));
     }
 
     @GetMapping("/{id}/detail")
     public ResponseEntity<ApiResponse<ProductDetailFromUpdateResponse>> getProductDetailFromUpdate(@PathVariable Long id) {
         ProductDetailFromUpdateResponse response = productService.getProductDetailFromUpdate(id);
         return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
+    @GetMapping("/{id}/variants")
+    public ResponseEntity<ApiResponse<List<VariantResponse>>> getVariantsByProductId(@PathVariable Long id) {
+        List<VariantResponse> responses = productService.getVariantsByProductId(id);
+        return ResponseEntity.ok(ApiResponse.ok(responses));
     }
 
 }

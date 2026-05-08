@@ -1,8 +1,11 @@
 package com.ttn.sporttn.modules.order.controller;
 
+import com.ttn.sporttn.modules.order.dto.request.OrderMessage;
+import com.ttn.sporttn.modules.order.producer.OrderProducer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,27 +29,32 @@ import lombok.extern.slf4j.Slf4j;
 @PreAuthorize("isAuthenticated()")
 public class OrderController {
 
+    private final OrderProducer orderProducer;
     private final OrderService orderService;
 
-    /**
-     * Create new order from cart
-     * POST /api/v1/orders
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<OrderDetailResponse> createOrder(
+    public ResponseEntity<ApiResponse<?>> createOrder(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody CreateOrderRequest request) {
         log.info("[ORDER] Yêu cầu tạo đơn hàng. userId={}", userDetails.getId());
-        
-        OrderDetailResponse response = orderService.createOrder(userDetails.getId(), request);
-        return ApiResponse.ok(response, "Tạo đơn hàng thành công");
+
+        OrderMessage message = new OrderMessage(
+                userDetails.getId(),
+                request.getAddressId(),
+                request.getVoucherId(),
+                request.getPaymentMethod(),
+                request.getCustomerNote(),
+                request.getPointsToUse(),
+                request.getItems()
+        );
+
+        orderProducer.sendOrder(message);
+
+        return ResponseEntity.accepted()
+                .body(ApiResponse.ok("Đơn hàng đang được xử lý"));
     }
 
-    /**
-     * Get user's orders with pagination
-     * GET /api/v1/orders?page=0&size=10&sort=createdAt,desc
-     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Page<OrderResponse>> getUserOrders(
@@ -58,10 +66,6 @@ public class OrderController {
         return ApiResponse.ok(response, "Lấy danh sách đơn hàng thành công");
     }
 
-    /**
-     * Get order detail by ID
-     * GET /api/v1/orders/{id}
-     */
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderDetailResponse> getOrderDetail(
@@ -73,10 +77,7 @@ public class OrderController {
         return ApiResponse.ok(response, "Lấy chi tiết đơn hàng thành công");
     }
 
-    /**
-     * Update order status (Admin only)
-     * PUT /api/v1/orders/{id}/status
-     */
+
     @PutMapping("/{id}/status")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
@@ -89,10 +90,6 @@ public class OrderController {
         return ApiResponse.ok(response, "Cập nhật trạng thái đơn hàng thành công");
     }
 
-    /**
-     * Cancel order
-     * POST /api/v1/orders/{id}/cancel
-     */
     @PostMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderResponse> cancelOrder(

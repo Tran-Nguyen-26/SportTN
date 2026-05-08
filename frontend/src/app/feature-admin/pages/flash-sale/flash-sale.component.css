@@ -127,12 +127,18 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 5px 12px;
   width: 240px;
 }
 
 .search-wrap:focus-within { border-color: #3b82f6; }
-.search-icon { font-size: 16px; color: #94a3b8; }
+.search-icon {
+  font-size: 16px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .search-input {
   flex: 1;
@@ -223,7 +229,12 @@
   transition: background 0.15s, color 0.15s;
 }
 
-.action-btn mat-icon { font-size: 20px; padding-top: 5px;}
+.action-btn mat-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .action-btn:hover { background: #f8fafc; color: #0f172a; }
 .action-btn.toggle-btn.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
 .action-btn.delete-btn:hover  { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
@@ -248,7 +259,13 @@
   color: #64748b;
 }
 
-.sale-time-row mat-icon { font-size: 15px; color: #94a3b8; padding-top: 10px}
+.sale-time-row mat-icon {
+  font-size: 15px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .sale-date { color: #94a3b8; font-size: 12px; margin-left: 4px; }
 
 /* Live bar */
@@ -341,7 +358,9 @@
 .sale-products-title mat-icon {
   font-size: 15px;
   color: #94a3b8;
-  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-add-product {
@@ -397,8 +416,9 @@
 .sp-thumb mat-icon {
   font-size: 18px;
   color: rgba(0,0,0,0.25);
-  padding-top: 5px;
-  padding-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sp-info { flex: 1; min-width: 0; }
@@ -889,7 +909,13 @@
   flex-shrink: 0;
 }
 
-.pi-thumb mat-icon { font-size: 18px; color: rgba(0,0,0,0.2); }
+.pi-thumb mat-icon {
+  font-size: 18px;
+  color: rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .pi-info { flex: 1; min-width: 0; }
 .pi-name { font-size: 13px; font-weight: 600; color: #0f172a; }
@@ -923,8 +949,19 @@
 .pi-price-input:focus { border-color: #f97316; }
 
 .pi-check { flex-shrink: 0; }
-.pi-check mat-icon { font-size: 20px; color: #cbd5e1; }
-.pi-check.checked mat-icon { color: #f97316; }
+.pi-check mat-icon {
+  font-size: 20px;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pi-check.checked mat-icon {
+  color: #f97316;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .picker-footer {
   display: flex;

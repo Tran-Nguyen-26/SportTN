@@ -4,6 +4,7 @@ import { BrandOption, BrandService } from '../../../core/services/brand/brand.se
 import { CategoryOption } from '../../pages/banners/banners.component';
 import { CategoryService } from '../../../core/services/category/category.service';
 import { ProductService } from '../../../core/services/product/product.service';
+import {VariantDetail} from "../../../core/models/product/product.model";
 
 export interface VariantImage {
   preview: string;
@@ -11,6 +12,7 @@ export interface VariantImage {
 }
 
 export interface ProductVariantForm {
+  id?: number | null;
   sku: string;
   color: string;
   size: string;
@@ -42,6 +44,7 @@ export interface VariantImageRequest {
 }
 
 export interface ProductVariantRequest {
+  id?: number | null;
   sku: string;
   color: string;
   size: string;
@@ -49,6 +52,7 @@ export interface ProductVariantRequest {
   salePrice: number | null;
   stockQuantity: number;
   weightGram: number | null;
+  mainImageUrl: string | null;
   images: VariantImageRequest[];
 }
 
@@ -183,26 +187,53 @@ export class AddProductComponent implements OnInit {
 
   private loadProduct(id: number): void {
     this.isLoading = true;
-    // TODO: gọi this.productService.getById(id)
-    setTimeout(() => {
-      this.form = {
-        name: 'Áo thun chạy bộ nam thoáng khí - Run Dry',
-        slug: 'ao-thun-chay-bo-nam-thoang-khi',
-        description: 'Áo chạy bộ nam, chất liệu thoáng khí, thấm mồ hôi nhanh',
-        categoryId: 3, brandId: 3, active: true, mainImageUrl: '',
-        variants: [
-          {
-            sku: 'RUN-SHIRT-M-BLUE-M', color: 'Xanh dương', size: 'M',
-            originalPrice: 299000, salePrice: 199000,
-            stockQuantity: 80, weightGram: 180,
-            images: [], imageSource: 'upload', pendingUrl: '',
-          },
-        ],
-      };
-      this.mainImagePreview = 'assets/products/ao-chay-bo.jpg';
-      this.isLoading = false;
-    }, 500);
+    this.productService.getEditDetail(id).subscribe({
+      next: (res) => {
+        if (res.data) {
+          const p = res.data;
 
+          // Map ProductDetail → ProductForm
+          this.form = {
+            name:         p.name,
+            description:  p.description,
+            slug:         p.slug,
+            categoryId:   p.categoryId,
+            brandId:      p.brandId,
+            active:       p.active,
+            mainImageUrl: p.mainImageUrl,
+            variants: p.variants.map((v: VariantDetail) => ({
+              id: v.id ?? null,
+              sku:           v.sku,
+              color:         v.color,
+              size:          v.size,
+              originalPrice: v.originalPrice,
+              salePrice:     v.salePrice,
+              stockQuantity: v.stockQuantity,
+              weightGram:    v.weightGram,
+              imageSource:   'url' as const,
+              pendingUrl:    '',
+              // VariantDetail dùng imageUrls: string[] → map sang VariantImage[]
+              images: (v.imageUrls ?? []).map(url => ({
+                preview: url,
+                file:    null,
+              })),
+            })),
+          };
+
+          // Hiển thị main image
+          if (p.mainImageUrl) {
+            this.mainImageSource  = 'url';
+            this.mainUrlPreview   = p.mainImageUrl;
+            this.mainUrlValid     = true;
+          }
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Lỗi tải sản phẩm:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
   private loadBrands(): void {
@@ -221,29 +252,64 @@ export class AddProductComponent implements OnInit {
 
   // ── BUILD REQUEST ─────────────────────────────
 
+  // private buildRequest(): ProductCreateRequest {
+  //   return {
+  //     name:         this.form.name.trim(),
+  //     description:  this.form.description.trim(),
+  //     slug: this.form.slug,
+  //     categoryId:   this.form.categoryId!,
+  //     brandId:      this.form.brandId!,
+  //     active:       this.form.active,
+  //     mainImageUrl: this.effectiveMainImage ?? this.form.mainImageUrl,
+  //     variants: this.form.variants.map(v => ({
+  //       id: v.id,
+  //       sku:           v.sku.trim(),
+  //       color:         v.color,
+  //       size:          v.size,
+  //       originalPrice: v.originalPrice!,
+  //       salePrice:     v.salePrice ?? null,
+  //       stockQuantity: v.stockQuantity!,
+  //       weightGram:    v.weightGram ?? null,
+  //       mainImageUrl: v.images.length > 0 ? v.images[0].preview : null,
+  //       // Mỗi VariantImage.preview là URL string (upload → base64, url → http string)
+  //       images: v.images.map((img, idx) => ({
+  //         imageUrl:     img.preview,
+  //         displayOrder: idx + 1,
+  //       })),
+  //     })),
+  //   };
+  // }
+
   private buildRequest(): ProductCreateRequest {
     return {
-      name:         this.form.name.trim(),
-      description:  this.form.description.trim(),
+      name: this.form.name.trim(),
+      description: this.form.description.trim(),
       slug: this.form.slug,
-      categoryId:   this.form.categoryId!,
-      brandId:      this.form.brandId!,
-      active:       this.form.active,
+      categoryId: this.form.categoryId!,
+      brandId: this.form.brandId!,
+      active: this.form.active,
       mainImageUrl: this.effectiveMainImage ?? this.form.mainImageUrl,
-      variants: this.form.variants.map(v => ({
-        sku:           v.sku.trim(),
-        color:         v.color,
-        size:          v.size,
-        originalPrice: v.originalPrice!,
-        salePrice:     v.salePrice ?? null,
-        stockQuantity: v.stockQuantity!,
-        weightGram:    v.weightGram ?? null,
-        // Mỗi VariantImage.preview là URL string (upload → base64, url → http string)
-        images: v.images.map((img, idx) => ({
-          imageUrl:     img.preview,
-          displayOrder: idx + 1,
-        })),
-      })),
+      variants: this.form.variants.map(v => {
+        const mainImageUrl = v.images.length > 0
+          ? v.images[0].preview
+          : this.effectiveMainImage || null;
+
+        return {
+          id: v.id,
+          sku: v.sku.trim(),
+          color: v.color,
+          size: v.size,
+          originalPrice: v.originalPrice!,
+          salePrice: v.salePrice ?? null,
+          stockQuantity: v.stockQuantity!,
+          weightGram: v.weightGram ?? null,
+          mainImageUrl,
+          images: v.images.map((img, idx) => ({
+            imageUrl: img.preview,
+            displayOrder: idx + 1,
+          })),
+        };
+      }),
     };
   }
 
@@ -259,8 +325,14 @@ export class AddProductComponent implements OnInit {
     const request = this.buildRequest();
 
     if (this.isEditMode && this.productId) {
-      // TODO: wire update khi có BE
-      // this.productService.updateProduct(this.productId, request).subscribe(...)
+      this.productService.updateProduct(this.productId, request).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.saveSuccess = true;
+            setTimeout(() => this.router.navigate([`/admin/products/detail/${this.productId}`]), 1000);
+          }
+        }
+      })
       console.log('[AddProduct] updateProduct payload:', request);
       this.isSaving = false;
     } else {
@@ -386,17 +458,23 @@ export class AddProductComponent implements OnInit {
   // ── HELPERS ───────────────────────────────────
 
   isFormValid(): boolean {
-    return !!(
-      this.form.name &&
+    const basicValid = !!(
+      this.form.name.trim() &&
       this.form.categoryId &&
       this.form.brandId &&
       this.form.variants.length > 0 &&
-      this.form.variants.every(v =>
-        v.sku && v.color && v.size &&
-        v.originalPrice !== null && v.originalPrice > 0 &&
-        v.stockQuantity !== null && v.stockQuantity >= 0
-      )
+      this.effectiveMainImage
     );
+
+    const variantsValid = this.form.variants.every(v =>
+      v.sku.trim() &&
+      v.color &&
+      v.size &&
+      v.originalPrice !== null && v.originalPrice > 0 &&
+      v.stockQuantity !== null && v.stockQuantity >= 0
+    );
+
+    return basicValid && variantsValid;
   }
 
   getDiscountPercent(variant: ProductVariantForm): number {
@@ -489,5 +567,9 @@ export class AddProductComponent implements OnInit {
     } else {
       this.form.slug = '';
     }
+  }
+
+  compareById = (a: number, b: number): boolean => {
+    return Number(a) === Number(b);
   }
 }

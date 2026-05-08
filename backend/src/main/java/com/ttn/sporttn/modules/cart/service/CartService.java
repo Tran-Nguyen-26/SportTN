@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.ttn.sporttn.modules.product.dto.response.ProductDtoForCart;
+import com.ttn.sporttn.modules.product.dto.response.VariantResponse;
+import com.ttn.sporttn.modules.product.entity.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -186,7 +189,7 @@ public class CartService {
     }
 
     private CartResponse buildCartResponse(Cart cart) {
-        List<CartItemResponse> items = cart.getItems()
+        List<CartItemResponse> items = (cart.getItems() == null) ? List.of() : cart.getItems()
             .stream()
             .map(this::mapToCartItemResponse)
             .toList();
@@ -203,18 +206,17 @@ public class CartService {
 
     private CartItemResponse mapToCartItemResponse(CartItem cartItem) {
         ProductVariant variant = cartItem.getProductVariant();
+        Product product = variant.getProduct();
         BigDecimal unitPrice = variant.getEffectivePrice();
         BigDecimal subTotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
         return new CartItemResponse(
             cartItem.getId(),
-            variant.getId(),
+            VariantResponse.buildVariantResponse(variant),
             cartItem.getQuantity(),
             cartItem.getAddedAt(),
-            unitPrice,
             subTotal,
-            variant.getProduct().getName(),
-            getMainImageUrl(variant)
+            ProductDtoForCart.toProductDto(product)
         );
     }
 

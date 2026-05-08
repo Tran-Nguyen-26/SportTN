@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, computed, signal } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
-import { Cart } from 'src/app/core/models/cart/cart.model';
+import { CartResponse } from "../../../../core/services/cart/cart.service";
 
-const FREE_SHIP_THRESHOLD = 500_000; // VND
-const SHIPPING_FEE        = 30_000;  // VND
+const FREE_SHIP_THRESHOLD = 500_000;
+const SHIPPING_FEE        = 30_000;
 const TAX_RATE            = 0.10;
 
 @Component({
@@ -22,42 +22,56 @@ const TAX_RATE            = 0.10;
     ])
   ]
 })
-export class OrderSummaryComponent implements OnChanges {
-  @Input() cart!: Cart;
-  /** Discount percent (0–1) emitted by CouponInputComponent */
-  @Input() discountPercent = 0;
+export class OrderSummaryComponent {
+  cartSignal = signal<CartResponse | null>(null);
+  discountPercentSignal = signal<number>(0);
+
+  @Input() set cart(value: CartResponse) {
+    this.cartSignal.set(value);
+  }
+
+  @Input() set discountPercent(value: number) {
+    this.discountPercentSignal.set(value);
+  }
+
   @Output() checkout = new EventEmitter<void>();
 
-  subtotal = 0;
-  discount = 0;
-  tax      = 0;
-  shipping = 0;
-  total    = 0;
-  freeShipGap      = 0;
-  freeShipProgress = 0;
 
-  ngOnChanges(_changes: SimpleChanges): void {
-    this.calculateSummary();
-  }
+  subtotal = computed(() => this.cartSignal()?.total || 0);
 
-  calculateSummary(): void {
-    if (!this.cart) return;
+  discountAmount = computed(() => {
+    // Giả định discountPercent truyền vào dạng số nguyên (ví dụ: 10 cho 10%)
+    return Math.round(this.subtotal() * (this.discountPercentSignal() / 100));
+  });
 
-    this.subtotal = this.cart.totalPrice;
-    this.discount = Math.round(this.subtotal * this.discountPercent);
+  // Thuế tính trên giá sau giảm
+  tax = computed(() => {
+    const afterDiscount = this.subtotal() - this.discountAmount();
+    return Math.round(afterDiscount * TAX_RATE);
+  });
 
-    const afterDiscount = this.subtotal - this.discount;
-    this.tax      = Math.round(afterDiscount * TAX_RATE);
-    this.shipping = this.subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
-    this.total    = afterDiscount + this.tax + this.shipping;
+  // Phí vận chuyển
+  shipping = computed(() => {
+    const s = this.subtotal();
+    if (s === 0) return 0;
+    return s >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
+  });
 
-    // Free-ship progress
-    this.freeShipGap      = Math.max(0, FREE_SHIP_THRESHOLD - this.subtotal);
-    this.freeShipProgress = Math.min(100, Math.round((this.subtotal / FREE_SHIP_THRESHOLD) * 100));
-  }
+  // Tổng thanh toán cuối cùng
+  total = computed(() => {
+    return (this.subtotal() - this.discountAmount()) + this.tax() + this.shipping();
+  });
+
+  // Logic Free Ship Progress
+  freeShipGap = computed(() => Math.max(0, FREE_SHIP_THRESHOLD - this.subtotal()));
+
+  freeShipProgress = computed(() =>
+    Math.min(100, Math.round((this.subtotal() / FREE_SHIP_THRESHOLD) * 100))
+  );
 
   proceedCheckout(): void {
-    if (this.cart.items.length > 0) {
+    const currentCart = this.cartSignal();
+    if (currentCart && currentCart.cartItems && currentCart.cartItems.length > 0) {
       this.checkout.emit();
     }
   }

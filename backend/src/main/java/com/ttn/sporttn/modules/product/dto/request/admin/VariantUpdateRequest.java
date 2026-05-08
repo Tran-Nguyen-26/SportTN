@@ -17,5 +17,6 @@ public class VariantUpdateRequest {
     private BigDecimal salePrice;
     private Integer stockQuantity;
     private Integer weightGram;
+    private String mainImageUrl;
     private List<String> imageUrls;
 }

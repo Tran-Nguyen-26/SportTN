@@ -6,7 +6,7 @@ import {Observable} from "rxjs";
 import {
   ProductAdminResponse,
   ProductDetail,
-  ProductPageResponse,
+  ProductPageResponse, VariantResponse,
 } from "../../models/product/product.model";
 import {ListRange} from "@angular/cdk/collections";
 import {PageResponse} from "../../models/page-response";
@@ -44,7 +44,6 @@ export class ProductService {
     return this.http.get<ApiResponse<ProductPageResponse>>(`${this.apiUrl}/slug/${slug}`);
   }
 
-
   getProductById(id: number): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/id/${id}`);
   }
@@ -57,8 +56,8 @@ export class ProductService {
     return this.http.get<ApiResponse<PageResponse<ProductAdminResponse>>>(`${this.apiUrl}/list`, { params })
   }
 
-  updateProduct(id: number, data: ProductUpdateRequest): Observable<ApiResponse<void>> {
-    return this.http.put<ApiResponse<void>>(`${this.apiUrl}/${id}`, data);
+  updateProduct(id: number, data: ProductUpdateRequest): Observable<ApiResponse<ProductDetail>> {
+    return this.http.put<ApiResponse<ProductDetail>>(`${this.apiUrl}/${id}`, data);
   }
 
   getEditDetail(id: number): Observable<ApiResponse<ProductDetail>> {
@@ -67,5 +66,9 @@ export class ProductService {
 
   createProduct(request: ProductCreateRequest): Observable<ApiResponse<ProductResponse>> {
     return this.http.post<ApiResponse<ProductResponse>>(this.apiUrl, request);
+  }
+
+  getProductVariantsByProductId(productId: number): Observable<ApiResponse<VariantResponse[]>> {
+    return this.http.get<ApiResponse<VariantResponse[]>>(`${this.apiUrl}/${productId}/variants`);
   }
 }

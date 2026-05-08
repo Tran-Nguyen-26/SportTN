@@ -202,7 +202,13 @@
 }
 
 .search-wrap:focus-within { border-color: #3b82f6; }
-.search-icon { font-size: 15px; color: #94a3b8; }
+.search-icon {
+  font-size: 15px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .search-input {
   flex: 1;
@@ -231,7 +237,12 @@
 }
 
 .btn-icon:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
-.btn-icon mat-icon { font-size: 17px; }
+.btn-icon mat-icon {
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Notification list */
 .notif-list { display: flex; flex-direction: column; }

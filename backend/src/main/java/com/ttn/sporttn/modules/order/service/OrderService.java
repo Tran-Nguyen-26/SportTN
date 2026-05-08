@@ -2,9 +2,18 @@ package com.ttn.sporttn.modules.order.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import com.ttn.sporttn.modules.order.dto.request.OrderItemRequest;
+import com.ttn.sporttn.modules.order.dto.request.OrderMessage;
+import com.ttn.sporttn.modules.order.entity.ShippingInfo;
+import com.ttn.sporttn.modules.product.entity.Product;
+import com.ttn.sporttn.modules.product.repository.ProductRepository;
+import com.ttn.sporttn.modules.user.entity.Address;
+import com.ttn.sporttn.modules.user.repository.AddressRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,6 +46,90 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;
     private final CartItemRepository cartItemRepository;
+    private final AddressRepository addressRepository;
+    private final ProductRepository productRepository;
+
+
+
+    @Transactional
+    public void processOrder(OrderMessage msg) {
+
+        // 1. Validate user
+        User user = userRepository.findById(msg.getUserId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. Validate & lấy địa chỉ
+        Address address = addressRepository
+                .findByIdAndUserId(msg.getAddressId(), msg.getUserId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
+
+        // 3. Tạo Order
+        Order order = Order.builder()
+                .user(user)
+                .paymentMethod(msg.getPaymentMethod())
+                .customerNote(msg.getCustomerNote())
+                .status("PENDING")
+                .paymentStatus("UNPAID")
+                .orderCode(generateOrderCode())
+                .build();
+
+        // 4. Snapshot địa chỉ → ShippingInfo
+        ShippingInfo shippingInfo = ShippingInfo.builder()
+                .order(order)
+                .receiverName(address.getReceiverName())
+                .receiverPhone(address.getReceiverPhone())
+                .addressFull(buildFullAddress(address))
+                .build();
+
+        order.setShippingInfo(shippingInfo);
+
+        // 5. Tạo OrderItems + trừ tồn kho
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        List<OrderItem> items = new ArrayList<>();
+        for (OrderItemRequest i : msg.getItems()) {
+            ProductVariant variant = productVariantRepository.findById(i.getVariantId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.VARIANT_NOT_FOUND));
+
+            if (variant.getStockQuantity() < i.getQuantity())
+                throw new BusinessException(ErrorCode.OUT_OF_STOCK,
+                        variant.getProduct().getName());
+
+            // Trừ tồn kho
+            variant.setStockQuantity(variant.getStockQuantity() - i.getQuantity());
+            productVariantRepository.save(variant);
+
+            BigDecimal unitPrice = variant.getEffectivePrice();
+            BigDecimal subtotal  = unitPrice.multiply(BigDecimal.valueOf(i.getQuantity()));
+            totalAmount = totalAmount.add(subtotal);
+
+            items.add(OrderItem.builder()
+                    .order(order)
+                    .productVariant(variant)
+                    .quantity(i.getQuantity())
+                    .build());
+        }
+
+        // 6. Tính tiền
+        BigDecimal shippingFee        = calculateShippingFee(totalAmount);
+        BigDecimal voucherDiscount    = BigDecimal.ZERO; // TODO: áp dụng voucher
+        BigDecimal pointsDiscount     = BigDecimal.ZERO; // TODO: áp dụng điểm
+        BigDecimal finalAmount        = totalAmount
+                .add(shippingFee)
+                .subtract(voucherDiscount)
+                .subtract(pointsDiscount);
+
+        order.setItems(items);
+        order.setTotalAmount(totalAmount);
+        order.setShippingFee(shippingFee);
+        order.setVoucherDiscount(voucherDiscount);
+        order.setPointsDiscountAmount(pointsDiscount);
+        order.setFinalAmount(finalAmount);
+
+        orderRepository.save(order);
+        log.info("Tạo đơn hàng thành công: code={}, user={}", order.getOrderCode(), msg.getUserId());
+    }
+
 
     /**
      * Create new order from cart
@@ -227,12 +320,26 @@ public class OrderService {
         return orderRepository.countByUserId(userId);
     }
 
-    /**
-     * Generate unique order code
-     */
-    private String generateOrderCode() {
-        // Format: ORD-TIMESTAMP-RANDOM
-        String code = "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        return code.substring(0, Math.min(code.length(), 20));
+    private String buildFullAddress(Address a) {
+        return String.join(", ",
+                a.getAddressDetail(),
+                a.getWard(),
+                a.getDistrict(),
+                a.getProvince());
     }
+
+    private BigDecimal calculateShippingFee(BigDecimal totalAmount) {
+        // Miễn phí ship đơn >= 500k, còn lại 30k
+        return totalAmount.compareTo(new BigDecimal("500000")) >= 0
+                ? BigDecimal.ZERO
+                : new BigDecimal("30000");
+    }
+
+    private String generateOrderCode() {
+        // TTN + timestamp + 4 số random  →  TTN20250507A3F1
+        return "#DH" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                + Integer.toHexString((int)(Math.random() * 0xFFFF)).toUpperCase();
+    }
+
+
 }

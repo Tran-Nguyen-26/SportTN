@@ -20,8 +20,7 @@ public class CreateOrderRequest {
     private List<OrderItemRequest> items;
 
     @NotNull(message = "Địa chỉ giao hàng không được để trống")
-    @Size(min = 10, max = 500, message = "Địa chỉ phải từ 10-500 ký tự")
-    private String shippingAddress;
+    private Long addressId;
 
     private Long voucherId;
 
@@ -31,5 +30,5 @@ public class CreateOrderRequest {
     @Size(max = 500, message = "Ghi chú không quá 500 ký tự")
     private String customerNote;
 
-    private Integer pointsToUse; // Points user wants to use for discount (optional)
+    private Integer pointsToUse;
 }

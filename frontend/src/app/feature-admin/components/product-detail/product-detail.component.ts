@@ -5,6 +5,7 @@ import { ProductDetail } from '../../../core/models/product/product.model';
 import { CategoryService } from '../../../core/services/category/category.service';
 import { BrandOption, BrandService } from '../../../core/services/brand/brand.service';
 import {CategoryOption} from "../../pages/banners/banners.component";
+import {ProductReview} from "../add-product/add-product.component";
 
 @Component({
   selector: 'app-product-detail',
@@ -17,7 +18,37 @@ export class ProductDetailComponent implements OnInit {
   isLoading = true;
   product: ProductDetail | null = null;
 
-  activeTab: 'info' | 'variants' | 'images' = 'info';
+  activeTab: 'info' | 'variants' | 'images' | 'reviews' = 'info';
+
+  reviews: ProductReview[] = [
+    {
+      id: 1, customerName: 'Nguyễn Văn An', customerAvatar: 'NA', rating: 5,
+      comment: 'Sản phẩm rất tốt, chất liệu mềm mại, mặc thoáng khí khi chạy bộ. Giao hàng nhanh, đóng gói cẩn thận. Sẽ mua lại!',
+      date: '20/04/2025', isVisible: true,
+      adminReply: 'Cảm ơn bạn đã tin tưởng SportZone! Chúc bạn tập luyện vui vẻ 🏃', images: []
+    },
+    {
+      id: 2, customerName: 'Trần Thị Bình', customerAvatar: 'TB', rating: 4,
+      comment: 'Áo đẹp, mặc vừa size M. Màu xanh đúng như hình. Chỉ hơi tiếc là không có túi nhỏ bên hông.',
+      date: '18/04/2025', isVisible: true, adminReply: null, images: []
+    },
+    {
+      id: 3, customerName: 'Lê Văn Cường', customerAvatar: 'LC', rating: 3,
+      comment: 'Chất liệu ổn nhưng đường may hơi thô. Giá hơi cao so với chất lượng.',
+      date: '15/04/2025', isVisible: true, adminReply: null, images: []
+    },
+    {
+      id: 4, customerName: 'Phạm Thị Dung', customerAvatar: 'PD', rating: 5,
+      comment: 'Mua lần 2 rồi, vẫn ưng lắm! Size chuẩn, màu đẹp, giặt nhiều lần không phai.',
+      date: '12/04/2025', isVisible: true,
+      adminReply: 'Cảm ơn bạn đã ủng hộ SportZone lần 2! ❤️', images: []
+    },
+    {
+      id: 5, customerName: 'Hoàng Văn Em', customerAvatar: 'HE', rating: 2,
+      comment: 'Hàng nhận được khác màu so với ảnh, liên hệ shop chưa được phản hồi.',
+      date: '10/04/2025', isVisible: false, adminReply: null, images: []
+    },
+  ];
 
   categories = signal<CategoryOption[]>([]);
   brands     = signal<BrandOption[]>([]);

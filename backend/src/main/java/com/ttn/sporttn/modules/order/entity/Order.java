@@ -32,7 +32,6 @@ public class Order {
     @Column(name = "voucher_id")
     private Long voucherId;
 
-    // Mapping read-only theo voucher_id để truy cập dữ liệu voucher khi cần
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voucher_id", insertable = false, updatable = false)
     private Voucher voucher;

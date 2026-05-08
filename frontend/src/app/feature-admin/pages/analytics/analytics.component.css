@@ -70,7 +70,13 @@
   color: #64748b;
 }
 
-.date-range mat-icon { font-size: 16px; color: #94a3b8; padding-top: 8px;}
+.date-range mat-icon {
+  font-size: 16px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .date-input {
   border: none;
@@ -101,7 +107,12 @@
 }
 
 .btn-export:hover { background: #f8fafc; }
-.btn-export mat-icon { font-size: 16px; padding-top: 10px;}
+.btn-export mat-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── KPI CARDS ────────────────────────────────── */
 .kpi-row {
@@ -137,7 +148,12 @@
   justify-content: center;
 }
 
-.kpi-icon mat-icon { font-size: 20px; }
+.kpi-icon mat-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .kpi-icon.blue   { background: #eff6ff; color: #2563eb; }
 .kpi-icon.green  { background: #f0fdf4; color: #16a34a; }
 .kpi-icon.orange { background: #fff7ed; color: #ea580c; }
@@ -402,7 +418,12 @@
   margin-top: 2px;
 }
 
-.conv-trend mat-icon { font-size: 12px; }
+.conv-trend mat-icon {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .conv-trend.up   { color: #16a34a; }
 .conv-trend:not(.up) { color: #dc2626; }
 
@@ -524,7 +545,12 @@
   border-radius: 4px;
 }
 
-.trend-badge mat-icon { font-size: 12px; }
+.trend-badge mat-icon {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .trend-badge.up   { background: #f0fdf4; color: #16a34a; }
 .trend-badge.down { background: #fef2f2; color: #dc2626; }
 
@@ -835,6 +861,11 @@
   width: fit-content;
 }
 
-.compare-delta mat-icon { font-size: 11px; padding-top: 10px; padding-left: 10px;}
+.compare-delta mat-icon {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .compare-delta.up   { background: #f0fdf4; color: #16a34a; }
 .compare-delta.down { background: #fef2f2; color: #dc2626; }

@@ -119,6 +119,7 @@ public class ProductService {
                         .salePrice(variantRequest.getSalePrice())
                         .stockQuantity(variantRequest.getStockQuantity())
                         .weightGram(variantRequest.getWeightGram())
+                        .mainImageUrl(variantRequest.getMainImageUrl())
                         .product(product)
                         .variantImages(new ArrayList<>())
                         .build();
@@ -146,7 +147,7 @@ public class ProductService {
         return buildProductResponse(saved);
     }
 
-// ── Map entity → response ────────────────────────────────────────────────────
+    // ── Map entity → response ────────────────────────────────────────────────────
 
     private ProductResponse buildProductResponse(Product product) {
         List<ProductVariantResponse> variantResponses = product.getVariants().stream()
@@ -247,164 +248,113 @@ public class ProductService {
         return buildProductDetailResponse(product);
     }
 
-//    @Transactional
-//    public ProductDetailResponse updateProduct(Long id, ProductRequest productRequest) {
-//        log.info("[PRODUCT] Cập nhật sản phẩm. id={}, name={}", id, productRequest.getName());
-//
-//        // Validate input
-//        if (productRequest == null || productRequest.getName() == null || productRequest.getName().isEmpty()) {
-//            log.warn("[PRODUCT] Tên sản phẩm không hợp lệ");
-//            throw new BusinessException(ErrorCode.INVALID_REQUEST);
-//        }
-//
-//        // Find product
-//        Product product = productRepository.findById(id)
-//                .orElseThrow(() -> {
-//                    log.warn("[PRODUCT] Sản phẩm không tìm thấy. id={}", id);
-//                    return new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
-//                });
-//
-//        // Update basic info
-//        product.setName(productRequest.getName());
-//        product.setDescription(productRequest.getDescription());
-//
-//        // Update category
-//        if (productRequest.getCategoryId() != null) {
-//            Category category = categoryRepository.findById(productRequest.getCategoryId())
-//                    .orElseThrow(() -> {
-//                        log.warn("[PRODUCT] Danh mục không tìm thấy. categoryId={}", productRequest.getCategoryId());
-//                        return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
-//                    });
-//            product.setCategory(category);
-//        } else {
-//            product.setCategory(null);
-//        }
-//
-//        // Update brand
-//        if (productRequest.getBrandId() != null) {
-//            Brand brand = brandRepository.findById(productRequest.getBrandId())
-//                    .orElseThrow(() -> {
-//                        log.warn("[PRODUCT] Thương hiệu không tìm thấy. brandId={}", productRequest.getBrandId());
-//                        return new BusinessException(ErrorCode.BRAND_NOT_FOUND);
-//                    });
-//            product.setBrand(brand);
-//        } else {
-//            product.setBrand(null);
-//        }
-//
-//        // Update images
-//        if (productRequest.getImages() != null) {
-//            product.getImages().clear();
-//            for (ImageRequest imageRequest : productRequest.getImages()) {
-//                ProductImage image = new ProductImage();
-//                image.setImageUrl(imageRequest.getImageUrl());
-//                image.setMain(imageRequest.isMain());
-//                image.setProduct(product);
-//                product.getImages().add(image);
-//            }
-//            log.debug("[PRODUCT] Cập nhật {} ảnh cho sản phẩm. id={}", productRequest.getImages().size(), id);
-//        }
-//
-//        // Update variants
-//        if (productRequest.getVariants() != null) {
-//            product.getVariants().clear();
-//            for (VariantRequest variantRequest : productRequest.getVariants()) {
-//                ProductVariant variant = new ProductVariant();
-//                variant.setSku(variantRequest.getSku());
-//                variant.setColor(variantRequest.getColor());
-//                variant.setSize(variantRequest.getSize());
-//                variant.setOriginalPrice(variantRequest.getOriginalPrice());
-//                variant.setSalePrice(variantRequest.getSalePrice());
-//                variant.setStockQuantity(variantRequest.getStockQuantity());
-//                variant.setWeightGram(variantRequest.getWeightGram());
-//                variant.setProduct(product);
-//                product.getVariants().add(variant);
-//            }
-//            log.debug("[PRODUCT] Cập nhật {} biến thể cho sản phẩm. id={}", productRequest.getVariants().size(), id);
-//        }
-//
-//        // Save updated product
-//        Product updatedProduct = productRepository.save(product);
-//        log.info("[PRODUCT] Cập nhật sản phẩm thành công. id={}, name={}", updatedProduct.getId(), updatedProduct.getName());
-//
-//        return buildProductDetailResponse(updatedProduct);
-//    }
+    @Transactional
+    public ProductResponse updateProduct(Long id, ProductUpdateRequest request) {
+        log.info("[PRODUCT] Cập nhật sản phẩm. id={}, name={}", id, request.getName());
 
-    public void updateProduct(Long id, ProductUpdateRequest request) {
-        // 1. Tìm Product gốc
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm ID: " + id));
+                .orElseThrow(() -> {
+                    log.warn("[PRODUCT] Sản phẩm không tìm thấy. id={}", id);
+                    return new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
+                });
 
-        // 2. Cập nhật thông tin cơ bản
+        // 1. Cập nhật thông tin cơ bản
         product.setName(request.getName());
         product.setDescription(request.getDescription());
-        product.setActive(request.getActive()); // request.getActive() tùy theo lombok
+        product.setSlug(request.getSlug());
         product.setMainImageUrl(request.getMainImageUrl());
+        product.setActive(request.getActive() != null ? request.getActive() : product.isActive());
 
-        // 3. Cập nhật Category & Brand
+        // 2. Cập nhật category & brand
         updateReferences(product, request);
 
-        // 4. Cập nhật Danh sách ảnh phụ (ProductImage)
+        // 3. Cập nhật ảnh phụ
         updateProductImages(product, request.getExtraImageUrls());
 
-        // 5. Cập nhật Biến thể (ProductVariant)
+        // 4. Cập nhật variants
         updateVariants(product, request.getVariants());
 
-        // Do có @Transactional và sử dụng Dirty Checking của Hibernate,
-        // bạn không nhất thiết phải gọi .save() trừ khi muốn flush ngay lập tức.
+        // 5. Lưu & trả về response
+        Product saved = productRepository.save(product);
+        log.info("[PRODUCT] Cập nhật thành công. id={}, name={}", saved.getId(), saved.getName());
+
+        return buildProductResponse(saved);
     }
+
 
     private void updateReferences(Product product, ProductUpdateRequest request) {
         if (request.getCategoryId() != null) {
-            Category category = categoryRepository.getReferenceById(request.getCategoryId());
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> {
+                        log.warn("[PRODUCT] Danh mục không tìm thấy. categoryId={}", request.getCategoryId());
+                        return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+                    });
             product.setCategory(category);
         }
         if (request.getBrandId() != null) {
-            Brand brand = brandRepository.getReferenceById(request.getBrandId());
+            Brand brand = brandRepository.findById(request.getBrandId())
+                    .orElseThrow(() -> {
+                        log.warn("[PRODUCT] Thương hiệu không tìm thấy. brandId={}", request.getBrandId());
+                        return new BusinessException(ErrorCode.BRAND_NOT_FOUND);
+                    });
             product.setBrand(brand);
         }
     }
 
+
     private void updateProductImages(Product product, List<String> newUrls) {
-        // Xóa sạch ảnh cũ (orphanRemoval = true trong Entity sẽ tự động xóa trong DB)
         product.getImages().clear();
 
         if (newUrls != null) {
-            for (String url : newUrls) {
+            for (int i = 0; i < newUrls.size(); i++) {
                 ProductImage img = new ProductImage();
-                img.setImageUrl(url); // Giả định BaseImage có field url
-                product.addImage(img);
+                img.setImageUrl(newUrls.get(i));
+                img.setDisplayOrder(i + 1);
+                img.setProduct(product);
+                product.getImages().add(img);
             }
+            log.debug("[PRODUCT] Cập nhật {} ảnh phụ. id={}", newUrls.size(), product.getId());
         }
     }
+
+
+    // ── updateVariants ────────────────────────────────────────────────────────────
 
     private void updateVariants(Product product, List<VariantUpdateRequest> variantRequests) {
         if (variantRequests == null) return;
 
-        // Xóa những variant không còn nằm trong request gửi lên
-        Set<Long> requestVariantIds = variantRequests.stream()
+        // ID của các variant FE gửi lên (có id = update, không có id = thêm mới)
+        Set<Long> requestIds = variantRequests.stream()
                 .map(VariantUpdateRequest::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        product.getVariants().removeIf(v -> !requestVariantIds.contains(v.getId()));
+        // Xóa variant không còn trong request
+        product.getVariants().removeIf(v -> !requestIds.contains(v.getId()));
+
+        product.getVariants().removeIf(v -> !requestIds.contains(v.getId()));
 
         for (VariantUpdateRequest vReq : variantRequests) {
             if (vReq.getId() != null) {
-                // UPDATE variant hiện có
+                // Update variant đã có
                 product.getVariants().stream()
                         .filter(v -> v.getId().equals(vReq.getId()))
                         .findFirst()
                         .ifPresent(v -> mapVariantData(v, vReq));
             } else {
-                // INSERT variant mới
+                // Thêm variant mới
                 ProductVariant newVariant = new ProductVariant();
-                mapVariantData(newVariant, vReq);
                 newVariant.setProduct(product);
+                newVariant.setVariantImages(new ArrayList<>());
+                mapVariantData(newVariant, vReq);
                 product.getVariants().add(newVariant);
             }
         }
+
+        log.debug("[PRODUCT] Cập nhật {} variants. id={}", variantRequests.size(), product.getId());
     }
+
+// ── mapVariantData ────────────────────────────────────────────────────────────
 
     private void mapVariantData(ProductVariant v, VariantUpdateRequest vReq) {
         v.setSku(vReq.getSku());
@@ -412,19 +362,24 @@ public class ProductService {
         v.setSize(vReq.getSize());
         v.setOriginalPrice(vReq.getOriginalPrice());
         v.setSalePrice(vReq.getSalePrice());
+        v.setMainImageUrl(vReq.getMainImageUrl());
         v.setStockQuantity(vReq.getStockQuantity());
         v.setWeightGram(vReq.getWeightGram());
 
-        // Xử lý ảnh của Variant (ProductVariantImage)
+        // orphanRemoval = true → clear() tự xóa ảnh variant cũ
         v.getVariantImages().clear();
+
         if (vReq.getImageUrls() != null) {
-            for (String url : vReq.getImageUrls()) {
-                ProductVariantImage vImg = new ProductVariantImage();
-                vImg.setImageUrl(url);
-                v.addImage(vImg);
+            for (int i = 0; i < vReq.getImageUrls().size(); i++) {
+                ProductVariantImage img = new ProductVariantImage();
+                img.setImageUrl(vReq.getImageUrls().get(i));
+                img.setDisplayOrder(i + 1);
+                img.setVariant(v);
+                v.getVariantImages().add(img);
             }
         }
     }
+
 
     public ProductDetailFromUpdateResponse getProductDetailFromUpdate(Long id) {
         Product product = productRepository.findById(id)
@@ -490,5 +445,13 @@ public class ProductService {
 
     public Page<ProductAdminResponse> getProductsForAdmin(Pageable pageable) {
         return productRepository.findAllForAdmin(pageable);
+    }
+
+    public List<VariantResponse> getVariantsByProductId(Long productId) {
+        List<ProductVariant> variants = productVariantRepository.findByProductId(productId);
+
+        return variants.stream()
+                .map(VariantResponse::buildVariantResponse)
+                .toList();
     }
 } 

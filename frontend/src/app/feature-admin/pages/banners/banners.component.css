@@ -209,12 +209,18 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 5px 12px;
   width: 220px;
 }
 
 .search-wrap:focus-within { border-color: #3b82f6; }
-.search-icon { font-size: 16px; color: #94a3b8; }
+.search-icon {
+  font-size: 16px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .search-input {
   flex: 1;

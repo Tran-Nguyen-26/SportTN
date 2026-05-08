@@ -1,33 +1,53 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductCardResponse } from '../../../core/models/home-response/home-response';
-// import {CartItem} from "../../../core/models/cart/cart.model";
-import {CartItem, DrawerProduct} from "../add-to-cart-drawer/add-to-cart-drawer.component";
+import { CartItem } from '../add-to-cart-drawer/add-to-cart-drawer.component';
 
-interface Spec { icon: string; text: string; }
+interface Spec {
+  icon: string;
+  text: string;
+}
 
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
-  styleUrls: ['./product-card.component.css']
+  styleUrls: ['./product-card.component.css'],
 })
 export class ProductCardComponent {
   @Input() product!: ProductCardResponse;
   @Input() specs: Spec[] = [];
+
   @Output() addToCart     = new EventEmitter<ProductCardResponse>();
   @Output() addToWishlist = new EventEmitter<ProductCardResponse>();
 
-  wishlisted = false;
-  drawerOpen = false;
-  selectedProduct: DrawerProduct | null = null;
+  wishlisted  = false;
+  drawerOpen  = false;
+
+  drawerProduct: ProductCardResponse | null = null;
 
   constructor(private router: Router) {}
 
+  // ── Navigation ─────────────────────────────────────────────────────────────
+
   goToProduct(): void {
-    if (this.product?.slug) this.router.navigate(['/product', this.product.slug]);
+    if (this.product?.slug) {
+      this.router.navigate(['/product', this.product.slug]);
+    }
   }
 
-  onAddToCart(): void { this.addToCart.emit(this.product); }
+  // ── Cart / Wishlist ────────────────────────────────────────────────────────
+
+  onAddToCart(event: Event): void {
+    event.stopPropagation();
+    this.openDrawer();
+  }
+
+  onAddedToCart(item: CartItem): void {
+    // TODO: gọi CartService.add(item)
+    console.log('Thêm vào giỏ:', item);
+    // Nếu cần emit lên parent:
+    // this.addToCart.emit(this.product);
+  }
 
   toggleWish(e: Event): void {
     e.stopPropagation();
@@ -35,13 +55,27 @@ export class ProductCardComponent {
     this.addToWishlist.emit(this.product);
   }
 
+  // ── Drawer helpers ─────────────────────────────────────────────────────────
+
+  openDrawer(): void {
+    this.drawerProduct = this.product;
+    this.drawerOpen = true;
+  }
+
+  closeDrawer(): void {
+    this.drawerOpen = false;
+  }
+
+  // ── Computed getters ───────────────────────────────────────────────────────
+
   isSaleBadge(): boolean {
     return !!this.label && this.label.startsWith('-');
   }
 
-  get name(): string    { return this.product?.name ?? ''; }
-  get brand(): string   { return this.product?.brandName ?? ''; }
-  get image(): string   { return this.product?.mainImageUrl ?? ''; }
+  get name(): string   { return this.product?.name        ?? ''; }
+  get brand(): string  { return this.product?.brandName   ?? ''; }
+  get image(): string  { return this.product?.mainImageUrl ?? ''; }
+
   get rating(): number | undefined  { return this.product?.rating; }
   get reviews(): number | undefined { return this.product?.reviewCount; }
 
@@ -50,7 +84,7 @@ export class ProductCardComponent {
   }
 
   get oldPrice(): number | null {
-    return this.product?.isOnSale ? this.product.originalPrice : null;
+    return this.product?.isOnSale ? (this.product.originalPrice ?? null) : null;
   }
 
   get label(): string {
@@ -59,23 +93,5 @@ export class ProductCardComponent {
     if (this.product?.isNew)        return 'MỚI';
     if (this.product?.isBestSeller) return 'BÁN CHẠY';
     return '';
-  }
-
-
-  openDrawer(product: ProductCardResponse) {
-    this.selectedProduct = {
-      id: product.id,
-      name: product.name,
-      brand: product.brandName,
-      imageUrl: product.mainImageUrl,
-      price: product.effectivePrice,
-      originalPrice: product.originalPrice,
-      isOnSale: product.isOnSale,
-    };
-    this.drawerOpen = true;
-  }
-
-  onAddedToCart(item: CartItem) {
-    // gọi CartService.add(item)
   }
 }
