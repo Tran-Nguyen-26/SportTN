@@ -111,7 +111,9 @@
         <app-order-summary
           [cart]="cart()!"
           [discountPercent]="discountPercent()"
-          (checkout)="proceedToCheckout()">
+          [selectedPaymentMethod]="selectedPaymentMethodId"
+          [voucherId]="appliedVoucherId"
+          (orderPlaced)="onOrderPlaced()">
         </app-order-summary>
       </div>
 

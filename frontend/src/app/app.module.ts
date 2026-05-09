@@ -70,7 +70,7 @@ import {FeatureAdminModule} from "./feature-admin/feature-admin.module";
     MatNativeDateModule,
     MatStepperModule,
     MatRadioModule,
-    FeatureAdminModule
+    FeatureAdminModule,
   ],
   providers: [
     {

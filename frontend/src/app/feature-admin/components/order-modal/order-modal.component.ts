@@ -1,9 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import {Order} from "../../pages/orders/orders.component";
+import {
+  OrderResponse,
+  OrderStatus,
+  ORDER_STATUS_LABEL,
+  PAYMENT_METHOD_LABEL
+} from "../../../core/services/order/order.service";
 
 export interface TimelineEvent {
   label: string;
-  time: string;
   done: boolean;
   active: boolean;
 }
@@ -14,93 +18,92 @@ export interface TimelineEvent {
   styleUrls: ['./order-modal.component.css']
 })
 export class OrderModalComponent implements OnInit {
-  @Input() order: Order | null = null;
-  @Input() mode: 'view' | 'edit' = 'view';
-  @Output() closed = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<Order>();
-  @Output() cancelled = new EventEmitter<string>();
 
-  editOrder: Order | null = null;
-  isSaving = false;
+  @Input() order: OrderResponse | null = null;
+  @Input() mode: 'view' | 'edit' = 'view';
+
+  @Output() closed         = new EventEmitter<void>();
+  @Output() statusUpdated  = new EventEmitter<{ id: number; status: OrderStatus }>();
+  @Output() cancelled      = new EventEmitter<{ id: number; reason?: string }>();
+
+  selectedStatus: OrderStatus | '' = '';
+  cancelReason = '';
   showCancelConfirm = false;
+  isSaving = false;
 
   statusOptions = [
-    { value: 'PENDING',   label: 'Chờ xử lý' },
-    { value: 'CONFIRMED', label: 'Đã xác nhận' },
-    { value: 'SHIPPING',  label: 'Đang giao' },
-    { value: 'DELIVERED', label: 'Đã giao' },
-    { value: 'CANCELLED', label: 'Đã hủy' },
+    { value: 'PENDING',   label: 'Chờ xử lý'   },
+    { value: 'CONFIRMED', label: 'Đã xác nhận'  },
+    { value: 'SHIPPING',  label: 'Đang giao'    },
+    { value: 'DELIVERED', label: 'Đã giao'      },
+    { value: 'CANCELLED', label: 'Đã hủy'       },
   ];
 
-  paymentOptions = ['VNPay', 'Momo', 'COD', 'Chuyển khoản'];
-
-  paymentStatusOptions = [
-    { value: 'UNPAID', label: 'Chưa thanh toán' },
-    { value: 'PAID',   label: 'Đã thanh toán' },
+  private readonly EDITABLE_STATUSES: OrderStatus[] = [
+    'PENDING', 'CONFIRMED', 'SHIPPING'
   ];
-
-  internalNote = '';
-  paymentStatus = 'UNPAID';
-  address = '';
-  quantity = 1;
 
   ngOnInit(): void {
     if (this.order) {
-      this.editOrder = { ...this.order };
-      this.address = this.getAddressMock(this.order.id);
-      this.quantity = 1;
-      this.paymentStatus = this.order.status === 'DELIVERED' ? 'PAID' : 'UNPAID';
+      this.selectedStatus = this.order.status;
     }
   }
 
   get isEditMode(): boolean { return this.mode === 'edit'; }
 
   get canEdit(): boolean {
-    return this.order?.status === 'PENDING' || this.order?.status === 'CONFIRMED';
+    return this.EDITABLE_STATUSES.includes(this.order?.status as OrderStatus);
   }
 
   get timeline(): TimelineEvent[] {
-    const steps = ['PENDING', 'CONFIRMED', 'SHIPPING', 'DELIVERED'];
-    const currentIdx = steps.indexOf(this.order?.status ?? '');
+    const steps: OrderStatus[] = ['PENDING', 'CONFIRMED', 'SHIPPING', 'DELIVERED'];
+    const currentIdx = steps.indexOf(this.order?.status as OrderStatus);
     return [
-      { label: 'Đơn đã được đặt',       time: this.order?.date + ' · 09:12', done: currentIdx >= 0, active: currentIdx === 0 },
-      { label: 'Đã xác nhận & đóng gói', time: this.order?.date + ' · 10:45', done: currentIdx >= 1, active: currentIdx === 1 },
-      { label: 'Đang vận chuyển',         time: this.order?.date + ' · 08:30', done: currentIdx >= 2, active: currentIdx === 2 },
-      { label: 'Giao hàng thành công',    time: this.order?.date + ' · 14:20', done: currentIdx >= 3, active: currentIdx === 3 },
+      { label: 'Đơn đã được đặt',        done: currentIdx > 0,  active: currentIdx === 0 },
+      { label: 'Đã xác nhận & đóng gói', done: currentIdx > 1,  active: currentIdx === 1 },
+      { label: 'Đang vận chuyển',         done: currentIdx > 2,  active: currentIdx === 2 },
+      { label: 'Giao hàng thành công',    done: currentIdx >= 3, active: currentIdx === 3 },
     ];
   }
 
   getStatusLabel(status: string): string {
-    return this.statusOptions.find(s => s.value === status)?.label ?? status;
+    return ORDER_STATUS_LABEL[status as OrderStatus] ?? status;
   }
 
   getStatusClass(status: string): string {
     const map: Record<string, string> = {
-      PENDING: 'pending', CONFIRMED: 'confirmed',
-      SHIPPING: 'shipping', DELIVERED: 'delivered', CANCELLED: 'cancelled'
+      PENDING:   'pending',
+      CONFIRMED: 'confirmed',
+      SHIPPING:  'shipping',
+      DELIVERED: 'delivered',
+      CANCELLED: 'cancelled',
+      REFUNDED:  'refunded',
     };
     return map[status] ?? '';
+  }
+
+  getPaymentMethodLabel(method: string): string {
+    return PAYMENT_METHOD_LABEL[method as keyof typeof PAYMENT_METHOD_LABEL] ?? method;
   }
 
   formatPrice(price: number): string {
     return price.toLocaleString('vi-VN') + 'đ';
   }
 
-  adjustQty(delta: number): void {
-    this.quantity = Math.max(1, this.quantity + delta);
-    if (this.editOrder) {
-      this.editOrder.amount = (this.order!.amount / 1) * this.quantity;
-    }
+  // ── Actions ───────────────────────────────────────────────────────────────────
+
+  switchToEdit(): void {
+    this.mode = 'edit';
   }
 
   onSave(): void {
-    if (!this.editOrder) return;
+    if (!this.order || !this.selectedStatus) return;
     this.isSaving = true;
-    setTimeout(() => {
-      this.isSaving = false;
-      this.saved.emit({ ...this.editOrder! });
-      this.close();
-    }, 600);
+    this.statusUpdated.emit({
+      id: this.order.id,
+      status: this.selectedStatus as OrderStatus
+    });
+    this.isSaving = false;
   }
 
   onCancelOrder(): void {
@@ -108,10 +111,12 @@ export class OrderModalComponent implements OnInit {
   }
 
   confirmCancel(): void {
-    if (this.order) {
-      this.cancelled.emit(this.order.id);
-      this.close();
-    }
+    if (!this.order) return;
+    this.cancelled.emit({
+      id: this.order.id,
+      reason: this.cancelReason || undefined
+    });
+    this.close();
   }
 
   close(): void {
@@ -122,19 +127,5 @@ export class OrderModalComponent implements OnInit {
     if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.close();
     }
-  }
-
-  switchToEdit(): void {
-    this.mode = 'edit';
-  }
-
-  private getAddressMock(id: string): string {
-    const map: Record<string, string> = {
-      '#DH001': '123 Nguyễn Trãi, Thanh Xuân, Hà Nội',
-      '#DH002': '45 Lê Lợi, Quận 1, TP. Hồ Chí Minh',
-      '#DH003': '78 Đinh Tiên Hoàng, Hoàn Kiếm, Hà Nội',
-      '#DH004': '12 Trần Phú, Hải Châu, Đà Nẵng',
-    };
-    return map[id] ?? '456 Hai Bà Trưng, Hà Nội';
   }
 }

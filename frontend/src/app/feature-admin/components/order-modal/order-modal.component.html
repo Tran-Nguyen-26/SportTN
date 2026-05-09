@@ -9,7 +9,7 @@
           <svg *ngIf="isEditMode" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
         </span>
         {{ isEditMode ? 'Cập nhật đơn hàng' : 'Chi tiết đơn hàng' }}
-        <span class="order-id-badge">{{ order.id }}</span>
+        <span class="order-id-badge">{{ order.orderCode }}</span>
       </div>
       <button class="close-btn" (click)="close()" title="Đóng">
         <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
@@ -25,10 +25,10 @@
         <div class="section">
           <div class="section-title">Khách hàng</div>
           <div class="customer-card">
-            <div class="avatar">{{ order.avatar }}</div>
+            <div class="avatar">{{ order.shippingInfo?.receiverName?.charAt(0) }}</div>
             <div class="customer-info">
-              <div class="cname">{{ order.customer }}</div>
-              <div class="cdetail">0912 345 678 &middot; khachhang@email.com</div>
+              <div class="cname">{{ order.shippingInfo?.receiverName }}</div>
+              <div class="cdetail">{{ order.shippingInfo?.receiverPhone }}</div>
             </div>
             <span class="status-pill" [class]="getStatusClass(order.status)">
               <span class="dot"></span>{{ getStatusLabel(order.status) }}
@@ -39,13 +39,18 @@
         <!-- Product -->
         <div class="section">
           <div class="section-title">Sản phẩm</div>
-          <div class="product-row">
-            <div class="product-thumb">🛍</div>
-            <div class="product-info">
-              <div class="pname">{{ order.product }}</div>
-              <div class="pdetail">Số lượng: 1</div>
+          <div class="product-row" *ngFor="let item of order.items">
+            <div class="product-thumb">
+              <img [src]="item.imageUrl" [alt]="item.productName">
             </div>
-            <div class="price">{{ formatPrice(order.amount) }}</div>
+            <div class="product-info">
+              <div class="pname">{{ item.productName }}</div>
+              <div class="pdetail">{{ item.color }} - {{ item.size }} · Số lượng: {{ item.quantity }}</div>
+            </div>
+            <div class="price">{{ formatPrice(item.priceAtPurchase) }}</div>
+          </div>
+          <div class="product-row" *ngIf="!order.items?.length">
+            <div class="pdetail">{{ order.itemCount }} sản phẩm</div>
           </div>
         </div>
 
@@ -55,23 +60,43 @@
           <div class="info-grid">
             <div class="info-cell">
               <span class="info-label">Ngày đặt</span>
-              <span class="info-value">{{ order.date }}</span>
+              <span class="info-value">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
             <div class="info-cell">
               <span class="info-label">Thanh toán</span>
-              <span class="info-value">{{ order.paymentMethod }}</span>
+              <span class="info-value">{{ getPaymentMethodLabel(order.paymentMethod) }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Tạm tính</span>
+              <span class="info-value">{{ formatPrice(order.totalAmount) }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Phí vận chuyển</span>
+              <span class="info-value">{{ formatPrice(order.shippingFee) }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Giảm giá</span>
+              <span class="info-value">{{ formatPrice(order.voucherDiscount) }}</span>
             </div>
             <div class="info-cell">
               <span class="info-label">Tổng tiền</span>
-              <span class="info-value amount-green">{{ formatPrice(order.amount) }}</span>
+              <span class="info-value amount-green">{{ formatPrice(order.finalAmount) }}</span>
             </div>
             <div class="info-cell">
               <span class="info-label">Trạng thái TT</span>
-              <span class="info-value">{{ order.status === 'DELIVERED' ? 'Đã thanh toán' : 'Chưa thanh toán' }}</span>
+              <span class="info-value">{{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Số điện thoại</span>
+              <span class="info-value">{{ order.shippingInfo?.receiverPhone }}</span>
             </div>
             <div class="info-cell full">
               <span class="info-label">Địa chỉ giao hàng</span>
-              <span class="info-value">{{ address }}</span>
+              <span class="info-value">{{ order.shippingInfo?.addressFull }}</span>
+            </div>
+            <div class="info-cell full" *ngIf="order.customerNote">
+              <span class="info-label">Ghi chú</span>
+              <span class="info-value">{{ order.customerNote }}</span>
             </div>
           </div>
         </div>
@@ -83,22 +108,23 @@
             <div class="tl-item" *ngFor="let step of timeline">
               <div class="tl-dot" [class.done]="step.done" [class.active]="step.active && !step.done"></div>
               <div class="tl-body">
-                <div class="tl-label" [class.muted]="!step.done">{{ step.label }}</div>
-                <div class="tl-time" *ngIf="step.done">{{ step.time }}</div>
+                <div class="tl-label" [class.muted]="!step.done && !step.active">{{ step.label }}</div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Cancelled -->
         <div class="cancelled-notice" *ngIf="order.status === 'CANCELLED'">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
           Đơn hàng này đã bị hủy
+          <span *ngIf="order.cancelReason"> · Lý do: {{ order.cancelReason }}</span>
         </div>
 
       </ng-container>
 
       <!-- ═══════════════════ EDIT MODE ═══════════════════ -->
-      <ng-container *ngIf="isEditMode && editOrder">
+      <ng-container *ngIf="isEditMode">
 
         <div class="edit-notice" *ngIf="!canEdit">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
@@ -111,25 +137,22 @@
           <div class="form-row-2">
             <div class="form-group">
               <label class="form-label">Trạng thái đơn hàng</label>
-              <select class="form-control select" [(ngModel)]="editOrder.status" [disabled]="!canEdit">
+              <select class="form-control select" [(ngModel)]="selectedStatus" [disabled]="!canEdit">
                 <option *ngFor="let s of statusOptions" [value]="s.value">{{ s.label }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Trạng thái thanh toán</label>
-              <select class="form-control select" [(ngModel)]="paymentStatus" [disabled]="!canEdit">
-                <option *ngFor="let p of paymentStatusOptions" [value]="p.value">{{ p.label }}</option>
-              </select>
+              <span class="info-label">Trạng thái thanh toán</span>
+              <span class="info-value">{{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}</span>
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" *ngIf="canEdit">
             <label class="form-label">Ghi chú nội bộ</label>
             <textarea
               class="form-control textarea"
-              [(ngModel)]="internalNote"
+              [(ngModel)]="cancelReason"
               placeholder="Nhập ghi chú cho đơn hàng này..."
-              rows="2"
-              [disabled]="!canEdit">
+              rows="2">
             </textarea>
           </div>
         </div>
@@ -137,40 +160,44 @@
         <!-- Shipping -->
         <div class="section">
           <div class="section-title">Thông tin giao hàng</div>
-          <div class="form-group">
-            <label class="form-label">Địa chỉ giao hàng</label>
-            <input class="form-control" type="text" [(ngModel)]="address" [disabled]="!canEdit" placeholder="Nhập địa chỉ...">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Phương thức thanh toán</label>
-            <select class="form-control select" [(ngModel)]="editOrder.paymentMethod" [disabled]="!canEdit">
-              <option *ngFor="let p of paymentOptions" [value]="p">{{ p }}</option>
-            </select>
+          <div class="info-grid">
+            <div class="info-cell">
+              <span class="info-label">Người nhận</span>
+              <span class="info-value">{{ order.shippingInfo?.receiverName }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Số điện thoại</span>
+              <span class="info-value">{{ order.shippingInfo?.receiverPhone }}</span>
+            </div>
+            <div class="info-cell full">
+              <span class="info-label">Địa chỉ</span>
+              <span class="info-value">{{ order.shippingInfo?.addressFull }}</span>
+            </div>
           </div>
         </div>
 
         <!-- Product -->
         <div class="section" style="margin-bottom:0">
           <div class="section-title">Sản phẩm</div>
-          <div class="product-row edit-product">
-            <div class="product-thumb">🛍</div>
+          <div class="product-row" *ngFor="let item of order.items">
+            <div class="product-thumb">
+              <img [src]="item.imageUrl" [alt]="item.productName">
+            </div>
             <div class="product-info">
-              <div class="pname">{{ order.product }}</div>
-              <div class="pdetail">{{ formatPrice(order.amount) }} / sản phẩm</div>
+              <div class="pname">{{ item.productName }}</div>
+              <div class="pdetail">{{ item.color }} - {{ item.size }} · x{{ item.quantity }}</div>
             </div>
-            <div class="qty-control" *ngIf="canEdit">
-              <button class="qty-btn" (click)="adjustQty(-1)" [disabled]="quantity <= 1">−</button>
-              <span class="qty-val">{{ quantity }}</span>
-              <button class="qty-btn" (click)="adjustQty(1)">+</button>
-            </div>
-            <div class="price">{{ formatPrice(editOrder.amount) }}</div>
+            <div class="price">{{ formatPrice(item.priceAtPurchase) }}</div>
+          </div>
+          <div class="product-row" *ngIf="!order.items?.length">
+            <div class="pdetail">{{ order.itemCount }} sản phẩm</div>
           </div>
         </div>
 
         <div class="divider"></div>
         <div class="total-row">
           <span class="total-label">Tổng cộng</span>
-          <span class="total-val">{{ formatPrice(editOrder.amount) }}</span>
+          <span class="total-val">{{ formatPrice(order.finalAmount) }}</span>
         </div>
 
       </ng-container>
@@ -189,6 +216,7 @@
       <ng-container *ngIf="isEditMode">
         <button class="btn btn-danger" (click)="onCancelOrder()" *ngIf="canEdit && !showCancelConfirm">Hủy đơn</button>
         <div class="confirm-cancel" *ngIf="showCancelConfirm">
+          <input class="form-control" [(ngModel)]="cancelReason" placeholder="Lý do hủy (tùy chọn)">
           <span class="confirm-text">Xác nhận hủy?</span>
           <button class="btn btn-danger-solid" (click)="confirmCancel()">Có, hủy đơn</button>
           <button class="btn btn-ghost" (click)="showCancelConfirm = false">Không</button>

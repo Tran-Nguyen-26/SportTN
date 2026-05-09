@@ -15,7 +15,7 @@ export interface ProductDtoForCart {
 }
 
 export interface CartItemResponse {
-  id: number;
+  cartItemId: number;
   variant: VariantResponse;
   quantity: number;
   addedAt: string;
@@ -49,5 +49,14 @@ export class CartService {
 
   addItemToCart(request: AddToCartRequest): Observable<ApiResponse<CartResponse>> {
     return this.http.post<ApiResponse<CartResponse>>(`${this.apiUrl}/items`, request);
+  }
+
+  removeItem(cartItemId: number): Observable<ApiResponse<CartResponse>> {
+    console.log("Xóa cartItem: ", `${this.apiUrl}/items/${cartItemId}`);
+    return this.http.delete<ApiResponse<CartResponse>>(`${this.apiUrl}/items/${cartItemId}`);
+  }
+
+  clearCart(): Observable<ApiResponse<any>> {
+    return this.http.delete<ApiResponse<any>>(this.apiUrl);
   }
 }

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../enviroments/enviroment';
 import { ApiResponse } from '../../models/home-response/home-response';
 import { AdminUser, UserForm, UserRole } from '../../../feature-admin/pages/users/users.component';
+import {PageResponse} from "../../models/page-response";
 
 export interface AdminUserCreateRequest {
   name: string;
@@ -66,5 +67,11 @@ export class UserService {
 
   deleteAdminUser(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl_admin}/users/${id}`);
+  }
+
+  getCustomers(params?: { page?: number; size?: number }): Observable<ApiResponse<PageResponse<AdminUser>>> {
+    return this.http.get<ApiResponse<PageResponse<AdminUser>>>(
+      `${this.apiUrl_admin}/customers`, { params }
+    );
   }
 }

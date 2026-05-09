@@ -55,6 +55,7 @@ export class LoginPageComponent implements OnInit {
       this.authService.login(credenitals).subscribe({
         next: (response) => {
           this.isLoading = false;
+          this.loginForm.enable();
           if (this.loginForm.get('rememberMe')?.value) {
             localStorage.setItem('rememberEmail', this.loginForm.value.email);
           } else {
@@ -74,6 +75,7 @@ export class LoginPageComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
+          this.loginForm.enable();
           this.errorMessage = err.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!';
         }
       });

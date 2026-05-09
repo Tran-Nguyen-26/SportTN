@@ -1,6 +1,7 @@
 package com.ttn.sporttn.modules.payment.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -47,4 +48,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
      * Find payments created after a specific date
      */
     Page<Payment> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime date, Pageable pageable);
+
+    Optional<Payment> findByOrderIdAndPaymentStatus(Long orderId, String status);
 }

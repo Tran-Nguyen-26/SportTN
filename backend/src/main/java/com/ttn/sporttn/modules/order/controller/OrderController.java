@@ -78,18 +78,6 @@ public class OrderController {
     }
 
 
-    @PutMapping("/{id}/status")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<OrderResponse> updateOrderStatus(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateOrderStatusRequest request) {
-        log.info("[ORDER] Cập nhật trạng thái đơn hàng. orderId={}, status={}", id, request.getStatus());
-        
-        OrderResponse response = orderService.updateOrderStatus(id, request);
-        return ApiResponse.ok(response, "Cập nhật trạng thái đơn hàng thành công");
-    }
-
     @PostMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderResponse> cancelOrder(

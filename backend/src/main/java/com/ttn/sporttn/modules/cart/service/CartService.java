@@ -121,7 +121,7 @@ public class CartService {
         cartRepository.save(cart);
 
         log.info("[CART] Xóa sản phẩm khỏi giỏ thành công. userId={}, cartItemId={}", userId, cartItemId);
-        return buildCartResponse(cart);
+        return getCart(userId);
     }
 
     @Transactional

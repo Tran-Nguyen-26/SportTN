@@ -1,111 +1,246 @@
-<div class="address-container">
-  <header class="page-header">
-    <div class="header-text">
-      <h2>Sổ địa chỉ</h2>
-      <p>Quản lý các địa điểm nhận hàng của bạn</p>
+<!-- address.component.html -->
+<div class="address-page">
+
+  <!-- ── Toast notification ── -->
+  <div class="toast" *ngIf="toast" [class.toast--success]="toast.type === 'success'" [class.toast--error]="toast.type === 'error'">
+    <svg *ngIf="toast.type === 'success'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    <svg *ngIf="toast.type === 'error'"   width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    {{ toast.message }}
+  </div>
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+      <div>
+        <h2 class="page-title">Sổ địa chỉ</h2>
+        <p class="page-sub">Quản lý địa điểm nhận hàng của bạn</p>
+      </div>
     </div>
-    <button mat-raised-button class="btn-add-new" (click)="showAddForm()" *ngIf="!showForm">
-      <mat-icon>add_location_alt</mat-icon>
-      Thêm địa chỉ mới
+    <button class="btn-add" (click)="showAddForm()" *ngIf="!showForm">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Thêm địa chỉ
     </button>
-  </header>
-
-  <div *ngIf="successMessage" class="success-message">
-    <mat-icon>check_circle</mat-icon>
-    <span>{{ successMessage }}</span>
   </div>
 
-  <mat-card *ngIf="showForm" class="form-card">
-    <mat-card-header>
-      <mat-icon class="header-icon">{{ editingId ? 'edit_location' : 'add_location' }}</mat-icon>
-      <mat-card-title>{{ editingId ? 'Cập nhật địa chỉ' : 'Thêm địa chỉ mới' }}</mat-card-title>
-    </mat-card-header>
+  <!-- ── Form thêm / sửa ── -->
+  <div class="form-card" *ngIf="showForm">
+    <div class="form-card-header">
+      <div class="form-card-title-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path *ngIf="!editingId" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          <path *ngIf="editingId"  d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path *ngIf="editingId"  d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        <span>{{ editingId ? 'Cập nhật địa chỉ' : 'Thêm địa chỉ mới' }}</span>
+      </div>
+      <button class="form-close-btn" (click)="cancelForm()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
 
-    <mat-card-content>
-      <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Tên gợi nhớ (Ví dụ: Nhà riêng, Công ty)</mat-label>
-            <input matInput formControlName="name">
-            <mat-icon matPrefix>label</mat-icon>
-          </mat-form-field>
+    <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="addr-form" novalidate>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Số điện thoại nhận hàng</mat-label>
-            <input matInput formControlName="phoneNumber" type="tel">
-            <mat-icon matPrefix>phone</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Địa chỉ chi tiết (Số nhà, tên đường...)</mat-label>
-            <input matInput formControlName="address">
-            <mat-icon matPrefix>home</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Tỉnh / Thành phố</mat-label>
-            <input matInput formControlName="city">
-            <mat-icon matPrefix>location_city</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Quận / Huyện</mat-label>
-            <mat-select formControlName="state">
-              <mat-option *ngFor="let state of getStateOptions()" [value]="state">{{ state }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+      <!-- Row 1: Họ tên + SĐT -->
+      <div class="form-row">
+        <div class="form-field" [class.has-error]="fieldError('receiverName')">
+          <label class="field-label">
+            Họ và tên người nhận <span class="required">*</span>
+          </label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <input class="field-input" formControlName="receiverName" placeholder="Nguyễn Văn A" type="text" autocomplete="name">
+          </div>
+          <span class="field-error" *ngIf="fieldError('receiverName')">Vui lòng nhập họ tên (tối thiểu 2 ký tự)</span>
         </div>
 
-        <div class="checkbox-wrapper">
-          <mat-checkbox formControlName="isDefault">Đặt làm địa chỉ mặc định</mat-checkbox>
-        </div>
-
-        <div class="form-actions">
-          <button mat-button class="btn-cancel" type="button" (click)="cancelForm()">Hủy bỏ</button>
-          <button mat-raised-button class="btn-save-address" type="submit" [disabled]="!addressForm.valid || isLoading">
-            <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
-            <span>{{ editingId ? 'Lưu cập nhật' : 'Tạo địa chỉ' }}</span>
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <div class="address-grid">
-    <div *ngFor="let address of addresses" class="address-item-card" [class.is-default]="address.isDefault">
-      <div class="address-content">
-        <div class="address-info-header">
-          <span class="label-tag">{{ address.name }}</span>
-          <span *ngIf="address.isDefault" class="default-pill">Mặc định</span>
-        </div>
-
-        <div class="contact-info">
-          <p class="user-name"><strong>Nguyên Trần</strong></p> <p class="phone-text">{{ address.phoneNumber }}</p>
-        </div>
-
-        <div class="location-info">
-          <p>{{ address.address }}</p>
-          <p>{{ address.city }}, {{ address.state }}</p>
+        <div class="form-field" [class.has-error]="fieldError('receiverPhone')">
+          <label class="field-label">
+            Số điện thoại <span class="required">*</span>
+          </label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.32C1.6 2.18 2.4 1.17 3.52 1H6.5a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6.08 6.08l1.36-1.36a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <input class="field-input" formControlName="receiverPhone" placeholder="0901234567" type="tel" autocomplete="tel">
+          </div>
+          <span class="field-error" *ngIf="fieldError('receiverPhone')">Số điện thoại không hợp lệ (VD: 0901234567)</span>
         </div>
       </div>
 
-      <div class="address-actions-sidebar">
-        <button mat-icon-button class="edit-btn" (click)="editAddress(address)" matTooltip="Sửa">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button class="delete-btn" (click)="deleteAddress(address.id)" matTooltip="Xóa">
-          <mat-icon>delete_outline</mat-icon>
-        </button>
-        <button mat-icon-button class="set-default-btn" *ngIf="!address.isDefault"
-                (click)="setDefaultAddress(address.id)" matTooltip="Đặt làm mặc định">
-          <mat-icon>bookmark_border</mat-icon>
+      <!-- Row 2: Tỉnh + Quận/Huyện + Phường/Xã -->
+      <div class="form-row form-row--3">
+        <div class="form-field" [class.has-error]="fieldError('province')">
+          <label class="field-label">Tỉnh / Thành phố <span class="required">*</span></label>
+          <div class="input-wrap input-wrap--select">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <select class="field-input field-select" formControlName="province">
+              <option value="" disabled>Chọn tỉnh / thành</option>
+              <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+            </select>
+            <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <span class="field-error" *ngIf="fieldError('province')">Vui lòng chọn tỉnh / thành phố</span>
+        </div>
+
+        <div class="form-field" [class.has-error]="fieldError('district')">
+          <label class="field-label">Quận / Huyện <span class="required">*</span></label>
+          <div class="input-wrap">
+            <input class="field-input" formControlName="district" placeholder="VD: Quận 1" type="text">
+          </div>
+          <span class="field-error" *ngIf="fieldError('district')">Vui lòng nhập quận / huyện</span>
+        </div>
+
+        <div class="form-field" [class.has-error]="fieldError('ward')">
+          <label class="field-label">Phường / Xã <span class="required">*</span></label>
+          <div class="input-wrap">
+            <input class="field-input" formControlName="ward" placeholder="VD: Phường Bến Nghé" type="text">
+          </div>
+          <span class="field-error" *ngIf="fieldError('ward')">Vui lòng nhập phường / xã</span>
+        </div>
+      </div>
+
+      <!-- Row 3: Địa chỉ chi tiết -->
+      <div class="form-field full-width" [class.has-error]="fieldError('addressDetail')">
+        <label class="field-label">Số nhà, tên đường <span class="required">*</span></label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <input class="field-input" formControlName="addressDetail" placeholder="VD: 123 Đường Lê Lợi" type="text" autocomplete="street-address">
+        </div>
+        <span class="field-error" *ngIf="fieldError('addressDetail')">Vui lòng nhập địa chỉ chi tiết</span>
+      </div>
+
+      <!-- Checkbox mặc định -->
+      <label class="checkbox-row">
+        <div class="custom-checkbox" [class.checked]="addressForm.get('isDefault')?.value" (click)="addressForm.get('isDefault')?.setValue(!addressForm.get('isDefault')?.value)">
+          <svg *ngIf="addressForm.get('isDefault')?.value" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <input type="checkbox" formControlName="isDefault" hidden>
+        <span class="checkbox-label">Đặt làm địa chỉ giao hàng mặc định</span>
+      </label>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn-cancel-form" (click)="cancelForm()">Hủy</button>
+        <button type="submit" class="btn-save" [disabled]="isSaving">
+          <span class="btn-spinner" *ngIf="isSaving"></span>
+          <svg *ngIf="!isSaving" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ editingId ? 'Lưu cập nhật' : 'Thêm địa chỉ' }}
         </button>
       </div>
+
+    </form>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <div class="loading-row" *ngFor="let i of [1,2]">
+      <div class="skeleton skeleton--card"></div>
     </div>
   </div>
 
-  <div *ngIf="addresses.length === 0 && !showForm" class="empty-state">
-    <mat-icon>location_off</mat-icon>
-    <p>Bạn chưa có địa chỉ nào. Hãy thêm một cái để đặt hàng nhanh hơn nhé!</p>
+  <!-- ── Empty state ── -->
+  <div class="empty-state" *ngIf="!isLoading && addresses.length === 0 && !showForm">
+    <div class="empty-icon">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <p class="empty-title">Chưa có địa chỉ nào</p>
+    <p class="empty-sub">Thêm địa chỉ để đặt hàng nhanh hơn</p>
+    <button class="btn-add" (click)="showAddForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Thêm địa chỉ đầu tiên
+    </button>
   </div>
+
+  <!-- ── Danh sách địa chỉ ── -->
+  <div class="address-grid" *ngIf="!isLoading && addresses.length > 0">
+    <div
+      class="address-card"
+      *ngFor="let addr of addresses"
+      [class.address-card--default]="addr.isDefault">
+
+      <!-- Default ribbon -->
+      <div class="default-ribbon" *ngIf="addr.isDefault">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mặc định
+      </div>
+
+      <!-- Card body -->
+      <div class="card-body">
+        <!-- Avatar chữ cái -->
+        <div class="addr-avatar">{{ addr.receiverName.charAt(0).toUpperCase() }}</div>
+
+        <div class="addr-info">
+          <p class="addr-name">{{ addr.receiverName }}</p>
+          <p class="addr-phone">{{ addr.receiverPhone }}</p>
+          <p class="addr-full">{{ getFullAddress(addr) }}</p>
+        </div>
+      </div>
+
+      <!-- Card actions -->
+      <div class="card-actions">
+        <button class="action-btn action-btn--edit" (click)="editAddress(addr)" title="Chỉnh sửa">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Sửa
+        </button>
+
+        <button
+          class="action-btn action-btn--default"
+          *ngIf="!addr.isDefault"
+          (click)="setDefaultAddress(addr.id)"
+          title="Đặt làm mặc định">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          Mặc định
+        </button>
+
+        <button
+          class="action-btn action-btn--delete"
+          (click)="confirmDelete(addr.id)"
+          title="Xóa">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          Xóa
+        </button>
+      </div>
+
+      <!-- Delete confirm inline -->
+      <div class="delete-confirm" *ngIf="deleteConfirmId === addr.id">
+        <p>Xóa địa chỉ này?</p>
+        <div class="delete-confirm-actions">
+          <button class="dc-cancel" (click)="cancelDelete()">Hủy</button>
+          <button class="dc-confirm" (click)="deleteAddress(addr.id)">Xóa</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>

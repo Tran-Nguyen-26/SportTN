@@ -62,20 +62,23 @@ export class CartItemComponent {
   increaseQuantity(): void {
     const item = this.itemSignal();
     if (item && item.quantity < item.variant.stockQuantity) {
-      this.quantityChanged.emit({ itemId: item.id, currentQty: item.quantity, delta: 1 });
+      this.quantityChanged.emit({ itemId: item.cartItemId, currentQty: item.quantity, delta: 1 });
     }
   }
 
   decreaseQuantity(): void {
     const item = this.itemSignal();
     if (item && item.quantity > 1) {
-      this.quantityChanged.emit({ itemId: item.id, currentQty: item.quantity, delta: -1 });
+      this.quantityChanged.emit({ itemId: item.cartItemId, currentQty: item.quantity, delta: -1 });
     }
   }
 
   remove(): void {
     const item = this.itemSignal();
-    if (item) this.itemRemoved.emit(item.id);
+    if (item) {
+      console.log('Emit item ID:', item.cartItemId);
+      this.itemRemoved.emit(item.cartItemId);
+    }
   }
 
   // onImageError(event: Event): void {

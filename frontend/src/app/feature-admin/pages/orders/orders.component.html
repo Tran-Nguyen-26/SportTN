@@ -14,7 +14,7 @@
         <mat-icon>pending</mat-icon>
       </div>
       <div class="stat-info">
-        <span class="stat-value">24</span>
+        <span class="stat-value">{{ stats.pending }}</span>
         <span class="stat-label">Chờ xử lý</span>
       </div>
     </div>
@@ -23,7 +23,7 @@
         <mat-icon>local_shipping</mat-icon>
       </div>
       <div class="stat-info">
-        <span class="stat-value">38</span>
+        <span class="stat-value">{{ stats.shipping }}</span>
         <span class="stat-label">Đang giao</span>
       </div>
     </div>
@@ -32,7 +32,7 @@
         <mat-icon>check_circle</mat-icon>
       </div>
       <div class="stat-info">
-        <span class="stat-value">1.204</span>
+        <span class="stat-value">{{ stats.delivered}}</span>
         <span class="stat-label">Đã giao</span>
       </div>
     </div>
@@ -41,7 +41,7 @@
         <mat-icon>cancel</mat-icon>
       </div>
       <div class="stat-info">
-        <span class="stat-value">18</span>
+        <span class="stat-value">{{ stats.cancelled }}</span>
         <span class="stat-label">Đã hủy</span>
       </div>
     </div>
@@ -86,18 +86,18 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let order of filteredOrders">
-          <td class="order-id">{{ order.id }}</td>
+        <tr *ngFor="let order of orders">
+          <td class="order-id">{{ order.orderCode }}</td>
           <td>
             <div class="customer-cell">
-              <div class="customer-avatar">{{ order.avatar }}</div>
-              <span class="customer-name">{{ order.customer }}</span>
+              <div class="customer-avatar">{{ order.shippingInfo?.receiverName?.charAt(0) }}</div>
+              <span class="customer-name">{{ order.shippingInfo?.receiverName }}</span>
             </div>
           </td>
-          <td class="product-name">{{ order.product }}</td>
-          <td class="date">{{ order.date }}</td>
+          <td class="product-name">{{ order.itemCount }}</td>
+          <td class="date">{{ order.createdAt | date:'HH:mm - dd/MM/yyyy' }}</td>
           <td class="payment">{{ order.paymentMethod }}</td>
-          <td class="amount">{{ formatPrice(order.amount) }}</td>
+          <td class="amount">{{ formatPrice(order.finalAmount) }}</td>
           <td>
             <app-status-badge [status]="order.status"></app-status-badge>
           </td>
@@ -116,7 +116,7 @@
       </table>
 
       <!-- Empty state -->
-      <div class="empty-state" *ngIf="filteredOrders.length === 0">
+      <div class="empty-state" *ngIf="!isLoading && orders.length === 0">
         <mat-icon>inbox</mat-icon>
         <p>Không tìm thấy đơn hàng</p>
       </div>
@@ -125,7 +125,7 @@
     <!-- Pagination -->
     <div class="table-footer">
       <span class="result-count">
-        Hiển thị {{ filteredOrders.length }} / {{ orders.length }} đơn hàng
+        Hiển thị {{ orders.length }} / {{ orders.length }} đơn hàng
       </span>
       <div class="pagination">
         <button class="page-btn" disabled>
@@ -149,6 +149,6 @@
   [order]="selectedOrder"
   [mode]="modalMode"
   (closed)="closeModal()"
-  (saved)="onSaved($event)"
-  (cancelled)="onCancelled($event)">
+  (statusUpdated)="updateStatus($event.id, $event.status)"
+  (cancelled)="cancelOrder($event.id, $event.reason)">
 </app-order-modal>

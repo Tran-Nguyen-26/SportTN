@@ -1,108 +1,199 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import {
+  DashboardService,
+  DashboardStatsResponse,
+  RevenueChartResponse,
+  TopProductResponse,
+  LowStockResponse,
+  RecentOrderResponse,
+  OrderStatusSummary
+} from "../../../core/services/overview/dashboard.service";
+import { forkJoin } from 'rxjs';
+import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR } from '../../../core/services/order/order.service';
+
+interface StatItem {
+  icon: string;
+  color: string;
+  value: string;
+  label: string;
+  trend: number;
+}
+
+interface OrderStatusItem {
+  label: string;
+  count: number;
+  percent: number;
+  color: string;
+}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
   today: string = new Date().toLocaleDateString('vi-VN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
 
   selectedPeriod: string = 'today';
+  loading = false;
+  error: string | null = null;
 
   periods = [
-    { value: 'today',  label: 'Hôm nay' },
-    { value: 'week',   label: '7 ngày' },
-    { value: 'month',  label: '30 ngày' },
+    { value: 'today', label: 'Hôm nay' },
+    { value: 'week',  label: '7 ngày'  },
+    { value: 'month', label: '30 ngày' },
   ];
 
   get periodLabel(): string {
     const map: Record<string, string> = {
       today: 'hôm qua', week: 'tuần', month: 'tháng'
     };
-    return map[this.selectedPeriod];
+    return map[this.selectedPeriod] || '';
   }
 
-  stats = [
-    {
-      icon: 'payments',
-      color: 'blue',
-      value: '48.250.000đ',
-      label: 'Doanh thu hôm nay',
-      trend: 12.5
-    },
-    {
-      icon: 'shopping_bag',
-      color: 'green',
-      value: '136',
-      label: 'Đơn hàng mới',
-      trend: 8.3
-    },
-    {
-      icon: 'people',
-      color: 'orange',
-      value: '24',
-      label: 'Khách hàng mới',
-      trend: -3.1
-    },
-    {
-      icon: 'inventory_2',
-      color: 'purple',
-      value: '1.248',
-      label: 'Sản phẩm đang bán',
-      trend: 2.0
-    },
-  ];
-
-  revenueData = [
-    { day: 'T2', revenue: 32000000, revenuePercent: 52, orders: 98,  orderPercent: 40 },
-    { day: 'T3', revenue: 41000000, revenuePercent: 66, orders: 120, orderPercent: 49 },
-    { day: 'T4', revenue: 28000000, revenuePercent: 45, orders: 85,  orderPercent: 35 },
-    { day: 'T5', revenue: 55000000, revenuePercent: 89, orders: 162, orderPercent: 66 },
-    { day: 'T6', revenue: 62000000, revenuePercent: 100, orders: 245, orderPercent: 100 },
-    { day: 'T7', revenue: 48000000, revenuePercent: 77, orders: 136, orderPercent: 56 },
-    { day: 'CN', revenue: 38000000, revenuePercent: 61, orders: 110, orderPercent: 45 },
-  ];
+  // API Data
+  stats: StatItem[]                    = [];
+  revenueData: RevenueChartResponse[]  = [];
+  topProducts: TopProductResponse[]    = [];
+  lowStockItems: LowStockResponse[]    = [];
+  recentOrders: RecentOrderResponse[]  = [];
+  orderStatuses: OrderStatusItem[]     = [];
 
   yLabels = ['60tr', '45tr', '30tr', '15tr', '0'];
 
-  orderStatuses = [
-    { label: 'Chờ xác nhận', count: 28,  percent: 20,  color: 'yellow' },
-    { label: 'Đang xử lý',   count: 45,  percent: 33,  color: 'blue'   },
-    { label: 'Đang giao',    count: 52,  percent: 38,  color: 'orange' },
-    { label: 'Hoàn thành',   count: 312, percent: 100, color: 'green'  },
-    { label: 'Đã hủy',       count: 12,  percent: 9,   color: 'red'    },
-  ];
+  private readonly statusColorMap: Record<string, string> = {
+    PENDING:   'yellow',
+    CONFIRMED: 'blue',
+    PROCESSING:'blue',
+    SHIPPING:  'orange',
+    DELIVERED: 'green',
+    CANCELLED: 'red',
+    REFUNDED:  'red',
+  };
 
-  recentOrders = [
-    { id: '10234', name: 'Nguyễn Văn An',    avatarColor: '#dbeafe', items: 2, total: 850000,  status: 'Hoàn thành',     statusClass: 'badge-green'  },
-    { id: '10233', name: 'Trần Thị Bích',    avatarColor: '#fce7f3', items: 1, total: 320000,  status: 'Đang giao',      statusClass: 'badge-orange' },
-    { id: '10232', name: 'Lê Minh Khoa',     avatarColor: '#d1fae5', items: 3, total: 1250000, status: 'Đang xử lý',     statusClass: 'badge-blue'   },
-    { id: '10231', name: 'Phạm Thu Hà',      avatarColor: '#fef3c7', items: 1, total: 495000,  status: 'Chờ xác nhận',   statusClass: 'badge-yellow' },
-    { id: '10230', name: 'Hoàng Đức Thịnh',  avatarColor: '#ede9fe', items: 4, total: 2100000, status: 'Hoàn thành',     statusClass: 'badge-green'  },
-    { id: '10229', name: 'Vũ Thị Lan',       avatarColor: '#fee2e2', items: 1, total: 180000,  status: 'Đã hủy',         statusClass: 'badge-red'    },
-    { id: '10228', name: 'Đặng Quốc Huy',    avatarColor: '#dbeafe', items: 2, total: 740000,  status: 'Đang giao',      statusClass: 'badge-orange' },
-    { id: '10227', name: 'Bùi Thanh Tùng',   avatarColor: '#d1fae5', items: 1, total: 299000,  status: 'Hoàn thành',     statusClass: 'badge-green'  },
-    { id: '10226', name: 'Ngô Thị Phương',   avatarColor: '#fce7f3', items: 2, total: 590000,  status: 'Đang xử lý',     statusClass: 'badge-blue'   },
-    { id: '10225', name: 'Trịnh Văn Long',   avatarColor: '#fef3c7', items: 3, total: 915000,  status: 'Chờ xác nhận',   statusClass: 'badge-yellow' },
-  ];
+  private readonly statusClassMap: Record<string, string> = {
+    PENDING:   'badge-yellow',
+    CONFIRMED: 'badge-blue',
+    PROCESSING:'badge-blue',
+    SHIPPING:  'badge-orange',
+    DELIVERED: 'badge-green',
+    CANCELLED: 'badge-red',
+    REFUNDED:  'badge-red',
+  };
 
-  topProducts = [
-    { name: 'Áo Chạy Bộ Nike Dri-FIT',    category: 'Chạy bộ',  sold: 284, revenue: 85200000 },
-    { name: 'Giày Bơi Speedo Aqua',        category: 'Bơi lội',  sold: 196, revenue: 58800000 },
-    { name: 'Kính Bơi TYR Special Ops',    category: 'Bơi lội',  sold: 175, revenue: 43750000 },
-    { name: 'Áo Chống Nắng UPF50+',        category: 'Chống nắng', sold: 163, revenue: 40750000 },
-    { name: 'Giày Chạy Bộ Adidas Ultra',   category: 'Chạy bộ',  sold: 142, revenue: 99400000 },
-  ];
+  constructor(private dashboardService: DashboardService) {}
 
-  lowStockItems = [
-    { name: 'Mũ Bơi Speedo - Đỏ / M',        sku: 'CAP-SPD-R-M',   stock: 3  },
-    { name: 'Áo Chạy Bộ Nike - Trắng / XL',  sku: 'RUN-NK-W-XL',   stock: 5  },
-    { name: 'Kính Bơi TYR - Xanh',            sku: 'GOG-TYR-BL',    stock: 2  },
-    { name: 'Quần Bơi Arena - Đen / L',       sku: 'SWM-ARN-BK-L',  stock: 7  },
-    { name: 'Áo Chống Nắng - Tím / S',        sku: 'SUN-PUR-S',     stock: 4  },
-  ];
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.loading = true;
+    this.error = null;
+
+    const period = this.selectedPeriod === 'today' ? 'week' : this.selectedPeriod as any;
+
+    forkJoin({
+      stats:         this.dashboardService.getStats(this.selectedPeriod as any),
+      revenueChart:  this.dashboardService.getRevenueChart(period),
+      topProducts:   this.dashboardService.getTopProducts(period),
+      lowStock:      this.dashboardService.getLowStock(10),
+      recentOrders:  this.dashboardService.getRecentOrders(10),
+      orderStatuses: this.dashboardService.getOrderStatusSummary()
+    }).subscribe({
+      next: ({ stats, revenueChart, topProducts, lowStock, recentOrders, orderStatuses }) => {
+        this.mapStatsData(stats.data);
+        this.revenueData   = this.processRevenueData(revenueChart.data   ?? []);
+        this.topProducts   = topProducts.data   ?? [];
+        this.lowStockItems = lowStock.data      ?? [];
+        this.recentOrders  = recentOrders.data  ?? [];
+        this.orderStatuses = this.mapOrderStatuses(orderStatuses.data ?? []);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Lỗi load dashboard:', err);
+        this.error = 'Không thể tải dữ liệu dashboard. Vui lòng thử lại.';
+        this.loading = false;
+      }
+    });
+  }
+
+  private mapOrderStatuses(data: OrderStatusSummary[]): OrderStatusItem[] {
+    const total = data.reduce((sum, s) => sum + s.count, 0);
+    return data.map(s => ({
+      label:   ORDER_STATUS_LABEL[s.status as keyof typeof ORDER_STATUS_LABEL] ?? s.status,
+      count:   s.count,
+      percent: total > 0 ? Math.round((s.count / total) * 100) : 0,
+      color:   this.statusColorMap[s.status] ?? 'blue'
+    }));
+  }
+
+  private processRevenueData(data: RevenueChartResponse[]): RevenueChartResponse[] {
+    if (!data.length) return [];
+    const maxRevenue = Math.max(...data.map(d => d.revenue));
+    const maxOrders  = Math.max(...data.map(d => d.orders));
+    return data.map(item => ({
+      ...item,
+      revenuePercent: maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0,
+      orderPercent:   maxOrders  > 0 ? (item.orders  / maxOrders)  * 100 : 0,
+    }));
+  }
+
+  private mapStatsData(apiStats: DashboardStatsResponse): void {
+    this.stats = [
+      {
+        icon:  'payments',
+        color: 'blue',
+        value: this.formatCurrency(apiStats.revenue),
+        label: `Doanh thu ${this.selectedPeriod === 'today' ? 'hôm nay' : this.periodLabel}`,
+        trend: apiStats.revenueTrend
+      },
+      {
+        icon:  'shopping_bag',
+        color: 'green',
+        value: apiStats.newOrders.toLocaleString(),
+        label: `Đơn hàng mới ${this.periodLabel}`,
+        trend: apiStats.orderTrend
+      },
+      {
+        icon:  'people',
+        color: 'orange',
+        value: apiStats.newCustomers.toLocaleString(),
+        label: `Khách hàng mới ${this.periodLabel}`,
+        trend: apiStats.customerTrend
+      },
+      {
+        icon:  'inventory_2',
+        color: 'purple',
+        value: apiStats.totalProducts.toLocaleString(),
+        label: 'Sản phẩm đang bán',
+        trend: 0
+      },
+    ];
+  }
+
+  onPeriodChange(): void {
+    this.loadDashboardData();
+  }
+
+  getStatusClass(status: string): string {
+    return this.statusClassMap[status] ?? 'badge-blue';
+  }
+
+  getStatusLabel(status: string): string {
+    return ORDER_STATUS_LABEL[status as keyof typeof ORDER_STATUS_LABEL] ?? status;
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency', currency: 'VND', minimumFractionDigits: 0
+    }).format(amount);
+  }
+
+  trackByFn(index: number, item: any): any {
+    return item.id || index;
+  }
 }

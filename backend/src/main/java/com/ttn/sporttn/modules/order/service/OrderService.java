@@ -7,9 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.ttn.sporttn.modules.invoice.entity.Invoice;
+import com.ttn.sporttn.modules.invoice.repository.InvoiceRepository;
 import com.ttn.sporttn.modules.order.dto.request.OrderItemRequest;
 import com.ttn.sporttn.modules.order.dto.request.OrderMessage;
+import com.ttn.sporttn.modules.order.dto.response.OrderStatsResponse;
 import com.ttn.sporttn.modules.order.entity.ShippingInfo;
+import com.ttn.sporttn.modules.payment.entity.Payment;
+import com.ttn.sporttn.modules.payment.repository.PaymentRepository;
 import com.ttn.sporttn.modules.product.entity.Product;
 import com.ttn.sporttn.modules.product.repository.ProductRepository;
 import com.ttn.sporttn.modules.user.entity.Address;
@@ -48,17 +53,14 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final AddressRepository addressRepository;
     private final ProductRepository productRepository;
-
-
+    private final PaymentRepository paymentRepository;
+    private final InvoiceRepository invoiceRepository;
 
     @Transactional
     public void processOrder(OrderMessage msg) {
-
-        // 1. Validate user
         User user = userRepository.findById(msg.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        // 2. Validate & lấy địa chỉ
         Address address = addressRepository
                 .findByIdAndUserId(msg.getAddressId(), msg.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
@@ -85,8 +87,8 @@ public class OrderService {
 
         // 5. Tạo OrderItems + trừ tồn kho
         BigDecimal totalAmount = BigDecimal.ZERO;
-
         List<OrderItem> items = new ArrayList<>();
+
         for (OrderItemRequest i : msg.getItems()) {
             ProductVariant variant = productVariantRepository.findById(i.getVariantId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.VARIANT_NOT_FOUND));
@@ -95,7 +97,6 @@ public class OrderService {
                 throw new BusinessException(ErrorCode.OUT_OF_STOCK,
                         variant.getProduct().getName());
 
-            // Trừ tồn kho
             variant.setStockQuantity(variant.getStockQuantity() - i.getQuantity());
             productVariantRepository.save(variant);
 
@@ -107,14 +108,15 @@ public class OrderService {
                     .order(order)
                     .productVariant(variant)
                     .quantity(i.getQuantity())
+                    .priceAtPurchase(unitPrice)
                     .build());
         }
 
         // 6. Tính tiền
-        BigDecimal shippingFee        = calculateShippingFee(totalAmount);
-        BigDecimal voucherDiscount    = BigDecimal.ZERO; // TODO: áp dụng voucher
-        BigDecimal pointsDiscount     = BigDecimal.ZERO; // TODO: áp dụng điểm
-        BigDecimal finalAmount        = totalAmount
+        BigDecimal shippingFee     = calculateShippingFee(totalAmount);
+        BigDecimal voucherDiscount = BigDecimal.ZERO;
+        BigDecimal pointsDiscount  = BigDecimal.ZERO;
+        BigDecimal finalAmount     = totalAmount
                 .add(shippingFee)
                 .subtract(voucherDiscount)
                 .subtract(pointsDiscount);
@@ -127,13 +129,37 @@ public class OrderService {
         order.setFinalAmount(finalAmount);
 
         orderRepository.save(order);
+
+        Invoice invoice = Invoice.builder()
+                .order(order)
+                .invoiceNumber("INV-" + String.format("%06d", order.getId()))
+                .issueDate(LocalDateTime.now())
+                .dueDate(LocalDateTime.now().plusDays(7))
+                .subtotal(totalAmount)
+                .taxAmount(BigDecimal.ZERO)
+                .finalAmount(finalAmount)
+                .status("PENDING")
+                .note(msg.getCustomerNote())
+                .build();
+
+        invoiceRepository.save(invoice);
+
+        if ("COD".equals(msg.getPaymentMethod())) {
+            Payment payment = Payment.builder()
+                    .order(order)
+                    .paymentMethod("COD")
+                    .amount(finalAmount)
+                    .paymentStatus("PENDING")  // sẽ → COMPLETED khi DELIVERED
+                    .build();
+            paymentRepository.save(payment);
+            log.info("[ORDER] Tạo Payment COD. orderId={}", order.getId());
+        }
+
+        cartItemRepository.deleteAllByCartUserId(msg.getUserId());
         log.info("Tạo đơn hàng thành công: code={}, user={}", order.getOrderCode(), msg.getUserId());
     }
 
 
-    /**
-     * Create new order from cart
-     */
     @Transactional
     public OrderDetailResponse createOrder(Long userId, CreateOrderRequest request) {
         log.info("[ORDER] Tạo đơn hàng mới. userId={}, itemCount={}", userId, request.getItems().size());
@@ -256,17 +282,34 @@ public class OrderService {
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
         log.info("[ORDER] Cập nhật trạng thái đơn hàng. orderId={}, status={}", orderId, request.getStatus());
-        
+
         Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> {
-                log.warn("[ORDER] Đơn hàng không tìm thấy. orderId={}", orderId);
-                return new BusinessException(ErrorCode.INVALID_REQUEST);
-            });
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST));
 
         order.setStatus(request.getStatus());
+
+        // ✅ COD: khi DELIVERED → đánh dấu đã thanh toán
+        if ("DELIVERED".equals(request.getStatus())
+                && "COD".equals(order.getPaymentMethod())
+                && "UNPAID".equals(order.getPaymentStatus())) {
+
+            // Cập nhật Order
+            order.setPaymentStatus("PAID");
+
+            // Cập nhật bảng payments
+            paymentRepository.findByOrderIdAndPaymentStatus(orderId, "PENDING")
+                    .ifPresent(payment -> {
+                        payment.setPaymentStatus("COMPLETED");
+                        payment.setPaidAt(LocalDateTime.now());
+                        paymentRepository.save(payment);
+                        log.info("[ORDER] COD - Cập nhật Payment=COMPLETED. orderId={}", orderId);
+                    });
+        }
+
         Order updated = orderRepository.save(order);
-        
-        log.info("[ORDER] Cập nhật trạng thái thành công. orderId={}, status={}", orderId, updated.getStatus());
+        log.info("[ORDER] Cập nhật trạng thái thành công. orderId={}, status={}, paymentStatus={}",
+                orderId, updated.getStatus(), updated.getPaymentStatus());
+
         return OrderResponse.from(updated);
     }
 
@@ -341,5 +384,50 @@ public class OrderService {
                 + Integer.toHexString((int)(Math.random() * 0xFFFF)).toUpperCase();
     }
 
+    /** Admin: lấy tất cả đơn hàng */
+    @Transactional(readOnly = true)
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(OrderResponse::from);
+    }
 
+    /** Admin: xem chi tiết không cần check userId */
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetailAdmin(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST));
+        return OrderDetailResponse.from(order);
+    }
+
+    /** Admin: hủy đơn không cần check userId */
+    @Transactional
+    public OrderResponse adminCancelOrder(Long orderId, String cancelReason) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST));
+
+        if (!order.getStatus().equals("PENDING") && !order.getStatus().equals("CONFIRMED")) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+
+        // Hoàn lại tồn kho
+        for (OrderItem item : order.getItems()) {
+            ProductVariant variant = item.getProductVariant();
+            variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+            productVariantRepository.save(variant);
+        }
+
+        order.setStatus("CANCELLED");
+        order.setCancelReason(cancelReason);
+        return OrderResponse.from(orderRepository.save(order));
+    }
+
+    public OrderStatsResponse getOrderStats() {
+        return OrderStatsResponse.builder()
+                .pending(orderRepository.countByStatus("PENDING"))
+                .confirmed(orderRepository.countByStatus("CONFIRMED"))
+                .shipping(orderRepository.countByStatus("SHIPPING"))
+                .delivered(orderRepository.countByStatus("DELIVERED"))
+                .cancelled(orderRepository.countByStatus("CANCELLED"))
+                .build();
+    }
 }

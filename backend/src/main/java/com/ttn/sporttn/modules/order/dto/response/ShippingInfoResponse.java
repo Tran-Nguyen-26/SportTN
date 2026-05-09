@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 public class ShippingInfoResponse {
 
     private Long id;
+    private String receiverName;
+    private String receiverPhone;
     private String carrier;
     private String trackingNumber;
     private String addressFull;
@@ -30,6 +32,8 @@ public class ShippingInfoResponse {
 
         return ShippingInfoResponse.builder()
             .id(shippingInfo.getId())
+            .receiverName(shippingInfo.getReceiverName())
+            .receiverPhone(shippingInfo.getReceiverPhone())
             .carrier(shippingInfo.getCarrier())
             .trackingNumber(shippingInfo.getTrackingNumber())
             .addressFull(shippingInfo.getAddressFull())

@@ -1,5 +1,18 @@
 <div class="dashboard-page">
 
+  <!-- Loading Overlay -->
+  <div *ngIf="loading" class="loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="error && !loading" class="error-alert">
+    <mat-icon>error</mat-icon>
+    {{ error }}
+    <button mat-button (click)="loadDashboardData()">Thử lại</button>
+  </div>
+
   <!-- Header -->
   <div class="dash-header">
     <div>
@@ -12,7 +25,7 @@
           class="period-tab"
           *ngFor="let p of periods"
           [class.active]="selectedPeriod === p.value"
-          (click)="selectedPeriod = p.value">
+          (click)="selectedPeriod = p.value; onPeriodChange()">
           {{ p.label }}
         </button>
       </div>
@@ -21,14 +34,14 @@
 
   <!-- Stats Row -->
   <div class="stats-row">
-    <div class="stat-card" *ngFor="let s of stats">
+    <div class="stat-card" *ngFor="let s of stats; trackBy: trackByFn">
       <div class="stat-top">
         <div class="stat-icon" [ngClass]="s.color">
           <mat-icon>{{ s.icon }}</mat-icon>
         </div>
-        <div class="stat-trend" [class.up]="s.trend > 0" [class.down]="s.trend < 0">
-          <mat-icon>{{ s.trend > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
-          {{ s.trend > 0 ? '+' : '' }}{{ s.trend }}%
+        <div class="stat-trend" [class.up]="s.trend >= 0" [class.down]="s.trend < 0">
+          <mat-icon>{{ s.trend >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+          <span>{{ s.trend >= 0 ? '+' : '' }}{{ s.trend }}%</span>
         </div>
       </div>
       <div class="stat-value">{{ s.value }}</div>
@@ -125,21 +138,19 @@
           </thead>
           <tbody>
           <tr *ngFor="let o of recentOrders">
-            <td class="order-id">#{{ o.id }}</td>
+            <td class="order-id">{{ o.orderCode }}</td>
             <td>
               <div class="customer-cell">
-                <div class="avatar-sm" [style.background]="o.avatarColor">
-                  {{ o.name[0] }}
-                </div>
-                <span class="customer-name-sm">{{ o.name }}</span>
+                <div class="avatar-sm">{{ o.receiverName?.charAt(0) }}</div>
+                <span class="customer-name-sm">{{ o.receiverName }}</span>
               </div>
             </td>
-            <td class="product-count">{{ o.items }} sản phẩm</td>
-            <td class="order-amount">{{ o.total | number:'1.0-0' }}đ</td>
+            <td class="product-count">{{ o.itemCount }} sản phẩm</td>
+            <td class="order-amount">{{ o.finalAmount | number:'1.0-0' }}đ</td>
             <td>
-                <span class="status-badge" [ngClass]="o.statusClass">
-                  {{ o.status }}
-                </span>
+              <span class="status-badge" [ngClass]="getStatusClass(o.status)">
+                {{ getStatusLabel(o.status) }}
+              </span>
             </td>
           </tr>
           </tbody>

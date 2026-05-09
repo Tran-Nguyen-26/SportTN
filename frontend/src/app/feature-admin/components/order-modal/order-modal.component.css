@@ -202,6 +202,11 @@
   flex-shrink: 0;
 }
 
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+}
+
 .product-info { flex: 1; min-width: 0; }
 .pname  { font-size: 13px; font-weight: 500; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pdetail{ font-size: 12px; color: #64748b; margin-top: 2px; }
@@ -322,6 +327,10 @@
 
 /* ── FORM ELEMENTS ────────────────────────── */
 .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+
+.form-group textarea {
+  width: 95%;
+}
 
 .form-row-2 {
   display: grid;
@@ -525,4 +534,97 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+/* Period Tabs */
+.period-tabs {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.period-tab {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #64748b;
+}
+
+.period-tab:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.period-tab.active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Chart Bars Fix */
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  width: 32px;
+}
+
+.bar {
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  min-height: 4px;
+}
+
+.bar:hover {
+  filter: brightness(1.1);
+}
+
+.revenue-bar {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.order-bar {
+  background: linear-gradient(135deg, #10b981, #059669);
 }

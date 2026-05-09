@@ -65,7 +65,7 @@ public class OrderDetailResponse {
             .cancelReason(order.getCancelReason())
             .createdAt(order.getCreatedAt())
             .items(items)
-            .shippingInfo(null) // Will be loaded separately if needed
+            .shippingInfo(ShippingInfoResponse.from(order.getShippingInfo()))
             .build();
     }
 }

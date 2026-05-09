@@ -1,11 +1,14 @@
 package com.ttn.sporttn.modules.order.consumer;
 
+import com.rabbitmq.client.Channel;
 import com.ttn.sporttn.config.RabbitMQConfig;
 import com.ttn.sporttn.modules.order.dto.request.OrderMessage;
 import com.ttn.sporttn.modules.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +29,13 @@ public class OrderConsumer {
             // message sẽ vào Dead Letter Queue nếu đã cấu hình
             throw e;
         }
+    }
+
+    @RabbitListener(queues = RabbitMQConfig.ORDER_DLQ)
+    public void handleFailedOrder(OrderMessage message) {
+        log.error("[MQ] Đơn hàng thất bại vào DLQ: userId={}, message={}",
+                message.getUserId(), message);
+        // TODO: gửi email thông báo / alert
     }
 }
 

@@ -56,7 +56,7 @@
   </div>
 
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="!isLoading && filteredOrders.length === 0">
+  <div class="empty-state" *ngIf="!isLoading && allOrders.length === 0">
     <div class="empty-icon">
       <mat-icon>inbox</mat-icon>
     </div>
@@ -66,10 +66,10 @@
   </div>
 
   <!-- Order List -->
-  <div class="orders-wrapper" *ngIf="!isLoading && filteredOrders.length > 0">
+  <div class="orders-wrapper" *ngIf="!isLoading && allOrders.length > 0">
     <div
       class="order-card"
-      *ngFor="let order of pagedOrders"
+      *ngFor="let order of allOrders"
       (click)="viewOrderDetails(order)">
       <div class="card-row">
 
@@ -80,7 +80,7 @@
           </div>
           <div class="order-id-info">
             <span class="order-id-label">Mã đơn hàng</span>
-            <span class="order-id-value">#{{ order.id }}</span>
+            <span class="order-id-value">{{ order.orderCode }}</span>
           </div>
         </div>
 
@@ -101,13 +101,13 @@
         <!-- Số lượng SP -->
         <div class="order-meta-col hide-sm">
           <span class="meta-label">Sản phẩm</span>
-          <span class="meta-value">{{ order.items.length }} sản phẩm</span>
+          <span class="meta-value">{{ order.itemCount }} sản phẩm</span>
         </div>
 
         <!-- Tổng tiền -->
         <div class="order-total-col">
           <span class="meta-label">Tổng thanh toán</span>
-          <span class="order-amount">{{ order.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+          <span class="order-amount">{{ order.totalAmount | currency:'VND':'':'1.0-0' }}đ</span>
         </div>
 
         <!-- Arrow -->
@@ -123,10 +123,10 @@
     <!-- Paginator -->
     <div class="paginator-row">
       <span class="pag-info">
-        Hiển thị {{ pageStart }}–{{ pageEnd }} trong {{ filteredOrders.length }} đơn hàng
+        Hiển thị {{ pageStart }}–{{ pageEnd }} trong {{ totalElements }} đơn hàng
       </span>
       <mat-paginator
-        [length]="filteredOrders.length"
+        [length]="totalElements"
         [pageSize]="pageSize"
         [pageSizeOptions]="[5, 10, 25]"
         (page)="onPageChange($event)"
@@ -149,7 +149,7 @@
           <mat-icon>{{ getStatusIcon(selectedOrder()!.status) }}</mat-icon>
           {{ getStatusLabel(selectedOrder()!.status) }}
         </span>
-        <h3>Đơn hàng #{{ selectedOrder()?.id }}</h3>
+        <h3>Đơn hàng {{ selectedOrder()?.orderCode }}</h3>
         <span class="order-timestamp">
           <mat-icon>schedule</mat-icon>
           {{ selectedOrder()?.createdAt | date:'HH:mm - dd/MM/yyyy' }}
@@ -196,15 +196,15 @@
           <div class="product-list">
             <div class="product-item" *ngFor="let item of selectedOrder()?.items">
               <div class="product-img-wrap">
-                <img [src]="item.product.mainImageUrl" [alt]="item.product.name" (error)="onImgError($event)">
+                <img [src]="item.imageUrl" [alt]="item.productName" (error)="onImgError($event)">
               </div>
               <div class="product-info">
-                <span class="product-brand">{{ item.product.brandName }}</span>
-                <span class="product-name">{{ item.product.name }}</span>
+                <span class="product-name">{{ item.productName }}</span>
+                <span class="product-variant">{{ item.color }} - {{ item.size }}</span>
                 <span class="product-qty">x{{ item.quantity }}</span>
               </div>
               <div class="product-price">
-                {{ item.price | currency:'VND':'':'1.0-0' }}đ
+                {{ item.priceAtPurchase | currency:'VND':'':'1.0-0' }}đ
               </div>
             </div>
           </div>
@@ -220,16 +220,15 @@
               <h5>Thông tin giao hàng</h5>
             </div>
             <div class="info-card-body">
-              <p class="recipient-name">{{ selectedOrder()?.deliveryAddress?.name }}</p>
+              <p class="recipient-name">{{ selectedOrder()?.shippingInfo?.receiverName }}</p>
               <div class="info-row">
                 <mat-icon>phone</mat-icon>
-                <span>{{ selectedOrder()?.deliveryAddress?.phoneNumber }}</span>
+                <span>{{ selectedOrder()?.shippingInfo?.receiverPhone }}</span>
               </div>
               <div class="info-row">
                 <mat-icon>location_on</mat-icon>
                 <span>
-                  {{ selectedOrder()?.deliveryAddress?.address }},
-                  {{ selectedOrder()?.deliveryAddress?.city }}
+                  {{ selectedOrder()?.shippingInfo?.addressFull }}
                 </span>
               </div>
             </div>
@@ -244,20 +243,20 @@
             <div class="info-card-body">
               <div class="pay-row">
                 <span class="pay-label">Tạm tính</span>
-                <span class="pay-val">{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+                <span class="pay-val">{{ selectedOrder()?.totalAmount | currency:'VND':'':'1.0-0' }}đ</span>
               </div>
               <div class="pay-row">
                 <span class="pay-label">Phí vận chuyển</span>
                 <span class="free-badge">Miễn phí</span>
               </div>
-              <div class="pay-row" *ngIf="selectedOrder()?.discountAmount">
+              <div class="pay-row" *ngIf="selectedOrder()?.shippingFee">
                 <span class="pay-label">Giảm giá</span>
-                <span class="discount-val">-{{ selectedOrder()?.discountAmount | currency:'VND':'':'1.0-0' }}đ</span>
+                <span class="discount-val">-{{ selectedOrder()?.voucherDiscount | currency:'VND':'':'1.0-0' }}đ</span>
               </div>
               <mat-divider></mat-divider>
               <div class="pay-row total">
                 <span>Tổng cộng</span>
-                <span class="total-amount">{{ selectedOrder()?.totalPrice | currency:'VND':'':'1.0-0' }}đ</span>
+                <span class="total-amount">{{ selectedOrder()?.finalAmount | currency:'VND':'':'1.0-0' }}đ</span>
               </div>
             </div>
           </div>
@@ -282,10 +281,10 @@
 
     <!-- Modal Footer -->
     <div class="modal-footer">
-      <button mat-stroked-button class="btn-download" (click)="downloadInvoice()">
-        <mat-icon>download_for_offline</mat-icon>
-        Xuất hóa đơn PDF
-      </button>
+<!--      <button mat-stroked-button class="btn-download" (click)="downloadInvoice()">-->
+<!--        <mat-icon>download_for_offline</mat-icon>-->
+<!--        Xuất hóa đơn PDF-->
+<!--      </button>-->
       <button
         mat-stroked-button
         class="btn-reorder"

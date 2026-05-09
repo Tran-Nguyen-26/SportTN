@@ -13,28 +13,28 @@
     <div class="stat-card">
       <div class="stat-icon blue"><mat-icon>receipt_long</mat-icon></div>
       <div class="stat-info">
-        <span class="stat-value">{{ invoices.length }}</span>
+        <span class="stat-value">{{ stats.invoiceCount }}</span>
         <span class="stat-label">Tổng hóa đơn</span>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon green"><mat-icon>check_circle</mat-icon></div>
       <div class="stat-info">
-        <span class="stat-value">{{ formatPrice(totalPaidAmount()) }}</span>
+        <span class="stat-value">{{ formatPrice(stats.totalPaidAmount) }}</span>
         <span class="stat-label">Đã thanh toán</span>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon orange"><mat-icon>schedule</mat-icon></div>
       <div class="stat-info">
-        <span class="stat-value">{{ formatPrice(totalPendingAmount())}}</span>
+        <span class="stat-value">{{ formatPrice(stats.totalPendingAmount)}}</span>
         <span class="stat-label">Chờ thanh toán</span>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon red"><mat-icon>warning</mat-icon></div>
       <div class="stat-info">
-        <span class="stat-value">{{ overdueCount() }}</span>
+        <span class="stat-value">{{ stats.overdueCount }}</span>
         <span class="stat-label">Quá hạn</span>
       </div>
     </div>
@@ -79,8 +79,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let inv of filteredInvoices()">
-          <td class="inv-id">{{ inv.id }}</td>
+        <tr *ngFor="let inv of invoices()">
+          <td class="inv-id">{{ inv.invoiceNumber }}</td>
           <td class="order-id">{{ inv.orderId }}</td>
           <td>
             <div class="customer-cell">
@@ -121,12 +121,12 @@
     <div class="summary-footer">
       <div class="summary-item">
         <span class="summary-label">Đã thanh toán:</span>
-        <span class="summary-value green">{{ formatPrice(totalPaidAmount()) }}</span>
+        <span class="summary-value green">{{ formatPrice(stats.totalPaidAmount) }}</span>
       </div>
       <div class="summary-divider"></div>
       <div class="summary-item">
         <span class="summary-label">Chờ thanh toán:</span>
-        <span class="summary-value orange">{{ formatPrice(totalPendingAmount()) }}</span>
+        <span class="summary-value orange">{{ formatPrice(stats.totalPendingAmount) }}</span>
       </div>
       <div class="summary-spacer"></div>
       <div class="pagination">
@@ -193,7 +193,7 @@
         <div class="invoice-meta">
           <div class="meta-row">
             <span class="meta-label">Mã hóa đơn</span>
-            <span class="meta-value">{{ selectedInvoice.id }}</span>
+            <span class="meta-value">{{ selectedInvoice.invoiceNumber }}</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Mã đơn hàng</span>
@@ -294,7 +294,7 @@
           </div>
           <div class="summary-row">
             <span class="sum-label">Thuế VAT (10%)</span>
-            <span class="sum-value">{{ formatPrice(selectedInvoice.tax) }}</span>
+            <span class="sum-value">{{ formatPrice(selectedInvoice.taxAmount) }}</span>
           </div>
           <div class="summary-divider"></div>
           <div class="summary-row total-row">
@@ -325,13 +325,13 @@
           <mat-icon>print</mat-icon>
           In hóa đơn
         </button>
-        <button
-          class="btn-mark-paid"
-          *ngIf="selectedInvoice.status !== 'PAID'"
-          (click)="selectedInvoice.status = 'PAID'">
-          <mat-icon>check_circle</mat-icon>
-          Đánh dấu đã thanh toán
-        </button>
+<!--        <button-->
+<!--          class="btn-mark-paid"-->
+<!--          *ngIf="selectedInvoice.status !== 'PAID'"-->
+<!--          (click)="selectedInvoice.status = 'PAID'">-->
+<!--          <mat-icon>check_circle</mat-icon>-->
+<!--          Đánh dấu đã thanh toán-->
+<!--        </button>-->
       </div>
     </div>
 

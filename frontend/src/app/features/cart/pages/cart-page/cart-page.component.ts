@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { CartService, CartResponse, CartItemResponse } from 'src/app/core/services/cart/cart.service'; // Cập nhật đường dẫn thực tế
 import { CouponResult } from "../../components/coupon-input/coupon-input.component";
+import {PaymentMethod} from "../../../../core/services/order/order.service";
 
 @Component({
   selector: 'app-cart-page',
@@ -18,23 +19,24 @@ import { CouponResult } from "../../components/coupon-input/coupon-input.compone
   ]
 })
 export class CartPageComponent implements OnInit {
-  // Cập nhật kiểu dữ liệu theo CartResponse mới
   cart = signal<CartResponse | null>(null);
 
   isLoading = false;
   isEmpty = true;
   discountPercent = signal(0);
-  selectedPaymentMethodId = 'cod';
+  selectedPaymentMethodId: PaymentMethod = "COD";
+  appliedVoucherId: number | null = null;
 
-  paymentMethods = [
-    {id: 'cod', label: 'Thanh toán khi nhận hàng', description: 'Thanh toán tiền mặt khi đơn được giao.'},
-    {id: 'banking', label: 'Chuyển khoản ngân hàng', description: 'Chuyển khoản nhanh qua app ngân hàng.'},
-    {id: 'ewallet', label: 'Ví điện tử', description: 'Thanh toán qua MoMo / ZaloPay / VNPay.'}
+
+  paymentMethods: { id: PaymentMethod; label: string; description: string }[] = [
+    { id: 'COD',          label: 'Thanh toán khi nhận hàng', description: 'Thanh toán tiền mặt khi đơn được giao.' },
+    { id: 'BANK_TRANSFER', label: 'Chuyển khoản ngân hàng',   description: 'Chuyển khoản nhanh qua app ngân hàng.' },
+    { id: 'E_WALLET',      label: 'Ví điện tử',               description: 'Thanh toán qua MoMo / ZaloPay / VNPay.' }
   ];
 
   constructor(
     private router: Router,
-    private cartService: CartService // Inject CartService
+    private cartService: CartService
   ) {
   }
 
@@ -68,7 +70,7 @@ export class CartPageComponent implements OnInit {
 
     const currentCart = this.cart();
 
-    const item = currentCart?.cartItems?.find(i => i.id === event.itemId);
+    const item = currentCart?.cartItems?.find(i => i.cartItemId === event.itemId);
 
     if (item && newQty > item.variant.stockQuantity) {
       alert(`Rất tiếc, sản phẩm này chỉ còn ${item.variant.stockQuantity} món.`);
@@ -90,13 +92,17 @@ export class CartPageComponent implements OnInit {
   }
 
   removeItem(cartItemId: number): void {
-    // if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-    //   this.isLoading = true;
-    //   this.cartService.removeItem(cartItemId).subscribe({
-    //     next: () => this.loadCart(),
-    //     error: () => (this.isLoading = false)
-    //   });
-    // }
+    if (!cartItemId || cartItemId <= 0) {
+      console.error('Invalid cartItemId:', cartItemId);
+      return;
+    }
+    if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+      this.isLoading = true;
+      this.cartService.removeItem(cartItemId).subscribe({
+        next: () => this.loadCart(),
+        error: () => (this.isLoading = false)
+      });
+    }
   }
 
   totalItemsCount = computed(() => {
@@ -112,12 +118,15 @@ export class CartPageComponent implements OnInit {
     return total * (1 - discount / 100);
   });
 
+
   onCouponApplied(result: CouponResult): void {
     this.discountPercent.set(result.discountPercent);
+    this.appliedVoucherId = result.voucherId ?? null;
   }
 
   onCouponRemoved(): void {
     this.discountPercent.set(0);
+    this.appliedVoucherId = null;
   }
 
   continueShopping(): void {
@@ -134,10 +143,10 @@ export class CartPageComponent implements OnInit {
   }
 
   trackByItemId(_index: number, item: CartItemResponse): number {
-    return item.id;
+    return item.cartItemId;
   }
 
-  selectPaymentMethod(methodId: string): void {
+  selectPaymentMethod(methodId: PaymentMethod): void {
     this.selectedPaymentMethodId = methodId;
   }
 
@@ -151,5 +160,9 @@ export class CartPageComponent implements OnInit {
     //     });
     //   }
     // }
+  }
+
+  onOrderPlaced(): void {
+    this.loadCart();
   }
 }

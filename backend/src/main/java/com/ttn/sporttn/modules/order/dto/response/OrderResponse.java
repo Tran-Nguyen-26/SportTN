@@ -33,6 +33,8 @@ public class OrderResponse {
     private String customerNote;
     private String cancelReason;
     private LocalDateTime createdAt;
+    private int itemCount;
+    private ShippingInfoResponse shippingInfo;
     private List<OrderItemResponse> items;
 
     public static OrderResponse from(Order order) {
@@ -52,6 +54,8 @@ public class OrderResponse {
             .customerNote(order.getCustomerNote())
             .cancelReason(order.getCancelReason())
             .createdAt(order.getCreatedAt())
+            .itemCount(order.getItems() != null ? order.getItems().size() : 0)
+            .shippingInfo(order.getShippingInfo() != null ? ShippingInfoResponse.from(order.getShippingInfo()) : null)
             .build();
     }
 }

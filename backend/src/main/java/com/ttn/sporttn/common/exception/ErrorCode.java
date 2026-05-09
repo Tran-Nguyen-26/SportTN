@@ -60,7 +60,14 @@ public enum ErrorCode {
     OUT_OF_STOCK            ("INVENTORY_004", "Sản phẩm hiện đã hết hàng", HttpStatus.GONE),
     STOCK_HOLD_EXPIRED      ("INVENTORY_005", "Thời gian giữ hàng đã hết hạn", HttpStatus.REQUEST_TIMEOUT),
     STOCK_UPDATE_FAILED     ("INVENTORY_006", "Cập nhật kho hàng thất bại", HttpStatus.INTERNAL_SERVER_ERROR),
-    SKU_ALREADY_EXISTS      ("INVENTORY_007", "Mã SKU đã tồn tại trên hệ thống", HttpStatus.CONFLICT);
+    SKU_ALREADY_EXISTS      ("INVENTORY_007", "Mã SKU đã tồn tại trên hệ thống", HttpStatus.CONFLICT),
+
+    // ── Invoice ──────────────────────────────────────
+    INVOICE_NOT_FOUND     ("INVOICE_001", "Không tìm thấy hóa đơn",                    HttpStatus.NOT_FOUND),
+    INVOICE_ALREADY_PAID  ("INVOICE_002", "Hóa đơn đã được thanh toán",                HttpStatus.BAD_REQUEST),
+    INVOICE_OVERDUE       ("INVOICE_003", "Hóa đơn đã quá hạn thanh toán",             HttpStatus.BAD_REQUEST),
+    INVOICE_CREATE_FAILED ("INVOICE_004", "Tạo hóa đơn thất bại",                      HttpStatus.INTERNAL_SERVER_ERROR),
+    INVOICE_STATUS_INVALID("INVOICE_005", "Trạng thái hóa đơn không hợp lệ",           HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

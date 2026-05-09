@@ -3,17 +3,17 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, style, animate, transition } from '@angular/animations';
 
 export interface CouponResult {
+  voucherId: number;
   code: string;
   discountPercent: number;
 }
 
-// Mock coupon catalog — replace with CouponService.validate()
-const COUPON_CATALOG: Record<string, number> = {
-  SAVE10:    0.10,
-  SAVE20:    0.20,
-  FREESHIP:  0,
-  WELCOME50: 0.50,
-  STN2026:   0.15,
+const COUPON_CATALOG: Record<string, { voucherId: number; discountPercent: number }> = {
+  SAVE10:    { voucherId: 1, discountPercent: 0.10 },
+  SAVE20:    { voucherId: 2, discountPercent: 0.20 },
+  FREESHIP:  { voucherId: 3, discountPercent: 0    },
+  WELCOME50: { voucherId: 4, discountPercent: 0.50 },
+  STN2026:   { voucherId: 5, discountPercent: 0.15 },
 };
 
 @Component({
@@ -47,7 +47,6 @@ export class CouponInputComponent {
   appliedDiscount = 0;
   isLoading = false;
   errorMessage = '';
-
   hintCodes = ['SAVE10', 'SAVE20', 'WELCOME50'];
 
   constructor(private fb: FormBuilder) {
@@ -65,25 +64,36 @@ export class CouponInputComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Simulate async API call — replace with: this.couponService.validate(code)
-    setTimeout(() => {
-      const discount = COUPON_CATALOG[code];
+    // TODO: thay bằng API thật
+    // this.couponService.validate(code).subscribe({
+    //   next: (result: CouponResult) => this.onCouponValid(result),
+    //   error: () => { this.errorMessage = 'Mã không hợp lệ hoặc đã hết hạn.'; this.isLoading = false; }
+    // });
 
-      if (discount !== undefined) {
-        this.appliedCoupon = code;
-        this.appliedDiscount = discount;
-        this.couponApplied.emit({ code, discountPercent: discount });
-        this.couponForm.reset();
+    setTimeout(() => {
+      const entry = COUPON_CATALOG[code];
+      if (entry) {
+        this.onCouponValid({
+          voucherId:       entry.voucherId,
+          code,
+          discountPercent: entry.discountPercent
+        });
       } else {
         this.errorMessage = 'Mã không hợp lệ hoặc đã hết hạn.';
       }
-
       this.isLoading = false;
     }, 500);
   }
 
+  private onCouponValid(result: CouponResult): void {
+    this.appliedCoupon   = result.code;
+    this.appliedDiscount = result.discountPercent;
+    this.couponForm.reset();
+    this.couponApplied.emit(result); // emit đầy đủ: voucherId + code + discountPercent
+  }
+
   removeCoupon(): void {
-    this.appliedCoupon = null;
+    this.appliedCoupon   = null;
     this.appliedDiscount = 0;
     this.couponForm.reset();
     this.errorMessage = '';

@@ -1,7 +1,8 @@
+// src/app/features/pages/address/address.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Address, AddressRequest } from 'src/app/core/models/address/address.model';
-import { MatDialog } from '@angular/material/dialog';
+import {Address, AddressRequest, AddressService} from "../../../../core/services/user/address.service";
 
 @Component({
   selector: 'app-address',
@@ -9,134 +10,177 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./address.component.css']
 })
 export class AddressComponent implements OnInit {
-  addresses: Address[] = [];
+
+  addresses: Address[]   = [];
   addressForm!: FormGroup;
-  isLoading = false;
-  showForm = false;
-  editingId: string | null = null;
-  successMessage = '';
+  isLoading    = false;
+  isSaving     = false;
+  showForm     = false;
+  editingId: number | null = null;
+  deleteConfirmId: number | null = null;
+  toast: { message: string; type: 'success' | 'error' } | null = null;
 
-  countries = ['India', 'USA', 'Canada', 'UK', 'Australia'];
-  states: { [key: string]: string[] } = {
-    'India': ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Gujarat'],
-    'USA': ['California', 'Texas', 'Florida', 'New York'],
-    'Canada': ['Ontario', 'Quebec', 'British Columbia'],
-    'UK': ['England', 'Scotland', 'Wales'],
-    'Australia': ['New South Wales', 'Victoria', 'Queensland']
-  };
+  // Dữ liệu tỉnh/thành — có thể thay bằng API GHN/GHTKs
+  provinces = [
+    'Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
+    'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
+    'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước',
+    'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông',
+    'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang',
+    'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hậu Giang', 'Hòa Bình',
+    'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu',
+    'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định',
+    'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
+    'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị',
+    'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên',
+    'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang',
+    'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái'
+  ];
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog) {
-    this.initForm();
-  }
+  constructor(
+    private fb: FormBuilder,
+    private addressService: AddressService
+  ) {}
 
   ngOnInit(): void {
+    this.initForm();
     this.loadAddresses();
   }
 
+  // ── Form ────────────────────────────────────────────────────────────────────
+
   initForm(): void {
     this.addressForm = this.fb.group({
-      name: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s-()]+$/)]],
-      address: ['', Validators.required],
-      city: ['', Validators.required],
-      state: ['', Validators.required],
-      postalCode: ['', [Validators.required, Validators.pattern(/^\d{5,6}$/)]],
-      country: ['India', Validators.required],
-      isDefault: [false]
+      receiverName:  ['', [Validators.required, Validators.minLength(2)]],
+      receiverPhone: ['', [Validators.required, Validators.pattern(/^(0|\+84)[3-9]\d{8}$/)]],
+      province:      ['', Validators.required],
+      district:      ['', Validators.required],
+      ward:          ['', Validators.required],
+      addressDetail: ['', [Validators.required, Validators.minLength(5)]],
+      isDefault:     [false],
     });
   }
 
+  // ── Load ────────────────────────────────────────────────────────────────────
+
   loadAddresses(): void {
     this.isLoading = true;
-    // Mock data - Replace with AddressService.getAddresses()
-    setTimeout(() => {
-      this.addresses = [
-        {
-          id: '1',
-          name: 'Home',
-          phoneNumber: '+84905123456',
-          address: '123 Main Street',
-          city: 'Bangalore',
-          state: 'Karnataka',
-          postalCode: '560001',
-          country: 'India',
-          isDefault: true
-        },
-        {
-          id: '2',
-          name: 'Office',
-          phoneNumber: '+84905123457',
-          address: '456 Business Park',
-          city: 'Bangalore',
-          state: 'Karnataka',
-          postalCode: '560002',
-          country: 'India',
-          isDefault: false
-        }
-      ];
-      this.isLoading = false;
-    }, 500);
+    this.addressService.getMyAddresses().subscribe({
+      next: (res) => {
+        this.addresses = res.data ?? [];
+        this.isLoading = false;
+        console.log("Danh sách địa chỉ: ", res.data);
+      },
+      error: () => {
+        this.showToast('Không thể tải danh sách địa chỉ', 'error');
+        this.isLoading = false;
+      }
+    });
   }
 
+  // ── Show / hide form ────────────────────────────────────────────────────────
+
   showAddForm(): void {
-    this.showForm = true;
+    this.showForm  = true;
     this.editingId = null;
-    this.addressForm.reset({ country: 'India' });
+    this.addressForm.reset({ isDefault: false });
+    setTimeout(() => document.querySelector('.form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   editAddress(address: Address): void {
-    this.showForm = true;
-    this.editingId = address.id || null;
-    this.addressForm.patchValue(address);
-  }
-
-  saveAddress(): void {
-    if (this.addressForm.valid) {
-      this.isLoading = true;
-      // Mock save - Replace with AddressService.saveAddress()
-      setTimeout(() => {
-        if (this.editingId) {
-          const index = this.addresses.findIndex(a => a.id === this.editingId);
-          if (index > -1) {
-            this.addresses[index] = { ...this.addresses[index], ...this.addressForm.value };
-          }
-        } else {
-          const newAddress: Address = { id: Date.now().toString(), ...this.addressForm.value };
-          this.addresses.push(newAddress);
-        }
-        this.successMessage = this.editingId ? 'Address updated successfully!' : 'Address added successfully!';
-        this.showForm = false;
-        this.addressForm.reset({ country: 'India' });
-        this.isLoading = false;
-        setTimeout(() => this.successMessage = '', 3000);
-      }, 500);
-    }
-  }
-
-  deleteAddress(id: string | undefined): void {
-    if (id) {
-      this.addresses = this.addresses.filter(a => a.id !== id);
-      this.successMessage = 'Address deleted successfully!';
-      setTimeout(() => this.successMessage = '', 3000);
-    }
-  }
-
-  setDefaultAddress(id: string | undefined): void {
-    if (id) {
-      this.addresses.forEach(a => a.isDefault = a.id === id);
-      this.successMessage = 'Default address updated!';
-      setTimeout(() => this.successMessage = '', 3000);
-    }
+    this.showForm  = true;
+    this.editingId = address.id;
+    this.addressForm.patchValue({
+      receiverName:  address.receiverName,
+      receiverPhone: address.receiverPhone,
+      province:      address.province,
+      district:      address.district,
+      ward:          address.ward,
+      addressDetail: address.addressDetail,
+      isDefault:     address.isDefault,
+    });
+    setTimeout(() => document.querySelector('.form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   cancelForm(): void {
-    this.showForm = false;
+    this.showForm  = false;
     this.editingId = null;
-    this.addressForm.reset({ country: 'India' });
+    this.addressForm.reset({ isDefault: false });
   }
 
-  getStateOptions(): string[] {
-    const country = this.addressForm.get('country')?.value || 'India';
-    return this.states[country] || [];
+  // ── Save ────────────────────────────────────────────────────────────────────
+
+  saveAddress(): void {
+    if (this.addressForm.invalid) {
+      this.addressForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSaving = true;
+    const req: AddressRequest = this.addressForm.value;
+
+    const call = this.editingId
+      ? this.addressService.updateAddress(this.editingId, req)
+      : this.addressService.createAddress(req);
+
+    call.subscribe({
+      next: () => {
+        this.showToast(
+          this.editingId ? 'Cập nhật địa chỉ thành công!' : 'Thêm địa chỉ thành công!',
+          'success'
+        );
+        this.cancelForm();
+        this.loadAddresses();
+        this.isSaving = false;
+      },
+      error: () => {
+        this.showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+        this.isSaving = false;
+      }
+    });
+  }
+
+  // ── Delete ──────────────────────────────────────────────────────────────────
+
+  confirmDelete(id: number): void { this.deleteConfirmId = id; }
+  cancelDelete():            void { this.deleteConfirmId = null; }
+
+  deleteAddress(id: number): void {
+    this.addressService.deleteAddress(id).subscribe({
+      next: () => {
+        this.addresses = this.addresses.filter(a => a.id !== id);
+        this.deleteConfirmId = null;
+        this.showToast('Đã xóa địa chỉ', 'success');
+      },
+      error: () => this.showToast('Không thể xóa địa chỉ', 'error')
+    });
+  }
+
+  // ── Set default ─────────────────────────────────────────────────────────────
+
+  setDefaultAddress(id: number): void {
+    this.addressService.setDefault(id).subscribe({
+      next: () => {
+        this.addresses.forEach(a => a.isDefault = a.id === id);
+        this.showToast('Đã đặt làm địa chỉ mặc định', 'success');
+      },
+      error: () => this.showToast('Không thể cập nhật', 'error')
+    });
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+
+  getFullAddress(a: Address): string {
+    return [a.addressDetail, a.ward, a.district, a.province].filter(Boolean).join(', ');
+  }
+
+  fieldError(field: string): boolean {
+    const ctrl = this.addressForm.get(field);
+    return !!(ctrl?.invalid && ctrl?.touched);
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    this.toast = { message, type };
+    setTimeout(() => this.toast = null, 3000);
   }
 }

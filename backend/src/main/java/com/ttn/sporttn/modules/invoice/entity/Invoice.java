@@ -22,7 +22,7 @@ public class Invoice {
     private Long id;
 
     @Column(name = "invoice_number", unique = true, nullable = false)
-    private String invoiceNumber; // Sẽ map vào id: string trong FE (INV-001)
+    private String invoiceNumber;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
