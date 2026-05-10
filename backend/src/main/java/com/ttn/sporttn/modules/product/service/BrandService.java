@@ -35,6 +35,10 @@ public class BrandService {
             throw new RuntimeException("Tên thương hiệu đã tồn tại!");
         }
 
+        if (brandRepository.existsBySlug(request.getSlug())) {
+            throw new RuntimeException("Slug đã tồn tại");
+        }
+
         Brand brand = new Brand();
         brand.setName(request.getName());
         brand.setDescription(request.getDescription());
@@ -59,6 +63,20 @@ public class BrandService {
         Brand brand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thương hiệu với ID: " + brandId));
 
+        if (request.getName() != null) {
+            if (brandRepository.existsByNameAndIdNot(request.getName(), brandId)) {
+                throw new RuntimeException("Tên thương hiệu đã tồn tại!");
+            }
+            brand.setName(request.getName());
+        }
+
+        if (request.getSlug() != null && !request.getSlug().isBlank()) {
+            if (brandRepository.existsBySlugAndIdNot(request.getSlug(), brandId)) {
+                throw new RuntimeException("Slug đã tồn tại!");
+            }
+            brand.setSlug(request.getSlug());
+        }
+
         brand.setName(request.getName());
         brand.setColor(request.getColor());
         brand.setDescription(request.getDescription());
@@ -67,10 +85,6 @@ public class BrandService {
 
         if (request.getLogoUrl() != null && !request.getLogoUrl().isBlank()) {
             brand.setLogoUrl(request.getLogoUrl());
-        }
-
-        if (request.getSlug() != null && !request.getSlug().isBlank()) {
-            brand.setSlug(request.getSlug());
         }
 
         Brand updatedBrand = brandRepository.save(brand);

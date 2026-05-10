@@ -267,10 +267,10 @@
             *ngFor="let order of detailCustomer.orderHistory">
             <div class="oh-left">
               <div class="oh-id">{{ order.id }}</div>
-              <div class="oh-date">{{ order.date }} · {{ order.items }} sản phẩm</div>
+              <div class="oh-date">{{ order.createdAt }} · {{ order.itemCount }} sản phẩm</div>
             </div>
             <div class="oh-right">
-              <div class="oh-total">{{ formatPrice(order.total) }}</div>
+              <div class="oh-total">{{ formatPrice(order.finalAmount) }}</div>
               <span class="oh-badge" [ngClass]="getOrderStatusClass(order.status)">
                 {{ getOrderStatusLabel(order.status) }}
               </span>

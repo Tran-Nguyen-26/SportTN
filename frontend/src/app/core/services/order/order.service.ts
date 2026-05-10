@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../enviroments/enviroment';
+import { environment } from '../../../../environments/enviroment';
 import {ApiResponse} from "../../models/home-response/home-response";
 
 // ── Enums / Union Types ───────────────────────────────────────────────────────

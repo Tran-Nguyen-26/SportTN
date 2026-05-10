@@ -22,11 +22,17 @@
     <div class="social-login">
       <p class="social-title">Or continue with</p>
       <div class="social-buttons">
-        <button mat-raised-button class="btn-google">
-          <mat-icon svgIcon="google"></mat-icon>
-          <span>Google</span>
-        </button>
-        <button mat-raised-button class="btn-facebook">
+<!--        <button mat-raised-button class="btn-google" (click)="onGoogleLogin()">-->
+<!--          <mat-icon svgIcon="google"></mat-icon>-->
+<!--          <span>Google</span>-->
+<!--        </button>-->
+        <div id="google-btn-container">
+          <button mat-raised-button class="btn-google">
+            <mat-icon svgIcon="google"></mat-icon>
+            <span>Google</span>
+          </button>
+        </div>
+        <button mat-raised-button class="btn-facebook" (click)="onFacebookLogin()">
           <mat-icon svgIcon="facebook"></mat-icon>
           <span>Facebook</span>
         </button>
@@ -45,11 +51,11 @@
     <mat-divider></mat-divider>
 
     <div class="benefits">
-      <h4>Member Benefits</h4>
+      <h4>Quyền lợi thành viên</h4>
       <ul>
-        <li><mat-icon>check_circle</mat-icon> Earn points on every purchase</li>
-        <li><mat-icon>check_circle</mat-icon> Exclusive member-only deals</li>
-        <li><mat-icon>check_circle</mat-icon> 365-day easy return policy</li>
+        <li><mat-icon>check_circle</mat-icon> Tích điểm trên mỗi đơn hàng</li>
+        <li><mat-icon>check_circle</mat-icon> Ưu điểm đặc quyền dành riêng cho thành viên</li>
+        <li><mat-icon>check_circle</mat-icon> Chính sách đổi trả dễ dàng trong 7 ngày</li>
       </ul>
     </div>
     </ng-container>

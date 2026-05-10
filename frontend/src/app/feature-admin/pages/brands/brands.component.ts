@@ -19,10 +19,12 @@ export class BrandsComponent implements OnInit {
   editingBrand: BrandResponse | null = null;
   isLoading = signal(false);
 
+  fieldErrors: { name?: string; slug?: string } = {};
+
   // ── Logo state ───────────────────────────────
   logoSource: 'upload' | 'url' = 'upload';
-  logoPreview: string | null = null;       // base64 khi upload file
-  logoUrlPreview: string = '';             // khi nhập URL
+  logoPreview: string | null = null;
+  logoUrlPreview: string = '';
   logoUrlValid: boolean | null = null;
 
   // ── Preset colors ────────────────────────────
@@ -67,6 +69,7 @@ export class BrandsComponent implements OnInit {
 
   // ── Drawer ───────────────────────────────────
   openDrawer(brand?: BrandResponse): void {
+    this.fieldErrors = {};
     if (brand) {
       this.editingBrand = brand;
       this.form = {
@@ -98,6 +101,7 @@ export class BrandsComponent implements OnInit {
     this.logoSource     = 'upload';
     this.logoUrlPreview = '';
     this.logoUrlValid   = null;
+    this.fieldErrors = {};
   }
 
   onOverlayClick(e: MouseEvent): void {
@@ -110,8 +114,8 @@ export class BrandsComponent implements OnInit {
 
   save(): void {
     if (!this.isFormValid()) return;
+    this.fieldErrors = {};
     const logoUrl = this.effectiveLogo || '';
-
 
     if (this.editingBrand) {
       const updateData: BrandAddRequest = {
@@ -126,17 +130,38 @@ export class BrandsComponent implements OnInit {
             );
             this.closeDrawer();
           }
+        },
+        error: (err) => {
+          const msg = err.error.message;
+          if (msg.includes('Tên thương hiệu')) {
+            this.fieldErrors.name = msg;
+          } else if (msg.includes('Slug')) {
+            this.fieldErrors.slug = msg;
+          } else {
+            console.error(msg);
+          }
         }
       })
     } else {
-      this.brandService.addBrand({...this.form, logoUrl}).subscribe(res => {
-        if (res.data) {
-          this.brands.update(all => [res.data, ...all]);
-          this.closeDrawer();
+      this.brandService.addBrand({...this.form, logoUrl}).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.brands.update(all => [res.data, ...all]);
+            this.closeDrawer();
+          }
+        },
+        error: err => {
+          const msg = err.error.message;
+          if (msg.includes('Tên thương hiệu')) {
+            this.fieldErrors.name = msg;
+          } else if (msg.includes('Slug')) {
+            this.fieldErrors.slug = msg;
+          } else {
+            console.error(msg);
+          }
         }
       })
     }
-    this.closeDrawer();
   }
 
   deleteBrand(id: number): void {

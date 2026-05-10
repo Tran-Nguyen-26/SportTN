@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import {MatIconRegistry} from "@angular/material/icon";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -11,6 +11,7 @@ import {DomSanitizer} from "@angular/platform-browser";
 export class AppComponent {
   isAuthPage = false;
   isAdminPage = false;
+  toastMessage: string = '';
 
   constructor(
     private router: Router,
@@ -44,6 +45,11 @@ export class AppComponent {
       'apple',
       this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/apple.svg')
     );
+  }
+
+  @HostListener('window:show-toast', ['$event'])
+  onShowToast(event: any) {
+    this.toastMessage = event.detail.message;
   }
 }
 

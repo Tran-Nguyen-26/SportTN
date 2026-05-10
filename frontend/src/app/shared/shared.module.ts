@@ -32,6 +32,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {LoadingSpinnerComponent} from "./components/loading-spinner/loading-spinner.component";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {AddToCartDrawerComponent} from "./components/add-to-cart-drawer/add-to-cart-drawer.component";
+import {ToastNotificationComponent} from "./components/toast-notification/toast-notification.component";
 
 const NAVBAR_COMPONENTS = [
   NavbarComponent,
@@ -53,7 +54,8 @@ const SHARED_COMPONENTS = [
   ProductCardComponent,
   RatingStarsComponent,
   LoadingSpinnerComponent,
-  AddToCartDrawerComponent
+  AddToCartDrawerComponent,
+  ToastNotificationComponent
 ]
 
 @NgModule({
@@ -86,7 +88,7 @@ const SHARED_COMPONENTS = [
     ...NAVBAR_COMPONENTS,
     ...FOOTER_COMPONENTS,
     ...SHARED_COMPONENTS,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ]
 })
 export class SharedModule { }

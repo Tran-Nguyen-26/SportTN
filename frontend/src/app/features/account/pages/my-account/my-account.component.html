@@ -242,6 +242,9 @@
                 <mat-icon *ngIf="!isLoading">shield</mat-icon>
                 Cập nhật mật khẩu
               </button>
+              <p class="field-error" style="text-align: center; margin-top: 10px;" *ngIf="errorMessage">
+                {{ errorMessage }}
+              </p>
             </div>
 
           </form>

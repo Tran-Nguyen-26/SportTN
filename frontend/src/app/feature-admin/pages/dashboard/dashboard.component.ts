@@ -10,6 +10,7 @@ import {
 } from "../../../core/services/overview/dashboard.service";
 import { forkJoin } from 'rxjs';
 import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR } from '../../../core/services/order/order.service';
+import {ReportService} from "../../../core/services/report/report.service";
 
 interface StatItem {
   icon: string;
@@ -32,6 +33,8 @@ interface OrderStatusItem {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+
+  isExporting = false;
 
   today: string = new Date().toLocaleDateString('vi-VN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -84,7 +87,10 @@ export class DashboardComponent implements OnInit {
     REFUNDED:  'badge-red',
   };
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private reportService: ReportService
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -117,6 +123,55 @@ export class DashboardComponent implements OnInit {
         console.error('Lỗi load dashboard:', err);
         this.error = 'Không thể tải dữ liệu dashboard. Vui lòng thử lại.';
         this.loading = false;
+      }
+    });
+  }
+
+  // ── Export ────────────────────────────────────────────────────────────────
+  exportRevenue(): void {
+    this.isExporting = true;
+
+    const to   = new Date();
+    const from = new Date();
+
+    // Tính from dựa theo period đang chọn
+    switch (this.selectedPeriod) {
+      case 'today':
+        from.setHours(0, 0, 0, 0); // từ đầu ngày hôm nay
+        break;
+      case 'week':
+        from.setDate(from.getDate() - 7);
+        break;
+      case 'month':
+        from.setDate(from.getDate() - 30);
+        break;
+      default:
+        from.setDate(from.getDate() - 7);
+    }
+
+    const fromStr = this.formatDate(from);
+    const toStr   = this.formatDate(to);
+
+    // Tên file theo period
+    const periodName: Record<string, string> = {
+      today: 'hom-nay',
+      week:  '7-ngay',
+      month: '30-ngay'
+    };
+
+    this.reportService.exportRevenue(fromStr, toStr).subscribe({
+      next: (blob) => {
+        const url     = window.URL.createObjectURL(blob);
+        const link    = document.createElement('a');
+        link.href     = url;
+        link.download = `bao-cao-doanh-thu-${periodName[this.selectedPeriod]}-${toStr}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.isExporting = false;
+      },
+      error: (err) => {
+        console.error('[REPORT] Lỗi xuất báo cáo:', err);
+        this.isExporting = false;
       }
     });
   }
@@ -195,5 +250,13 @@ export class DashboardComponent implements OnInit {
 
   trackByFn(index: number, item: any): any {
     return item.id || index;
+  }
+
+  get currentPeriodLabel(): string {
+    return this.periods.find(p => p.value === this.selectedPeriod)?.label ?? '';
+  }
+
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0]; // yyyy-MM-dd
   }
 }

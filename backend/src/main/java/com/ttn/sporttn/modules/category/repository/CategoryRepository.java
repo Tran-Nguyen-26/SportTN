@@ -25,6 +25,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             String parentSlug
     );
 
+    List<Category> findTop12ByParentIsNullAndActiveTrueOrderByDisplayOrderAsc();
+
     /**
      * Find all active categories with pagination
      */
@@ -58,4 +60,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<CategoryAdminResponse> findAllForAdmin();
 
     Optional<Category> findBySlug(@NotBlank(message = "Slug không được để trống") String slug);
+
+    @Query("SELECT MAX(c.displayOrder) FROM Category c")
+    Integer findMaxDisplayOrder();
 }

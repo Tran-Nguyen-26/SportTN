@@ -19,16 +19,24 @@
 
         <div class="field full">
           <label>Tên danh mục <span class="req">*</span></label>
-          <input type="text" [(ngModel)]="form.name"
-                 (ngModelChange)="onNameChange($event)"
-                 placeholder="VD: Bơi lội, Chạy bộ...">
+          <input
+            type="text"
+               [(ngModel)]="form.name"
+              [class.is-invalid]="errors.name"
+               (ngModelChange)="onNameChange($event)"
+               placeholder="VD: Bơi lội, Chạy bộ...">
+          <span class="error-msg" *ngIf="errors.name">{{ errors.name }}</span>
         </div>
 
         <div class="field full">
           <label>Slug <span class="req">*</span></label>
-          <input type="text" [(ngModel)]="form.slug"
-                 placeholder="boi-loi" class="slug-input">
+          <input
+            type="text"
+            [(ngModel)]="form.slug"
+            [class.is-invalid]="errors.slug"
+            placeholder="boi-loi" class="slug-input">
           <span class="hint">Tự động tạo từ tên · Chỉ dùng chữ thường, số và dấu gạch ngang</span>
+          <span class="error-msg" *ngIf="errors.slug">{{ errors.slug }}</span>
         </div>
 
         <div class="field full">

@@ -57,7 +57,6 @@ export class RegisterPageComponent implements OnInit {
         next: (res) => {
           this.isLoading = false;
           if (res.data === true) {
-            // Gán lỗi thủ công cho ô input email
             emailControl.setErrors({ 'alreadyExists': true });
           } else {
             this.currentStep = 2;
@@ -104,8 +103,10 @@ export class RegisterPageComponent implements OnInit {
       this.authService.register(requestData).subscribe({
         next: (res) => {
           this.isLoading = false;
-          this.successMessage = res.message || 'Đăng ký thành công';
-          window.alert(this.successMessage);
+          const event = new CustomEvent('show-toast', {
+            detail: { message: 'Đăng ký thành công!' }
+          });
+          window.dispatchEvent(event);
           this.router.navigate(['/auth/login']);
 
         },

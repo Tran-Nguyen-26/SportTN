@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../../enviroments/enviroment";
+import {environment} from "../../../../environments/enviroment";
 import {Observable} from "rxjs";
 import {ApiResponse} from "../../models/home-response/home-response";
 import {VariantResponse} from "../../models/product/product.model";

@@ -6,4 +6,10 @@ import com.ttn.sporttn.modules.product.entity.Brand;
 
 public interface BrandRepository extends JpaRepository<Brand, Long> {
     boolean existsByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long brandId);
+
+    boolean existsBySlugAndIdNot(String slug, Long brandId);
+
+    boolean existsBySlug(String slug);
 }

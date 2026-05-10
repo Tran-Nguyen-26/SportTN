@@ -207,6 +207,23 @@
   margin-bottom: 2px;
 }
 
+.field input.is-invalid {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.error-msg {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
+.field .hint {
+  transition: opacity 0.2s;
+}
+
 .upload-icon mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
 .upload-text {

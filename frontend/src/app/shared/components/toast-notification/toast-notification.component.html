@@ -1,1 +1,5 @@
-<p>toast-notification works!</p>
+<div class="toast-box" [ngClass]="type">
+  <span class="icon" *ngIf="type === 'success'">✓</span>
+  <span class="icon" *ngIf="type === 'error'">✕</span>
+  <span class="text">{{ message }}</span>
+</div>

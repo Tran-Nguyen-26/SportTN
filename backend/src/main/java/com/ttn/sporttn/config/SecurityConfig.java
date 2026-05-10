@@ -56,6 +56,7 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/public/**",
+                                "/api/v1/auth/forgot-password/**",
                                 "/api/v1/products/**")
                             .permitAll()
                             .anyRequest().authenticated()

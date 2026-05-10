@@ -87,6 +87,10 @@
             [(ngModel)]="form.name"
             (ngModelChange)="onNameChange($event)"
             placeholder="VD: Nike, Adidas, Decathlon...">
+          <div class="error-text" *ngIf="fieldErrors.name">
+            <mat-icon>error</mat-icon>
+            {{ fieldErrors.name }}
+          </div>
         </div>
 
         <div class="field">
@@ -97,6 +101,10 @@
             placeholder="nike"
             class="slug-input">
           <span class="hint">Tự động tạo từ tên · Dùng chữ thường, số, dấu gạch ngang</span>
+          <div class="error-text" *ngIf="fieldErrors.slug">
+            <mat-icon>error</mat-icon>
+            {{ fieldErrors.slug }}
+          </div>
         </div>
 
         <div class="field">

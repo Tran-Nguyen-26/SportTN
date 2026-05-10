@@ -9,7 +9,6 @@
   </app-page-header>
 
   <app-add-category-drawer
-    *ngIf="showDrawer"
     [(visible)]="showDrawer"
     [parentCategories]="parentList()"
     (saved)="onCategorySaved($event)"

@@ -271,3 +271,20 @@
   }
 }
 
+.stn-alert {
+  display: flex;
+  align-items: center;
+}
+
+.stn-alert mat-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+}
+
+.stn-alert span {
+  color: red;
+}
+

@@ -44,4 +44,17 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex,
+                                                                HttpServletRequest request) {
+        log.error("Runtime Exception: ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.builder()
+                        .code("INTERNAL_SERVER_ERROR")
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build());
+    }
+
 }

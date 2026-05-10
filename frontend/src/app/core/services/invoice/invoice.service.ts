@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {ApiResponse} from "../../models/home-response/home-response";
 import {PageResponse} from "../../models/page-response";
-import {environment} from "../../../../enviroments/enviroment";
+import {environment} from "../../../../environments/enviroment";
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 

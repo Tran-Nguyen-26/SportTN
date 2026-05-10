@@ -143,10 +143,10 @@
     <!-- User avatar + dropdown -->
     <div class="dropdown-host user-host" [class.open]="userOpen">
       <div class="user-btn" (click)="toggleUser()">
-        <div class="user-avatar">{{ currentUser.initials }}</div>
+        <div class="user-avatar">{{ currentUserInfo.initials }}</div>
         <div class="user-info">
-          <span class="user-name">{{ currentUser.name }}</span>
-          <span class="user-role">{{ currentUser.roleLabel }}</span>
+          <span class="user-name">{{ currentUserInfo.name }}</span>
+          <span class="user-role">{{ currentUserInfo.roleLabel }}</span>
         </div>
         <mat-icon class="user-chevron" [class.rotated]="userOpen">expand_more</mat-icon>
       </div>
@@ -155,13 +155,13 @@
 
         <!-- Profile summary -->
         <div class="user-dd-profile">
-          <div class="udp-avatar" [style.background]="currentUser.color + '22'" [style.color]="currentUser.color">
-            {{ currentUser.initials }}
+          <div class="udp-avatar" [style.background]="currentUserInfo.color + '22'" [style.color]="currentUserInfo.color">
+            {{ currentUserInfo.initials }}
           </div>
           <div class="udp-info">
-            <div class="udp-name">{{ currentUser.name }}</div>
-            <div class="udp-email">{{ currentUser.email }}</div>
-            <span class="udp-role-badge">{{ currentUser.roleLabel }}</span>
+            <div class="udp-name">{{ currentUserInfo.name }}</div>
+            <div class="udp-email">{{ currentUserInfo.email }}</div>
+            <span class="udp-role-badge">{{ currentUserInfo.roleLabel }}</span>
           </div>
         </div>
 
@@ -218,18 +218,18 @@
       <div class="avatar-section">
         <div class="profile-avatar-wrap">
           <div class="profile-avatar"
-               [style.background]="currentUser.color + '22'"
-               [style.color]="currentUser.color">
-            {{ profileForm.name ? profileForm.name[0].toUpperCase() : currentUser.initials }}
+               [style.background]="currentUserInfo.color + '22'"
+               [style.color]="currentUserInfo.color">
+            {{ profileForm.name ? profileForm.name[0].toUpperCase() : currentUserInfo.initials }}
           </div>
           <button class="avatar-change-btn" title="Đổi ảnh đại diện">
             <mat-icon>photo_camera</mat-icon>
           </button>
         </div>
         <div class="avatar-info">
-          <div class="avatar-name">{{ currentUser.name }}</div>
-          <div class="avatar-role">{{ currentUser.roleLabel }}</div>
-          <div class="avatar-email">{{ currentUser.email }}</div>
+          <div class="avatar-name">{{ currentUserInfo.name }}</div>
+          <div class="avatar-role">{{ currentUserInfo.roleLabel }}</div>
+          <div class="avatar-email">{{ currentUserInfo.email }}</div>
         </div>
       </div>
 
@@ -251,7 +251,7 @@
 
         <div class="field">
           <label>Email</label>
-          <input type="email" [value]="currentUser.email" disabled class="input-disabled">
+          <input type="email" [value]="currentUserInfo.email" disabled class="input-disabled">
           <span class="hint">Email không thể thay đổi</span>
         </div>
 

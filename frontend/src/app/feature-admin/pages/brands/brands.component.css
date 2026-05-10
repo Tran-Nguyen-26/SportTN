@@ -198,7 +198,7 @@
   box-shadow: none;
 }
 
-.add-icon { font-size: 32px; color: #cbd5e1; }
+.add-icon { font-size: 24px; color: #cbd5e1; }
 .add-card:hover .add-icon { color: #3b82f6; }
 .add-label { font-size: 13px; color: #94a3b8; font-weight: 500; }
 .add-card:hover .add-label { color: #2563eb; }
@@ -562,6 +562,20 @@
 .url-status mat-icon { font-size: 13px; }
 .url-status.ok  { color: #16a34a; }
 .url-status.err { color: #dc2626; }
+
+.error-text {
+  color: red;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.error-text mat-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── COLOR PICKER ─────────────────────────────── */
 .color-picker-wrap {

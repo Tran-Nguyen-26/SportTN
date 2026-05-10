@@ -326,20 +326,28 @@ mat-divider {
   height: 18px;
 }
 
+#google-btn-container {
+  display: contents; /* ✅ Xóa div wrapper, button bên trong tự chiếm style của flexbox cha */
+}
+
+#google-btn-container .btn-google {
+  width: 100%;
+}
+
 
 /* Social Login Buttons - White Background */
 .btn-google,
 .btn-facebook,
 .btn-apple {
-  background: #ffffff !important;   /* nền trắng */
-  color: #000000 !important;        /* chữ đen */
-  border: 1px solid #000000 !important; /* viền đen */
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
 }
 
 .btn-google:hover,
 .btn-facebook:hover,
 .btn-apple:hover {
-  background: #f9f9f9 !important;   /* nền hơi xám khi hover */
+  background: #f9f9f9 !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
   transform: translateY(-2px) !important;
 }

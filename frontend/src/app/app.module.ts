@@ -12,7 +12,6 @@ import { CartModule } from './features/cart/cart.module';
 import { AccountModule } from './features/account/account.module';
 import { AuthTokenInterceptor } from './core/interceptors/auth-token/auth-token.interceptor';
 
-// Material Modules
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -34,6 +33,13 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatRadioModule } from '@angular/material/radio';
 import { CategoryModule } from './features/category/category.module';
 import {FeatureAdminModule} from "./feature-admin/feature-admin.module";
+import {
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+  SocialAuthServiceConfig,
+  SocialLoginModule
+} from "@abacritt/angularx-social-login";
+import {environment} from "../environments/enviroment";
 
 @NgModule({
   declarations: [
@@ -71,12 +77,32 @@ import {FeatureAdminModule} from "./feature-admin/feature-admin.module";
     MatStepperModule,
     MatRadioModule,
     FeatureAdminModule,
+    SocialLoginModule
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthTokenInterceptor,
       multi: true
+    },
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(environment.googleClientId, {
+              oneTapEnabled: false
+            })
+          },
+          {
+            id: FacebookLoginProvider.PROVIDER_ID,
+            provider: new FacebookLoginProvider(environment.facebookAppId)
+          }
+        ],
+        onError: (err) => console.error('Social login error:', err)
+      } as SocialAuthServiceConfig
     }
   ],
   bootstrap: [AppComponent]

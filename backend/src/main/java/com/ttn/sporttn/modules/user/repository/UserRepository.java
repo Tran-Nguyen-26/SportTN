@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     boolean existsByPhone(String phone);
     long countByRoleAndCreatedAtBetween(UserRole role, LocalDateTime from, LocalDateTime to);
+
+    boolean existsByPhoneAndIdNot(String newPhone, Long userId);
 }

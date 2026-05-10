@@ -30,6 +30,14 @@
         </button>
       </div>
     </div>
+
+    <button
+      class="btn-export"
+      (click)="exportRevenue()"
+      [disabled]="isExporting">
+      <mat-icon>{{ isExporting ? 'hourglass_empty' : 'download' }}</mat-icon>
+      {{ isExporting ? 'Đang xuất...' : 'Xuất báo cáo ' + currentPeriodLabel }}
+    </button>
   </div>
 
   <!-- Stats Row -->
@@ -141,7 +149,7 @@
             <td class="order-id">{{ o.orderCode }}</td>
             <td>
               <div class="customer-cell">
-                <div class="avatar-sm">{{ o.receiverName?.charAt(0) }}</div>
+<!--                <div class="avatar-sm">{{ o.receiverName?.charAt(0) }}</div>-->
                 <span class="customer-name-sm">{{ o.receiverName }}</span>
               </div>
             </td>

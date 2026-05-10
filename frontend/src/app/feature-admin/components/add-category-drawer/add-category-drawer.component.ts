@@ -35,6 +35,11 @@ export class AddCategoryDrawerComponent implements OnChanges {
   urlValid:    boolean | null = null;
   form:        CategoryForm = this.emptyForm();
 
+  errors = {
+    name: '',
+    slug: ''
+  };
+
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.visible) return;
 
@@ -55,6 +60,7 @@ export class AddCategoryDrawerComponent implements OnChanges {
   private loadInitialData(data: CategoryForm): void {
     this.form = {
       ...data,
+      categoryId: data.categoryId ? Number(data.categoryId) : null,
       parentId: data.parentId != null ? Number(data.parentId) : null,
     };
 
@@ -77,6 +83,7 @@ export class AddCategoryDrawerComponent implements OnChanges {
     this.imageSource = 'upload';
     this.urlPreview  = '';
     this.urlValid    = null;
+    this.errors = { name: '', slug: '' };
   }
 
   emptyForm(): CategoryForm {
@@ -89,6 +96,7 @@ export class AddCategoryDrawerComponent implements OnChanges {
   }
 
   onNameChange(val: string): void {
+    this.errors.name = '';
     this.form.name = val;
     this.form.slug = val.toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -134,14 +142,22 @@ export class AddCategoryDrawerComponent implements OnChanges {
   }
 
   save(): void {
-    if (!this.form.name || !this.form.slug) return;
+    if (!this.form.name || !this.form.slug) {
+      if(!this.form.name) this.errors.name = 'Tên danh mục không được để trống';
+      if(!this.form.slug) this.errors.slug = 'Slug không được để trống';
+      return;
+    }
     this.saved.emit({ ...this.form });
-    this.close();
   }
 
   close(): void {
     this.visible = false;
     this.visibleChange.emit(false);
     this.resetForm();
+  }
+
+  setErrors(backendErrors: {name?: string, slug?: string}) {
+    this.errors.name = backendErrors.name || '';
+    this.errors.slug = backendErrors.slug || '';
   }
 }

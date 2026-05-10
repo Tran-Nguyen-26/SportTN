@@ -60,7 +60,7 @@ public class HomeService {
 
     private List<CategoryResponse> getSportsPopular() {
         return categoryRepository
-                .findTop10ByParentSlugAndActiveTrueOrderByDisplayOrderAsc("sport")
+                .findTop12ByParentIsNullAndActiveTrueOrderByDisplayOrderAsc()
                 .stream()
                 .map(this::toCategoryResponse)
                 .collect(Collectors.toList());

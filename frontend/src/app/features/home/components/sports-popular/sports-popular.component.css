@@ -11,23 +11,26 @@
 }
 
 .sports-list {
-  display: flex;
-  flex-wrap: wrap;             /* chia thành nhiều hàng */
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: 20px;
+  justify-items: center;
 }
 
 .sport-item {
-  width: 150px;
+  width: 100%;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .sport-image {
-  width: 150px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid #3498db;   /* viền xanh giống ảnh */
+  border: 2px solid #3498db;
   margin-bottom: 8px;
 }
 
@@ -38,8 +41,20 @@
 }
 
 .sport-name {
-  display: block;
+  width: 100%;
   font-size: 0.9rem;
   font-weight: 500;
   color: #333;
+}
+
+@media (max-width: 1024px) {
+  .sports-list {
+    grid-template-columns: repeat(4, 1fr); /* 3 hàng, mỗi hàng 4 */
+  }
+}
+
+@media (max-width: 600px) {
+  .sports-list {
+    grid-template-columns: repeat(3, 1fr); /* 4 hàng, mỗi hàng 3 */
+  }
 }

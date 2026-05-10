@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/fo
 import { trigger, transition, style, animate } from '@angular/animations';
 import { map } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { UserService } from 'src/app/core/services/user/user.service';
 
 @Component({
-  selector: 'app-my-account',
+  selector:    'app-my-account',
   templateUrl: './my-account.component.html',
-  styleUrls: ['./my-account.component.css'],
+  styleUrls:   ['./my-account.component.css'],
   animations: [
     trigger('fadeInOut', [
       transition(':enter', [
@@ -22,7 +23,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
 })
 export class MyAccountComponent implements OnInit {
 
-  profileForm!: FormGroup;
+  profileForm!:  FormGroup;
   passwordForm!: FormGroup;
 
   user$ = this.authService.currentUser$.pipe(
@@ -33,19 +34,18 @@ export class MyAccountComponent implements OnInit {
   hideNew     = true;
   hideConfirm = true;
 
-  isLoading  = false;
-  isEditing  = false;
+  isLoading = false;
+  isEditing = false;
 
   successMessage = '';
   errorMessage   = '';
 
-  // Hạng thành viên
-  private readonly SILVER_MAX  = 500;   // điểm tối đa của hạng Bạc
-  private readonly GOLD_MIN    = 500;   // điểm tối thiểu để lên hạng Vàng
+  private readonly GOLD_MIN = 500;
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService
+    private fb:          FormBuilder,
+    private authService: AuthService,
+    private userService: UserService
   ) {
     this.initForms();
   }
@@ -54,7 +54,7 @@ export class MyAccountComponent implements OnInit {
     this.loadUserProfile();
   }
 
-  // ─── Form init ──────────────────────────────────────────────────────────────
+  // ─── Form init ────────────────────────────────────────────────────────────────
 
   initForms(): void {
     this.profileForm = this.fb.group({
@@ -80,7 +80,7 @@ export class MyAccountComponent implements OnInit {
     return pw && confirm && pw !== confirm ? { passwordMismatch: true } : null;
   }
 
-  // ─── Load profile ────────────────────────────────────────────────────────────
+  // ─── Load profile ─────────────────────────────────────────────────────────────
 
   loadUserProfile(): void {
     const user = this.authService.currentUserValue;
@@ -88,7 +88,7 @@ export class MyAccountComponent implements OnInit {
       this.profileForm.patchValue({
         username:    user.username,
         email:       user.email,
-        phone:       user.phone ?? '',
+        phone:       user.phone       ?? '',
         totalPoints: user.totalPoints ?? 0
       });
     }
@@ -111,13 +111,25 @@ export class MyAccountComponent implements OnInit {
     if (this.profileForm.invalid) return;
     this.isLoading = true;
 
-    // TODO: replace with this.userService.updateProfile({ phone: ... }).subscribe(...)
-    setTimeout(() => {
-      this.showSuccess('Cập nhật thông tin thành công!');
-      this.isLoading  = false;
-      this.isEditing  = false;
-      this.profileForm.get('phone')?.disable();
-    }, 1000);
+    const phone = this.profileForm.get('phone')?.value;
+
+    this.userService.updateMyPhone(phone).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.showSuccess('Cập nhật thông tin thành công!');
+          this.isEditing = false;
+          this.profileForm.get('phone')?.disable();
+        } else {
+          this.showError(res.message ?? 'Cập nhật thất bại!');
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('[MyAccount] saveProfile error:', err);
+        this.showError('Đã xảy ra lỗi, vui lòng thử lại!');
+        this.isLoading = false;
+      }
+    });
   }
 
   // ─── Change password ──────────────────────────────────────────────────────────
@@ -127,31 +139,38 @@ export class MyAccountComponent implements OnInit {
     this.isLoading = true;
 
     const { oldPassword, newPassword } = this.passwordForm.value;
-    // TODO: replace with this.authService.changePassword({ oldPassword, newPassword }).subscribe(...)
-    console.log('[MyAccount] changePassword', { oldPassword, newPassword });
 
-    setTimeout(() => {
-      this.showSuccess('Đổi mật khẩu thành công!');
-      this.passwordForm.reset();
-      Object.keys(this.passwordForm.controls).forEach(k =>
-        this.passwordForm.get(k)?.setErrors(null)
-      );
-      this.isLoading = false;
-    }, 1500);
+    this.userService.changeMyPassword(oldPassword, newPassword).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.showSuccess('Đổi mật khẩu thành công!');
+          this.passwordForm.reset();
+        } else {
+          // Hiển thị lỗi từ message của Backend trả về
+          this.showError(res.message || 'Đổi mật khẩu thất bại!');
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        // Lấy câu báo lỗi từ Backend (ví dụ: "Mật khẩu cũ không đúng")
+        const msg = err.error?.message || 'Mật khẩu cũ không chính xác!';
+        this.showError(msg);
+        this.isLoading = false;
+      }
+    });
   }
 
   // ─── Membership helpers ───────────────────────────────────────────────────────
 
   getProgressPercent(points: number): number {
-    const pct = Math.min((points / this.GOLD_MIN) * 100, 100);
-    return Math.round(pct);
+    return Math.round(Math.min((points / this.GOLD_MIN) * 100, 100));
   }
 
   getRemainingPoints(points: number): number {
     return Math.max(this.GOLD_MIN - points, 0);
   }
 
-  // ─── Avatar / display helpers ─────────────────────────────────────────────────
+  // ─── Avatar helpers ───────────────────────────────────────────────────────────
 
   getInitials(username: string): string {
     if (!username) return 'U';
@@ -168,9 +187,9 @@ export class MyAccountComponent implements OnInit {
     const pw = this.passwordForm.get('newPassword')?.value ?? '';
     if (!pw) return 0;
     let score = 0;
-    if (pw.length >= 8)           score++;
-    if (/[A-Z]/.test(pw))         score++;
-    if (/\d/.test(pw))            score++;
+    if (pw.length >= 8)            score++;
+    if (/[A-Z]/.test(pw))          score++;
+    if (/\d/.test(pw))             score++;
     if (/[^A-Za-z0-9]/.test(pw))  score++;
     return Math.min(score, 3);
   }

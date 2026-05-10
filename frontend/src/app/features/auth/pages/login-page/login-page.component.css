@@ -216,3 +216,94 @@ mat-checkbox {
     font-size: 13px;
   }
 }
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  padding: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-desc {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #dc2626;
+  font-size: 13px;
+  background: #fef2f2;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.resend-btn {
+  color: #666;
+  font-size: 13px;
+}
+
+/* Success */
+.success-body {
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.success-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #16a34a;
+}
+
+.success-body h4 {
+  margin: 8px 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.success-body p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}

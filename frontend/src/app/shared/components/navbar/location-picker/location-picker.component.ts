@@ -7,13 +7,13 @@ import { Component } from '@angular/core';
 })
 export class LocationPickerComponent {
   isOpen = false;
-  selectedLocation = 'TP. Ho Chi Minh';
+  selectedLocation = 'Hà Nội';
   locations = [
-    'TP. Ho Chi Minh',
-    'Ha Noi',
-    'Da Nang',
-    'Can Tho',
-    'Hai Phong'
+    'Hà Nội',
+    'TP. Hồ Chí Minh',
+    'Đà Nẵng',
+    'Cần Thơ',
+    'Hải Phòng'
   ];
 
   toggleOpen(): void {

@@ -1,12 +1,10 @@
 package com.ttn.sporttn.modules.user.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
-import com.ttn.sporttn.modules.user.dto.request.LoginRequest;
-import com.ttn.sporttn.modules.user.dto.request.LogoutRequest;
-import com.ttn.sporttn.modules.user.dto.request.RegisterRequest;
-import com.ttn.sporttn.modules.user.dto.request.SocialLoginRequest;
+import com.ttn.sporttn.modules.user.dto.request.*;
 import com.ttn.sporttn.modules.user.dto.response.AuthResponse;
 import com.ttn.sporttn.modules.user.dto.response.UserDetailResponse;
+import com.ttn.sporttn.modules.user.service.CustomerService;
 import com.ttn.sporttn.modules.user.service.SocialAuthService;
 import com.ttn.sporttn.modules.user.service.UserService;
 import jakarta.validation.Valid;
@@ -24,6 +22,7 @@ public class AuthController {
 
     private final UserService userService;
     private final SocialAuthService socialAuthService;
+    private final CustomerService customerService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
@@ -75,5 +74,27 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(exists, exists ? "Email đã tồn tại" : "Email khả dụng"));
     }
 
+    // POST /api/v1/auth/forgot-password/send-otp
+    @PostMapping("/forgot-password/send-otp")
+    public ResponseEntity<ApiResponse<Void>> sendOtp(@Valid @RequestBody SendOtpRequest request) {
+        log.info("[FORGOT_PASSWORD] Gửi OTP. email={}", request.getEmail());
+        customerService.sendOtp(request.getEmail());
+        return ResponseEntity.ok(ApiResponse.ok("Mã OTP đã được gửi đến email của bạn"));
+    }
 
+    // POST /api/v1/auth/forgot-password/verify-otp
+    @PostMapping("/forgot-password/verify-otp")
+    public ResponseEntity<ApiResponse<Void>> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        log.info("[FORGOT_PASSWORD] Verify OTP. email={}", request.getEmail());
+        customerService.verifyOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok(ApiResponse.ok("OTP hợp lệ"));
+    }
+
+    // POST /api/v1/auth/forgot-password/reset
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        log.info("[FORGOT_PASSWORD] Reset password. email={}", request.getEmail());
+        customerService.resetPassword(request.getEmail(), request.getOtp(), request.getNewPassword());
+        return ResponseEntity.ok(ApiResponse.ok("Đặt lại mật khẩu thành công"));
+    }
 }

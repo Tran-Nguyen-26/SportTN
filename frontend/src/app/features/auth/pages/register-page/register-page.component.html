@@ -1,4 +1,4 @@
-<app-auth-form-layout title="Đăng ký tài khoản SportTN" [showExtraFeatures]="false">
+<app-auth-form-layout title="Đăng ký tài khoản" [showExtraFeatures]="false">
   <div form-content class="stn-register-container">
 
     <div class="stn-step-indicator">
@@ -12,12 +12,12 @@
       </div>
     </div>
 
-    <div *ngIf="errorMessage" class="stn-alert error" [@fadeIn]>
+    <div *ngIf="errorMessage" class="stn-alert error" >
       <mat-icon>error_outline</mat-icon>
       <span>{{ errorMessage }}</span>
     </div>
 
-    <div *ngIf="currentStep === 1" class="stn-step-content" [@fadeIn]>
+    <div *ngIf="currentStep === 1" class="stn-step-content" >
       <div class="stn-step-header">
         <h3>Chào mừng bạn!</h3>
         <p>Nhập email để bắt đầu hành trình cùng SportTN</p>
@@ -43,7 +43,7 @@
       </form>
     </div>
 
-    <div *ngIf="currentStep === 2" class="stn-step-content" [@fadeIn]>
+    <div *ngIf="currentStep === 2" class="stn-step-content" >
       <div class="stn-step-header">
         <h3>Thông tin cá nhân</h3>
       </div>
@@ -71,6 +71,9 @@
             </mat-error>
             <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('pattern')">
               Số điện thoại không đúng định dạng
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('phoneNumber')?.hasError('serverError')">
+              {{ registerForm.get('phoneNumber')?.getError('serverError') }}
             </mat-error>
           </mat-form-field>
         </div>

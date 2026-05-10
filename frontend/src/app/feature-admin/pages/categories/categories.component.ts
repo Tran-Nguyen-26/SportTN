@@ -1,5 +1,8 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
-import { CategoryForm } from '../../components/add-category-drawer/add-category-drawer.component';
+import {Component, computed, OnInit, signal, ViewChild} from '@angular/core';
+import {
+  AddCategoryDrawerComponent,
+  CategoryForm
+} from '../../components/add-category-drawer/add-category-drawer.component';
 import {
   CategoryAdminResponse,
   CategoryCreateRequest,
@@ -14,6 +17,8 @@ import {
 export class CategoriesComponent implements OnInit {
 
   constructor(private categoryService: CategoryService) {}
+
+  @ViewChild(AddCategoryDrawerComponent) drawer!: AddCategoryDrawerComponent;
 
   // ── State ──────────────────────────────────────────────────────
   searchQuery  = signal('');
@@ -98,8 +103,27 @@ export class CategoriesComponent implements OnInit {
 
   // ── Lưu (tạo mới hoặc cập nhật) ───────────────────────────────
   onCategorySaved(form: CategoryForm): void {
+
+    const handleBackendError = (err: any) => {
+      console.error('Lỗi nghiệp vụ:', err);
+      const msg = err.error?.message || 'Có lỗi xảy ra, vui lòng thử lại';
+
+      if (msg.includes('Danh mục')) {
+        this.drawer.setErrors({ name: msg });
+      } else if (msg.includes('Slug')) {
+        this.drawer.setErrors({ slug: msg });
+      } else {
+        alert(msg);
+      }
+    };
+
     if (this.editMode) {
-      console.log('Cập nhật danh mục:', form);
+      const categoryId = this.editingCategory?.categoryId;
+
+      if (!categoryId) {
+        console.error('Không tìm thấy ID của danh mục cần cập nhật');
+        return;
+      }
 
       const request: CategoryUpdateRequest = {
         name: form.name,
@@ -120,11 +144,10 @@ export class CategoriesComponent implements OnInit {
             this.categories.update(list =>
               list.map(c => c.categoryId === form.categoryId ? {...c, ...res.data!} : c)
             );
+            this.showDrawer = false;
           }
         },
-        error: (err) => {
-          console.error('Lỗi tạo category:', err);
-        }
+        error: handleBackendError
       })
 
     } else {
@@ -147,12 +170,11 @@ export class CategoriesComponent implements OnInit {
           if (res.data) {
             this.categories.update(list =>
               [...list, {...res.data!}]
-            )
+            );
+            this.showDrawer = false;
           }
         },
-        error: (err) => {
-          console.error('Lỗi tạo category:', err);
-        }
+        error: handleBackendError
       })
     }
   }

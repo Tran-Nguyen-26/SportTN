@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {AuthResponse, LoginRequest, RegisterRequest, UserResponse} from "../../models/auth/auth.model";
 import {BehaviorSubject, delay, map, Observable, tap} from "rxjs";
-import { environment } from "../../../../enviroments/enviroment";
+import { environment } from "../../../../environments/enviroment";
 import {Router} from "@angular/router";
 
 @Injectable({
@@ -85,6 +85,28 @@ export class AuthService {
     localStorage.removeItem('auth_data');
     this.currentUserSubject.next(null);
     this.router.navigate(['/']);
+  }
+
+  saveAuthData(authData: AuthResponse): void {
+    localStorage.setItem('auth_data', JSON.stringify(authData));
+    this.currentUserSubject.next(authData);
+  }
+
+
+  sendOtp(email: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/forgot-password/send-otp`, { email });
+  }
+
+  verifyOtp(email: string, otp: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/forgot-password/verify-otp`, { email, otp });
+  }
+
+  resetPassword(email: string, otp: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/forgot-password/reset`, {
+      email,
+      otp,
+      newPassword
+    });
   }
 }
 

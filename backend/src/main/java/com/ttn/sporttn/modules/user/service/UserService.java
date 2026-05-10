@@ -14,6 +14,7 @@ import com.ttn.sporttn.modules.user.repository.UserRepository;
 import com.ttn.sporttn.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class UserService {
                 .orElseThrow(() -> {
                     log.warn("[AUTH] Đăng nhập thất bại. Email Không tồn tại. email={}", loginRequest.getEmail());
                     return new BusinessException(ErrorCode.INVALID_CREDENTIALS);
-                });
+            });
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
             log.warn("[AUTH] Đăng nhập thất bại. Sai mật khẩu.");
@@ -101,7 +102,13 @@ public class UserService {
         User user = userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = new User();
             newUser.setEmail(email);
-            newUser.setUsername(UUID.randomUUID().toString());
+            String baseUsername = email.split("@")[0];
+
+            String username = baseUsername;
+            while (userRepository.existsByUsername(username)) {
+                username = baseUsername + "_" + (int)(Math.random() * 9000 + 1000);
+            }
+            newUser.setUsername(username);
             newUser.setProvider(AuthProvider.valueOf(provider));
             newUser.setStatus(UserStatus.ACTIVE);
             newUser.setRole(UserRole.CUSTOMER);
@@ -114,7 +121,20 @@ public class UserService {
             return userRepository.save(newUser);
         });
 
-        return generateTokenPair(user);
+        AuthResponse authResponse = generateTokenPair(user);
+        UserResponse userResponse = UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .totalPoints(user.getTotalPoints())
+                .provider(user.getProvider())
+                .build();
+        authResponse.setUserResponse(userResponse);
+
+        return authResponse;
     }
 
     //Đăng ký
@@ -171,7 +191,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
             throw new BusinessException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
@@ -183,7 +203,30 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void logout(String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
+    }
+
+    @Transactional
+    public void updatePhone(Long userId, String newPhone) {
+        if (newPhone == null || newPhone.trim().isEmpty()) {
+            throw new RuntimeException("Số điện thoại không được để trống");
+        }
+
+        if (!newPhone.matches("^(0|\\+84)(\\d{9})$")) {
+            throw new RuntimeException("Số điện thoại không đúng định dạng");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        if (userRepository.existsByPhoneAndIdNot(newPhone, userId)) {
+            throw new RuntimeException("Số điện thoại này đã được sử dụng bởi tài khoản khác");
+        }
+
+        // 5. Cập nhật và lưu
+        user.setPhone(newPhone);
+        userRepository.save(user);
     }
 }

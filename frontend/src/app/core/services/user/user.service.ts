@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../enviroments/enviroment';
+import { environment } from '../../../../environments/enviroment';
 import { ApiResponse } from '../../models/home-response/home-response';
 import { AdminUser, UserForm, UserRole } from '../../../feature-admin/pages/users/users.component';
 import {PageResponse} from "../../models/page-response";
@@ -34,6 +34,7 @@ export interface PermissionOption {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
+
   private readonly apiUrl_customer = `${environment.apiUrl}/customer`;
   private readonly apiUrl_admin    = `${environment.apiUrl}/admin`;
 
@@ -73,5 +74,16 @@ export class UserService {
     return this.http.get<ApiResponse<PageResponse<AdminUser>>>(
       `${this.apiUrl_admin}/customers`, { params }
     );
+  }
+
+  updateMyPhone(phone: string): Observable<ApiResponse<any>> {
+    return this.http.patch<ApiResponse<any>>(`${environment.apiUrl}/users/phone`, { phone });
+  }
+
+  changeMyPassword(oldPassword: string, newPassword: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/users/change-password`, {
+      oldPassword,
+      newPassword
+    });
   }
 }

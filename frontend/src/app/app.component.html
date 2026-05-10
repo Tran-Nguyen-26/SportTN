@@ -5,3 +5,9 @@
 
   <app-footer *ngIf="!isAuthPage && !isAdminPage"></app-footer>
 </div>
+
+<app-toast-notification
+  *ngIf="toastMessage"
+  [message]="toastMessage"
+  (close)="toastMessage = ''">
+</app-toast-notification>

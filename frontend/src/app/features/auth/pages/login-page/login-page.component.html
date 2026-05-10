@@ -36,8 +36,8 @@
       </mat-form-field>
 
       <div class="login-options">
-        <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
-        <a href="#" (click)="forgotPassword(); $event.preventDefault()" class="forgot-password">Forgot password?</a>
+        <mat-checkbox formControlName="rememberMe">Ghi nhớ đăng nhập</mat-checkbox>
+        <a href="#" (click)="forgotPassword(); $event.preventDefault()" class="forgot-password">Quên mật khẩu?</a>
       </div>
 
       <button
@@ -54,6 +54,125 @@
   </div>
 
   <div footer-link>
-    <p>Don't have an account? <a routerLink="/auth/register">Đăng ký</a></p>
+    <p>Chưa có tài khoản? <a routerLink="/auth/register">Đăng ký</a></p>
   </div>
 </app-auth-form-layout>
+
+<div class="modal-overlay" *ngIf="showForgotModal" (click)="onOverlayClick($event)">
+  <div class="modal-card">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h3>{{ forgotStep === 1 ? 'Quên mật khẩu' : forgotStep === 2 ? 'Nhập mã OTP' : 'Đặt lại mật khẩu' }}</h3>
+      <button mat-icon-button (click)="closeForgotModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Step 1: Nhập email -->
+    <div *ngIf="forgotStep === 1" class="modal-body">
+      <p class="modal-desc">Nhập email của bạn, chúng tôi sẽ gửi mã OTP để đặt lại mật khẩu.</p>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput [formControl]="forgotEmailControl" type="email" placeholder="email@gmail.com">
+        <mat-error *ngIf="forgotEmailControl.hasError('required') && forgotEmailControl.touched">
+          Vui lòng nhập email
+        </mat-error>
+        <mat-error *ngIf="forgotEmailControl.hasError('email') && forgotEmailControl.touched">
+          Email không đúng định dạng
+        </mat-error>
+      </mat-form-field>
+      <div *ngIf="forgotError" class="error-message">
+        <mat-icon>error</mat-icon> {{ forgotError }}
+      </div>
+      <button mat-raised-button color="primary" class="full-width"
+              [disabled]="forgotEmailControl.invalid || forgotLoading"
+              (click)="sendOtp()">
+        <app-loading-spinner *ngIf="forgotLoading" [diameter]="20"></app-loading-spinner>
+        <span *ngIf="!forgotLoading">Gửi mã OTP</span>
+      </button>
+    </div>
+
+    <!-- Step 2: Nhập OTP -->
+    <div *ngIf="forgotStep === 2" class="modal-body">
+      <p class="modal-desc">Mã OTP đã được gửi đến <strong>{{ forgotEmailControl.value }}</strong></p>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mã OTP</mat-label>
+        <input matInput [formControl]="otpControl" placeholder="Nhập mã 6 số" maxlength="6">
+        <mat-error *ngIf="otpControl.hasError('required') && otpControl.touched">
+          Vui lòng nhập mã OTP
+        </mat-error>
+        <mat-error *ngIf="otpControl.hasError('minlength') && otpControl.touched">
+          Mã OTP gồm 6 số
+        </mat-error>
+      </mat-form-field>
+      <div *ngIf="forgotError" class="error-message">
+        <mat-icon>error</mat-icon> {{ forgotError }}
+      </div>
+      <button mat-raised-button color="primary" class="full-width"
+              [disabled]="otpControl.invalid || forgotLoading"
+              (click)="verifyOtp()">
+        <app-loading-spinner *ngIf="forgotLoading" [diameter]="20"></app-loading-spinner>
+        <span *ngIf="!forgotLoading">Xác nhận OTP</span>
+      </button>
+      <button mat-button class="full-width resend-btn"
+              [disabled]="resendCountdown > 0"
+              (click)="sendOtp()">
+        {{ resendCountdown > 0 ? 'Gửi lại sau ' + resendCountdown + 's' : 'Gửi lại mã' }}
+      </button>
+    </div>
+
+    <!-- Step 3: Đặt lại mật khẩu -->
+    <div *ngIf="forgotStep === 3" class="modal-body">
+      <p class="modal-desc">Nhập mật khẩu mới cho tài khoản của bạn.</p>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mật khẩu mới</mat-label>
+        <input matInput [type]="hideNewPassword ? 'password' : 'text'"
+               [formControl]="newPasswordControl" placeholder="Tối thiểu 6 ký tự">
+        <button mat-icon-button matSuffix type="button" (click)="hideNewPassword = !hideNewPassword">
+          <mat-icon>{{ hideNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="newPasswordControl.hasError('required') && newPasswordControl.touched">
+          Vui lòng nhập mật khẩu mới
+        </mat-error>
+        <mat-error *ngIf="newPasswordControl.hasError('minlength') && newPasswordControl.touched">
+          Mật khẩu tối thiểu 6 ký tự
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Xác nhận mật khẩu</mat-label>
+        <input matInput [type]="hideConfirmPassword ? 'password' : 'text'"
+               [formControl]="confirmPasswordControl" placeholder="Nhập lại mật khẩu">
+        <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword">
+          <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="confirmPasswordControl.hasError('required') && confirmPasswordControl.touched">
+          Vui lòng xác nhận mật khẩu
+        </mat-error>
+      </mat-form-field>
+      <div *ngIf="passwordMismatch" class="error-message">
+        <mat-icon>error</mat-icon> Mật khẩu không khớp
+      </div>
+      <div *ngIf="forgotError" class="error-message">
+        <mat-icon>error</mat-icon> {{ forgotError }}
+      </div>
+      <button mat-raised-button color="primary" class="full-width"
+              [disabled]="newPasswordControl.invalid || confirmPasswordControl.invalid || forgotLoading"
+              (click)="resetPassword()">
+        <app-loading-spinner *ngIf="forgotLoading" [diameter]="20"></app-loading-spinner>
+        <span *ngIf="!forgotLoading">Đặt lại mật khẩu</span>
+      </button>
+    </div>
+
+    <!-- Step 4: Thành công -->
+    <div *ngIf="forgotStep === 4" class="modal-body success-body">
+      <mat-icon class="success-icon">check_circle</mat-icon>
+      <h4>Đặt lại mật khẩu thành công!</h4>
+      <p>Bạn có thể đăng nhập bằng mật khẩu mới.</p>
+      <button mat-raised-button color="primary" class="full-width" (click)="closeForgotModal()">
+        Đăng nhập ngay
+      </button>
+    </div>
+
+  </div>
+</div>

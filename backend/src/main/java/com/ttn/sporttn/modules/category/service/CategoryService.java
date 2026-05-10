@@ -44,35 +44,49 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
-        log.info("[CATEGORY] Tạo danh mục mới. name={}", request.getName());
-        
-        categoryRepository.findByName(request.getName())
-            .ifPresent(cat -> {
-                log.warn("[CATEGORY] Tên danh mục đã tồn tại. name={}", request.getName());
-                throw new BusinessException(ErrorCode.INVALID_REQUEST);
-            });
+        log.info("[CATEGORY] Tạo danh mục mới. name={}, slug={}", request.getName(), request.getSlug());
+
+        categoryRepository.findByName(request.getName()).ifPresent(cat -> {
+            throw new RuntimeException("Tên danh mục đã tồn tại");
+        });
+
+        categoryRepository.findBySlug(request.getSlug()).ifPresent(cat -> {
+            throw new RuntimeException("Slug đã tồn tại");
+        });
 
         Category parent = null;
         if (request.getParentId() != null) {
             parent = categoryRepository.findById(request.getParentId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
         }
 
+        // 4. Xử lý logic Display Order
+        int finalOrder;
+        Integer maxOrder = categoryRepository.findMaxDisplayOrder();
+        int currentMax = (maxOrder == null) ? 0 : maxOrder;
+
+        if (request.getDisplayOrder() == null || request.getDisplayOrder() > currentMax) {
+            finalOrder = currentMax + 1;
+        } else {
+            finalOrder = request.getDisplayOrder();
+        }
+
+        // 5. Build và Save
         Category category = Category.builder()
-            .name(request.getName())
-            .slug(request.getSlug())
-            .displayOrder(request.getDisplayOrder())
-            .parent(parent)
-            .sectionTitle(request.getSectionTitle())
-            .description(request.getDescription())
-            .imageUrl(request.getImageUrl())
-            .linkUrl(request.getLinkUrl())
-            .showOnHome(request.isShowOnHome())
-            .active(request.isActive())
-            .build();
+                .name(request.getName())
+                .slug(request.getSlug())
+                .displayOrder(finalOrder)
+                .parent(parent)
+                .sectionTitle(request.getSectionTitle())
+                .description(request.getDescription())
+                .imageUrl(request.getImageUrl())
+                .linkUrl(request.getLinkUrl())
+                .showOnHome(request.isShowOnHome())
+                .active(request.isActive())
+                .build();
 
         Category saved = categoryRepository.save(category);
-        log.info("[CATEGORY] Tạo danh mục thành công. id={}, name={}", saved.getId(), saved.getName());
+        log.info("[CATEGORY] Tạo thành công. id={}, name={}, order={}", saved.getId(), saved.getName(), saved.getDisplayOrder());
         return CategoryResponse.from(saved);
     }
 
@@ -91,7 +105,7 @@ public class CategoryService {
             categoryRepository.findByName(request.getName())
                     .ifPresent(cat -> {
                         log.warn("[CATEGORY] Tên danh mục đã tồn tại. name={}", request.getName());
-                        throw new BusinessException(ErrorCode.INVALID_REQUEST);
+                        throw new RuntimeException("Danh mục đã tồn tại");
                     });
         }
 
@@ -100,7 +114,7 @@ public class CategoryService {
             categoryRepository.findBySlug(request.getSlug())
                     .ifPresent(cat -> {
                         log.warn("[CATEGORY] Slug đã tồn tại. slug={}", request.getSlug());
-                        throw new BusinessException(ErrorCode.INVALID_REQUEST);
+                        throw new RuntimeException("Slug đã tồn tại");
                     });
         }
 

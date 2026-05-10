@@ -35,7 +35,17 @@ export class NavActionsComponent {
   }
 
   handleLogout(): void {
-    this.authService.logout();
+    const confirmLogout = window.confirm('Bạn có chắc chắn muốn đăng xuất không?');
+
+    if (confirmLogout) {
+      this.authService.logout();
+
+      // Hiển thị toast thông báo nếu muốn
+      const event = new CustomEvent('show-toast', {
+        detail: { message: 'Đăng xuất thành công!', type: 'success' }
+      });
+      window.dispatchEvent(event);
+    }
   }
 
   isCustomer(user: UserResponse | AdminUser): user is UserResponse {
