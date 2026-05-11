@@ -1,12 +1,13 @@
 package com.ttn.sporttn.modules.product.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ttn.sporttn.common.dto.PageResponse;
+import com.ttn.sporttn.modules.payment.dto.request.ProductFilterRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.*;
 import com.ttn.sporttn.modules.product.dto.response.*;
 import com.ttn.sporttn.modules.product.dto.response.admin.*;
@@ -14,8 +15,12 @@ import com.ttn.sporttn.modules.product.entity.*;
 import com.ttn.sporttn.modules.product.mapper.ProductMapper;
 import com.ttn.sporttn.modules.product.repository.ProductVariantRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +36,7 @@ import com.ttn.sporttn.modules.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -46,14 +52,12 @@ public class ProductService {
     public ProductPageResponse getProductPage(String slug) {
         Product product = productRepository.findBySlug(slug)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
-
         ProductCardResponse productCardResponse = productMapper.toProductCartResponse(product);
 
         List<ImageResponse> imageResponse = product.getImages()
                 .stream()
                 .map(ImageResponse::buildImageResponse)
                 .collect(Collectors.toList());
-
 
         List<ProductVariant> productVariants = productVariantRepository.findByProductId(product.getId());
 
@@ -81,21 +85,18 @@ public class ProductService {
     public ProductResponse createProduct(ProductCreateRequest request) {
         log.info("[PRODUCT] Tạo sản phẩm mới. name={}", request.getName());
 
-        // Fetch category
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> {
                     log.warn("[PRODUCT] Danh mục không tìm thấy. categoryId={}", request.getCategoryId());
                     return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
                 });
 
-        // Fetch brand
         Brand brand = brandRepository.findById(request.getBrandId())
                 .orElseThrow(() -> {
                     log.warn("[PRODUCT] Thương hiệu không tìm thấy. brandId={}", request.getBrandId());
                     return new BusinessException(ErrorCode.BRAND_NOT_FOUND);
                 });
 
-        // Build product entity
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -107,7 +108,6 @@ public class ProductService {
                 .variants(new ArrayList<>())
                 .build();
 
-        // Build variants
         if (request.getVariants() != null) {
             for (ProductVariantRequest variantRequest : request.getVariants()) {
 
@@ -453,5 +453,152 @@ public class ProductService {
         return variants.stream()
                 .map(VariantResponse::buildVariantResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ProductCardResponse> searchProducts(String q, Pageable pageable) {
+        if (q == null || q.isBlank()) {
+            return PageResponse.from(Page.empty(pageable));
+        }
+        Page<ProductCardResponse> page = productRepository
+                .searchProducts(q.trim(), pageable)
+                .map(this::toProductCardResponse);
+        return PageResponse.from(page);
+    }
+
+
+    private ProductCardResponse toProductCardResponse(Product p) {
+        ProductVariant cheapest = p.getVariants().stream()
+                .filter(v -> v.getStockQuantity() > 0)
+                .min(Comparator.comparing(v -> {
+                    BigDecimal price = v.getSalePrice() != null ? v.getSalePrice() : v.getOriginalPrice();
+                    return price != null ? price : BigDecimal.ZERO;
+                }))
+                .orElse(null);
+
+        BigDecimal originalPrice  = cheapest != null && cheapest.getOriginalPrice() != null
+                ? cheapest.getOriginalPrice() : BigDecimal.ZERO;
+        BigDecimal salePrice      = cheapest != null ? cheapest.getSalePrice() : null;
+        BigDecimal effectivePrice = salePrice != null ? salePrice : originalPrice;
+
+        int discountPercent = (salePrice != null && originalPrice.compareTo(BigDecimal.ZERO) > 0)
+                ? (int) Math.round(
+                originalPrice.subtract(salePrice)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(originalPrice, 2, RoundingMode.HALF_UP)
+                .doubleValue()
+        )
+                : 0;
+
+        return ProductCardResponse.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .slug(p.getSlug())
+                .mainImageUrl(p.getMainImageUrl())
+                .brandName(p.getBrand() != null ? p.getBrand().getName() : "")
+                .rating(p.getRating())
+                .reviewCount(p.getReviewCount())
+                .soldCount(p.getSoldCount())
+                .originalPrice(originalPrice)
+                .salePrice(salePrice)
+                .effectivePrice(effectivePrice)
+                .discountPercent(discountPercent)
+                .isOnSale(salePrice != null)
+                .isNew(p.getCreatedAt() != null
+                        && p.getCreatedAt().isAfter(LocalDateTime.now().minusDays(30)))
+                .isBestSeller(p.getSoldCount() > 100)
+                .build();
+    }
+
+    public PageResponse<ProductCardResponse> filterProducts(ProductFilterRequest filter) {
+
+        Sort sort = buildSort(filter.getSort());
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize(), sort);
+
+        Specification<Product> spec = Specification.where(null);
+
+        if (StringUtils.hasText(filter.getCategorySlug())) {
+            spec = spec.and((root, q, cb) ->
+                cb.equal(root.get("category").get("slug"), filter.getCategorySlug()));
+        }
+
+        if (StringUtils.hasText(filter.getSubCategory())) {
+            spec = spec.and((root, q, cb) ->
+                cb.equal(root.get("subCategory").get("slug"), filter.getSubCategory()));
+        }
+
+        if (!filter.getBrands().isEmpty()) {
+            spec = spec.and((root, q, cb) ->
+                root.get("brand").get("name").in(filter.getBrands()));
+        }
+
+        spec = spec.and((root, q, cb) -> {
+            if (q == null) return null;
+
+            Join<Product, ProductVariant> v = root.join("variants", JoinType.LEFT);
+
+            Expression<BigDecimal> effectivePrice = cb.<BigDecimal>selectCase()
+                    .when(cb.and(
+                            cb.isNotNull(v.get("salePrice")),
+                            cb.greaterThan(v.get("salePrice"), BigDecimal.ZERO),
+                            cb.lessThan(v.get("salePrice"), v.get("originalPrice"))
+                    ), v.get("salePrice"))
+                    .otherwise(v.get("originalPrice"));
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (filter.getMinPrice() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(effectivePrice, filter.getMinPrice()));
+            }
+            if (filter.getMaxPrice() != null) {
+                predicates.add(cb.lessThanOrEqualTo(effectivePrice, filter.getMaxPrice()));
+            }
+
+            if (filter.getSort() != null && filter.getSort().startsWith("effectivePrice")) {
+                q.orderBy(filter.getSort().endsWith("asc")
+                        ? cb.asc(effectivePrice)
+                        : cb.desc(effectivePrice));
+            }
+
+            q.distinct(true);
+
+            return predicates.isEmpty()
+                    ? cb.conjunction()
+                    : cb.and(predicates.toArray(new Predicate[0]));
+        });
+
+        // -- Query --
+        Page<Product> productPage = productRepository.findAll(spec, pageable);
+        List<ProductCardResponse> content = productPage.getContent()
+                .stream()
+                .map(this::toProductCardResponse)
+                .toList();
+        Page<ProductCardResponse> mappedPage = new PageImpl<>(
+                content,
+                pageable,
+                productPage.getTotalElements()
+        );
+        return PageResponse.from(mappedPage);
+    }
+
+    private Sort buildSort(String sortParam) {
+        if (!StringUtils.hasText(sortParam)) return Sort.by("soldCount").descending();
+        String[] parts = sortParam.split(",");
+        String field     = parts[0].trim();
+        String direction = parts.length > 1 ? parts[1].trim() : "desc";
+
+        if (field.equals("effectivePrice")) {
+            return Sort.unsorted();
+        }
+
+        String entityField = switch (field) {
+            case "soldCount"  -> "soldCount";
+            case "createdAt"  -> "createdAt";
+            default           -> "soldCount";
+        };
+
+        return direction.equalsIgnoreCase("asc")
+                ? Sort.by(entityField).ascending()
+                : Sort.by(entityField).descending();
     }
 } 

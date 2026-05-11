@@ -6,6 +6,14 @@ const routes: Routes = [
   {
     path: '',
     component: CategoryPageComponent
+  },
+  {
+    path: ':slug',
+    component: CategoryPageComponent
+  },
+  {
+    path: ':slug/:page',
+    component: CategoryPageComponent
   }
 ];
 

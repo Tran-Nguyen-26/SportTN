@@ -13,12 +13,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "product_variants")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "product_variants", indexes = {
+        @Index(name = "idx_variants_sku",          columnList = "sku"),
+        @Index(name = "idx_variants_product_id",   columnList = "product_id"),
+        @Index(name = "idx_variants_active",       columnList = "active"),
+        @Index(name = "idx_variants_stock",        columnList = "stock_quantity"),
+        @Index(name = "idx_variants_original_price", columnList = "original_price"),
+        @Index(name = "idx_variants_sale_price",   columnList = "sale_price"),
+        @Index(name = "idx_variants_product_active", columnList = "product_id, active")
+})
 public class ProductVariant {
 
     @Id

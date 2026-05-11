@@ -2,6 +2,7 @@ package com.ttn.sporttn.modules.user.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
 import com.ttn.sporttn.modules.user.dto.request.admin.ToggleActiveRequest;
+import com.ttn.sporttn.modules.user.dto.request.admin.UpdateCustomerRequest;
 import com.ttn.sporttn.modules.user.dto.response.admin.AdminCustomerResponse;
 import com.ttn.sporttn.modules.user.service.AdminCustomerService;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,12 @@ public class AdminCustomerController {
         log.info("[ADMIN_CUSTOMER] Xóa customer. id={}", id);
         adminCustomerService.deleteCustomer(id);
         return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<AdminCustomerResponse>> updateCustomer(
+            @PathVariable Long id,
+            @RequestBody UpdateCustomerRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(adminCustomerService.updateCustomer(id, request)));
     }
 }

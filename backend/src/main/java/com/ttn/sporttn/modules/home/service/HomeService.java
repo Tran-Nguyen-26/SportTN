@@ -12,6 +12,8 @@ import com.ttn.sporttn.modules.product.dto.response.ProductCardResponse;
 import com.ttn.sporttn.modules.product.mapper.ProductMapper;
 import com.ttn.sporttn.modules.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HomeService {
@@ -30,7 +33,9 @@ public class HomeService {
 
     private static final Pageable TOP_10 = PageRequest.of(0, 10);
 
+    @Cacheable("home-page")
     public HomeResponse getHomeData() {
+        log.info("Lấy dữ liệu home-page");
         return HomeResponse.builder()
                 .heroBanners(getHeroBanners())
                 .mostSearched(getMostSearched())

@@ -141,7 +141,8 @@ export class AddProductComponent implements OnInit {
   };
 
   // ── UI STATE ─────────────────────────────────
-  activeTab: 'info' | 'variants' | 'images' | 'reviews' = 'info';
+  // activeTab: 'info' | 'variants' | 'images' | 'reviews' = 'info';
+  activeTab: 'info' | 'variants' | 'images' = 'info';
   isEditMode  = false;
   productId: number | null = null;
   isLoading   = false;

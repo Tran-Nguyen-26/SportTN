@@ -1,55 +1,66 @@
-<div class="search-bar">
-  <mat-icon>search</mat-icon>
-  <input type="text" placeholder="Tìm kiếm sản phẩm, môn thể thao"
-         (focus)="onFocus()"
-         (blur)="onBlur()">
-
-  <button *ngIf="isSearchFocus" class="close-search" (mousedown)="closeSearch()">
+<div class="search-bar" [class.focused]="isSearchFocus">
+  <mat-icon class="search-icon">search</mat-icon>
+  <input
+    type="text"
+    placeholder="Tìm kiếm sản phẩm, môn thể thao..."
+    [(ngModel)]="searchQuery"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    (keydown.enter)="onSearch()"
+    (input)="onInput()">
+  <button class="btn-clear" *ngIf="searchQuery" (mousedown)="clearSearch()">
     <mat-icon>close</mat-icon>
   </button>
+  <button class="btn-search" (mousedown)="onSearch()">Tìm</button>
 
-  <div class="search-results-dropdown" *ngIf="isSearchFocus">
-    <div class="search-container">
+  <div class="search-dropdown" *ngIf="isSearchFocus">
 
-      <aside class="search-sidebar">
-        <section class="search-section">
-          <h4>Tìm kiếm gần đây</h4>
-          <ul class="suggestion-list">
-            <li><span>dây kháng lực</span> <button class="delete-item">✕</button></li>
-            <li><span>pickleball</span> <button class="delete-item">✕</button></li>
-          </ul>
-        </section>
+    <div class="search-loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <span>Đang tìm kiếm...</span>
+    </div>
 
-        <section class="search-section">
-          <h4>Tìm kiếm phổ biến</h4>
-          <ul class="popular-list">
-            <li><mat-icon>grid_view</mat-icon> Giá giảm</li>
-            <li><mat-icon>grid_view</mat-icon> Sản Phẩm Mới</li>
-            <li>
-              <mat-icon>pool</mat-icon>
-              <div>
-                <strong>Bơi lội</strong>
-                <small>trong Môn Thể Thao / Thể Thao Dưới Nước</small>
-              </div>
-            </li>
-          </ul>
-        </section>
-      </aside>
+    <ng-container *ngIf="!isLoading">
 
-      <main class="search-main">
-        <h4>Sản phẩm phổ biến</h4>
-        <div *ngIf="isLoading" class="loading-spinner">Đang tải sản phẩm hot...</div>
-        <div class="product-search-grid" *ngIf="!isLoading">
+      <div class="search-empty-state" *ngIf="!searchQuery && popularProducts.length > 0">
+        <p class="dropdown-label">Sản phẩm phổ biến</p>
+        <div class="search-product-grid">
           <app-product-card
             *ngFor="let p of popularProducts"
             [product]="p"
-          />
+            (openDrawer)="openDrawer(p)">
+          </app-product-card>
         </div>
-        <p *ngIf="!isLoading && popularProducts.length === 0" class="empty-msg">
-          Hiện chưa có sản phẩm gợi ý nào.
-        </p>
-      </main>
+      </div>
 
-    </div>
+      <div class="search-results" *ngIf="searchQuery && searchResults.length > 0">
+        <p class="dropdown-label">
+          Kết quả cho "<strong>{{ searchQuery }}</strong>"
+          <span class="result-count">{{ searchResults.length }} sản phẩm</span>
+        </p>
+        <div class="search-product-grid">
+          <app-product-card
+            *ngFor="let p of searchResults"
+            [product]="p"
+            (openDrawer)="openDrawer(p)">
+          </app-product-card>
+        </div>
+      </div>
+
+      <div class="search-no-result"
+           *ngIf="searchQuery && !isLoading && searchResults.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <p>Không tìm thấy "<strong>{{ searchQuery }}</strong>"</p>
+        <span>Hãy thử từ khóa khác</span>
+      </div>
+
+    </ng-container>
   </div>
 </div>
+
+<app-add-to-cart-drawer
+  [isOpen]="drawerOpen"
+  [product]="drawerProduct"
+  (closed)="closeDrawer()"
+  (addedToCart)="onAddedToCart($event)">
+</app-add-to-cart-drawer>

@@ -1,9 +1,11 @@
 <div class="sports-popular">
   <h2>Môn Thể Thao Phổ Biến</h2>
   <div class="sports-list">
-    <div class="sport-item" *ngFor="let category of categories">
+    <div class="sport-item"
+         *ngFor="let category of categories"
+         (click)="goToCategory(category)">
       <div class="sport-image">
-        <img [src]="category.imageUrl" alt="{{ category.name }}">
+        <img [src]="category.imageUrl" [alt]="category.name">
       </div>
       <span class="sport-name">{{ category.name }}</span>
     </div>

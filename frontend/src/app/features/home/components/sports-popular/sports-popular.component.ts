@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {CategoryResponse} from "../../../../core/models/home-response/home-response";
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { CategoryResponse } from '../../../../core/models/home-response/home-response';
 
 @Component({
   selector: 'app-sports-popular',
@@ -8,4 +9,10 @@ import {CategoryResponse} from "../../../../core/models/home-response/home-respo
 })
 export class SportsPopularComponent {
   @Input() categories: CategoryResponse[] = [];
+
+  constructor(private router: Router) {}
+
+  goToCategory(category: CategoryResponse): void {
+    this.router.navigate(['/category', category.slug]);
+  }
 }

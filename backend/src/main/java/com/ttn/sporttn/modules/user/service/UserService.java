@@ -53,15 +53,21 @@ public class UserService {
             throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        if (user.getStatus() == UserStatus.BANNED) {
+        if (user.getStatus() == UserStatus.INACTIVE) {
             log.warn("[AUTH] Truy cập bị chặn. Tài khoản bị khóa. email={}, status={}", loginRequest.getEmail(), user.getStatus());
-            throw new BusinessException(ErrorCode.FORBIDDEN);
+            throw new RuntimeException("Tài khoản bị vô hiệu hóa");
         }
+
+//        if (user.getStatus() == UserStatus.BANNED) {
+//            log.warn("[AUTH] Truy cập bị chặn. Tài khoản bị khóa. email={}, status={}", loginRequest.getEmail(), user.getStatus());
+//            throw new BusinessException(ErrorCode.FORBIDDEN);
+//        }
 
         UserResponse userResponse =
                 UserResponse.builder()
                         .id(user.getId())
                         .username(user.getUsername())
+                        .fullname(user.getFullname())
                         .email(user.getEmail())
                         .phone(user.getPhone())
                         .role(user.getRole())

@@ -19,7 +19,7 @@
 
     <!-- Quick-add overlay (hiện khi hover) -->
     <div class="pc-quick">
-      <button class="pc-quick-btn" (click)="openDrawer(); $event.stopPropagation()">
+      <button class="pc-quick-btn" (click)="triggerDrawer(); $event.stopPropagation()">
         <mat-icon>shopping_cart</mat-icon>
         Thêm vào giỏ
       </button>
@@ -59,7 +59,7 @@
       <div class="pc-rating" *ngIf="!rating"></div>
 
       <button class="pc-cart-btn"
-              (click)="openDrawer(); $event.stopPropagation()"
+              (click)="triggerDrawer(); $event.stopPropagation()"
               title="Thêm vào giỏ hàng">
         <mat-icon>shopping_cart</mat-icon>
       </button>

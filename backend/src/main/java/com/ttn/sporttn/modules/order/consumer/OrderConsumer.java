@@ -21,6 +21,14 @@ public class OrderConsumer {
     @RabbitListener(queues = RabbitMQConfig.ORDER_QUEUE)
     public void handleOrder(OrderMessage message) {
         log.info("Nhận đơn hàng từ queue: userId={}", message.getUserId());
+
+//        try {
+//            log.info("[ORDER] Đang xử lý đơn hàng... (giả lập 20s)");
+//            Thread.sleep(20000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+
         try {
             orderService.processOrder(message);
             log.info("Xử lý đơn hàng thành công: userId={}", message.getUserId());

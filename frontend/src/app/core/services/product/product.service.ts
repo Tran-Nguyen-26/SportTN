@@ -71,4 +71,17 @@ export class ProductService {
   getProductVariantsByProductId(productId: number): Observable<ApiResponse<VariantResponse[]>> {
     return this.http.get<ApiResponse<VariantResponse[]>>(`${this.apiUrl}/${productId}/variants`);
   }
+
+  searchProducts(q: string, page = 0, size = 10): Observable<ApiResponse<PageResponse<ProductCardResponse>>> {
+    return this.http.get<ApiResponse<PageResponse<ProductCardResponse>>>(
+      `${this.apiUrl}/search?q=${encodeURIComponent(q)}&page=${page}&size=${size}`
+    );
+  }
+
+  getProductsByFilter(params: any): Observable<ApiResponse<PageResponse<ProductCardResponse>>> {
+    return this.http.get<ApiResponse<PageResponse<ProductCardResponse>>>(
+      `${this.apiUrl}/filtered`,
+      { params }
+    );
+  }
 }

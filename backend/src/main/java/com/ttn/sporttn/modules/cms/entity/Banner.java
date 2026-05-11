@@ -8,12 +8,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "banners")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "banners", indexes = {
+        @Index(name = "idx_banners_position",    columnList = "position"),
+        @Index(name = "idx_banners_active",      columnList = "active"),
+        @Index(name = "idx_banners_category_id", columnList = "category_id"),
+        @Index(name = "idx_banners_active_position", columnList = "active, position")
+})
 public class Banner {
 
     @Id

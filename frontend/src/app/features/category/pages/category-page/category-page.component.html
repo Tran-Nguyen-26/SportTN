@@ -1,25 +1,168 @@
 <div class="category-page">
-  <div class="category-header">
-    <img src="assets/sports.jpg" alt="Danh mục sản phẩm thể thao">
 
-    <div class="category-header-content">
-      <span class="hero-tag">SPORTS SHOP</span>
-      <h2>Môn thể thao</h2>
-      <p>
-        Khám phá thế giới thể thao với đầy đủ quần áo, giày và phụ kiện cho chạy bộ, gym, bóng đá, cầu lông,
-        bơi lội và nhiều bộ môn khác. Chất lượng bền bỉ, thiết kế năng động và giá phù hợp cho mọi nhu cầu luyện tập.
-      </p>
-
-      <div class="category-highlights">
+  <!-- ── HEADER ── -->
+  <header class="cat-header">
+    <div class="cat-header__icon">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M3 12h18M3 18h18"/>
+      </svg>
+    </div>
+    <div class="cat-header__text">
+      <span class="cat-header__tag">SPORTS SHOP</span>
+      <h1 class="cat-header__title">Môn thể thao</h1>
+      <p class="cat-header__desc">Quần áo, giày và phụ kiện chuyên dụng — chất lượng bền bỉ cho mọi nhu cầu luyện tập.</p>
+      <div class="cat-header__pills">
         <span>Hàng chính hãng</span>
         <span>Đổi trả linh hoạt</span>
         <span>Giao nhanh toàn quốc</span>
       </div>
     </div>
-  </div>
+    <div class="cat-header__deco cat-header__deco--1"></div>
+    <div class="cat-header__deco cat-header__deco--2"></div>
+  </header>
 
-  <div class="category-content">
-    <app-filter-sidebar />
-    <app-product-grid />
+  <div class="category-body">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="filter-sidebar">
+
+      <div class="filter-sidebar__top">
+        <span class="filter-sidebar__badge">LỌC</span>
+        <h4 class="filter-sidebar__heading">Bộ lọc sản phẩm</h4>
+      </div>
+
+      <!-- Clear All -->
+      <button class="btn-clear-all" *ngIf="hasActiveFilters()" (click)="clearAllFilters()">
+        <span class="btn-clear-all__icon">✕</span> Xóa tất cả bộ lọc
+      </button>
+
+      <!-- Active filter tags -->
+      <div class="active-tags" *ngIf="hasActiveFilters()">
+        <span class="active-tag" *ngIf="selectedCategory">
+          {{ selectedCategory }}
+          <button class="active-tag__rm" (click)="onSelectCategory('')">✕</button>
+        </span>
+        <span class="active-tag" *ngFor="let b of selectedBrands">
+          {{ b.name }}
+          <button class="active-tag__rm" (click)="toggleBrand(b)">✕</button>
+        </span>
+      </div>
+
+      <!-- Danh mục -->
+      <section class="filter-section">
+        <h4 class="filter-section__title">Danh mục</h4>
+
+        <ul class="cat-list">
+
+          <li *ngFor="let cat of categories"
+              class="cat-list__item"
+              [class.cat-list__item--active]="selectedCategory === cat.slug"
+              (click)="onSelectCategory(cat.slug)">
+
+            <span class="cat-list__label">
+              {{ cat.name }}
+            </span>
+          </li>
+        </ul>
+        <button
+          class="btn-clear-sm"
+          *ngIf="selectedCategory"
+          (click)="onSelectCategory('')">
+          ✕ Xóa chọn
+        </button>
+      </section>
+
+      <!-- Thương hiệu -->
+      <section class="filter-section">
+        <h4 class="filter-section__title">Thương hiệu</h4>
+        <div class="check-list">
+          <label *ngFor="let brand of brands" class="check-item">
+            <input type="checkbox"
+                   [checked]="isBrandSelected(brand.id)"
+                   (change)="toggleBrand(brand)"
+                   class="check-item__input">
+            <span class="check-item__box"></span>
+            <span class="check-item__label">{{ brand.name }}</span>
+<!--            <span class="check-item__count">({{ brand.count | number }})</span>-->
+          </label>
+        </div>
+      </section>
+
+      <!-- Khoảng giá -->
+      <section class="filter-section">
+        <h4 class="filter-section__title">
+          Khoảng giá (VNĐ)
+        </h4>
+        <div class="price-input-group">
+          <div class="price-input-item">
+            <label class="price-input-label">
+              Từ
+            </label>
+            <input
+              type="number"
+              class="price-input"
+              [(ngModel)]="selectedMin"
+              [min]="minPrice"
+              [max]="selectedMax"
+              (change)="onPriceChange()"
+              placeholder="0">
+          </div>
+          <div class="price-input-item">
+            <label class="price-input-label">
+              Đến
+            </label>
+            <input
+              type="number"
+              class="price-input"
+              [(ngModel)]="selectedMax"
+              [min]="selectedMin"
+              [max]="maxPrice"
+              (change)="onPriceChange()"
+              placeholder="5000000">
+          </div>
+        </div>
+        <div class="price-display">
+    <span class="price-display__val">
+      {{ selectedMin | number }} ₫
+    </span>
+          <span class="price-display__sep">-</span>
+          <span class="price-display__val">
+      {{ selectedMax | number }} ₫
+    </span>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ── PRODUCT AREA ── -->
+    <main class="product-area">
+
+      <div class="product-area__header">
+        <div class="product-area__count">
+          Tổng: <strong>{{ totalFilteredProducts | number }}</strong> sản phẩm
+        </div>
+        <select [(ngModel)]="selectedSort" (change)="applyFilters()" class="sort-select">
+          <option value="popularity">Phổ biến nhất</option>
+          <option value="newest">Mới nhất</option>
+          <option value="priceAsc">Giá tăng dần</option>
+          <option value="priceDesc">Giá giảm dần</option>
+        </select>
+      </div>
+
+      <div class="product-grid">
+        <app-product-card *ngFor="let p of products" [product]="p"></app-product-card>
+      </div>
+
+      <div class="product-area__footer">
+        <button class="btn-load-more"
+                (click)="onLoadMore()"
+                *ngIf="products.length < totalFilteredProducts">
+          Xem thêm sản phẩm
+        </button>
+        <button class="btn-back-top" (click)="onBackToTop()">
+          ↑ Đầu trang
+        </button>
+      </div>
+
+    </main>
   </div>
 </div>

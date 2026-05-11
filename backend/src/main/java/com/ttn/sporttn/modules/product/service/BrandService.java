@@ -6,6 +6,9 @@ import com.ttn.sporttn.modules.product.dto.response.admin.BrandResponse;
 import com.ttn.sporttn.modules.product.entity.Brand;
 import com.ttn.sporttn.modules.product.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,22 +18,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BrandService {
 
     private final BrandRepository brandRepository;
 
+    @Cacheable(value = "brands")
     public List<BrandResponse> getBrands() {
-        return brandRepository.findAll()
-                .stream()
-                .map(this::toBrandResponse)
-                .toList();
+        log.info("Lấy danh sách brands");
+        return brandRepository.findAllBrandResponses();
     }
 
+    @CacheEvict(value = "brands", allEntries = true)
     @Transactional
     public BrandResponse addBrand(BrandAddRequest request) {
-        // 1. Kiểm tra trùng tên hoặc trùng slug (Validation sớm)
         if (brandRepository.existsByName(request.getName())) {
             throw new RuntimeException("Tên thương hiệu đã tồn tại!");
         }
@@ -47,7 +50,6 @@ public class BrandService {
         brand.setActive(true);
         brand.setProducts(new ArrayList<>());
 
-        // 3. Xử lý Slug tự động nếu Request không gửi lên
         String slug = (request.getSlug() != null && !request.getSlug().isBlank())
                 ? request.getSlug()
                 : generateSlug(request.getName());
@@ -58,6 +60,7 @@ public class BrandService {
         return toBrandResponse(savedBrand);
     }
 
+    @CacheEvict(value = "brands", allEntries = true)
     @Transactional
     public BrandResponse updateBrand(Long brandId, BrandUpdateRequest request) {
         Brand brand = brandRepository.findById(brandId)

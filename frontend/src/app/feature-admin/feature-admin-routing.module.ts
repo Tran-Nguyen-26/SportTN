@@ -17,9 +17,9 @@ import {NotificationsComponent} from "./pages/notifications/notifications.compon
 import {SettingsComponent} from "./pages/settings/settings.component";
 import {adminGuard} from "../core/guards/admin/admin.guard";
 import {FlashSaleComponent} from "./pages/flash-sale/flash-sale.component";
-import {AddProductComponent} from "./components/add-product/add-product.component";
 import {ChartsComponent} from "./pages/charts/charts.component";
-import {ProductDetailComponent} from "./components/product-detail/product-detail.component";
+import {ProductPageComponent} from "./components/product-detail/product-page.component";
+import { roleGuard } from "../core/guards/role/role.guard";
 
 const routes: Routes = [
   {
@@ -27,26 +27,93 @@ const routes: Routes = [
     component: AdminLayoutComponent,
     canActivate: [adminGuard],
     children: [
-      { path: '',             redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard',    component: DashboardComponent    },
-      { path: 'analytics',    component: AnalyticsComponent    },
-      { path: 'charts', component: ChartsComponent},
-      { path: 'orders',       component: OrdersComponent       },
-      { path: 'products',     component: ProductsComponent     },
-      { path: 'products/add', component: AddProductComponent },
-      { path: 'products/edit/:id', component: AddProductComponent },
-      { path: 'products/detail/:id', component: ProductDetailComponent},
-      { path: 'customers',    component: CustomersComponent    },
-      { path: 'invoices',     component: InvoicesComponent     },
-      { path: 'inventory',    component: InventoryComponent    },
-      { path: 'categories',   component: CategoriesComponent   },
-      { path: 'brands',       component: BrandsComponent       },
-      { path: 'banners',      component: BannersComponent      },
-      { path: 'vouchers',     component: VouchersComponent     },
-      { path: 'flash-sale', component: FlashSaleComponent},
-      { path: 'users',        component: UsersComponent        },
-      { path: 'notifications',component: NotificationsComponent},
-      { path: 'settings',     component: SettingsComponent     },
+      { path: '',          redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'analytics', component: AnalyticsComponent },
+      { path: 'charts',    component: ChartsComponent },
+
+      // ADMIN + SUPER_ADMIN
+      {
+        path: 'orders', component: OrdersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }
+      },
+      {
+        path: 'products', component: ProductsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN', 'WAREHOUSE'] }
+      },
+      {
+        path: 'products/add', component: ProductPageComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'products/edit/:id', component: ProductPageComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'products/detail/:id', component: ProductPageComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN', 'WAREHOUSE'] }
+      },
+      {
+        path: 'customers', component: CustomersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }
+      },
+      {
+        path: 'invoices', component: InvoicesComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'inventory', component: InventoryComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN', 'WAREHOUSE'] }
+      },
+      {
+        path: 'categories', component: CategoriesComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'brands', component: BrandsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'banners', component: BannersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'vouchers', component: VouchersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+      {
+        path: 'flash-sale', component: FlashSaleComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN', 'ADMIN'] }
+      },
+
+      {
+        path: 'users', component: UsersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN'] }
+      },
+      {
+        path: 'settings', component: SettingsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN'] }
+      },
+      {
+        path: 'notifications', component: NotificationsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ADMIN'] }
+      },
     ]
   }
 ];

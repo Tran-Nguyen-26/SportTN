@@ -13,7 +13,7 @@ export interface AdminCustomer {
   phone: string;
   totalOrders: number;
   totalSpent: number;
-  joinDate: string;    // BE trả dd/MM/yyyy
+  joinDate: string;
   status: string;
   address?: string;
   gender?: string;
@@ -30,6 +30,16 @@ export interface CustomerOrder {
   paymentStatus: string;
   itemCount: number;
   createdAt: string;
+}
+
+export interface UpdateCustomerRequest {
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  gender?: string;
+  birthday?: string;
+  note?: string;
+  status?: string;
 }
 
 export interface ToggleActiveRequest {
@@ -56,5 +66,9 @@ export class AdminCustomerService {
 
   delete(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.API_URL}/${id}`);
+  }
+
+  updateCustomer(id: number, request: UpdateCustomerRequest): Observable<ApiResponse<AdminCustomer>> {
+    return this.http.put<ApiResponse<AdminCustomer>>(`${this.API_URL}/${id}`, request);
   }
 }

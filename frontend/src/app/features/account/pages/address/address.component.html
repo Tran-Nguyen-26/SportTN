@@ -99,7 +99,7 @@
         <div class="form-field" [class.has-error]="fieldError('district')">
           <label class="field-label">Quận / Huyện <span class="required">*</span></label>
           <div class="input-wrap">
-            <input class="field-input" formControlName="district" placeholder="VD: Quận 1" type="text">
+            <input class="field-input" formControlName="district"type="text">
           </div>
           <span class="field-error" *ngIf="fieldError('district')">Vui lòng nhập quận / huyện</span>
         </div>
@@ -107,7 +107,7 @@
         <div class="form-field" [class.has-error]="fieldError('ward')">
           <label class="field-label">Phường / Xã <span class="required">*</span></label>
           <div class="input-wrap">
-            <input class="field-input" formControlName="ward" placeholder="VD: Phường Bến Nghé" type="text">
+            <input class="field-input" formControlName="ward" type="text">
           </div>
           <span class="field-error" *ngIf="fieldError('ward')">Vui lòng nhập phường / xã</span>
         </div>
@@ -120,7 +120,7 @@
           <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
           </svg>
-          <input class="field-input" formControlName="addressDetail" placeholder="VD: 123 Đường Lê Lợi" type="text" autocomplete="street-address">
+          <input class="field-input" formControlName="addressDetail" type="text" autocomplete="street-address">
         </div>
         <span class="field-error" *ngIf="fieldError('addressDetail')">Vui lòng nhập địa chỉ chi tiết</span>
       </div>
@@ -130,7 +130,7 @@
         <div class="custom-checkbox" [class.checked]="addressForm.get('isDefault')?.value" (click)="addressForm.get('isDefault')?.setValue(!addressForm.get('isDefault')?.value)">
           <svg *ngIf="addressForm.get('isDefault')?.value" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <input type="checkbox" formControlName="isDefault" hidden>
+<!--        <input type="checkbox" formControlName="isDefault" hidden>-->
         <span class="checkbox-label">Đặt làm địa chỉ giao hàng mặc định</span>
       </label>
 

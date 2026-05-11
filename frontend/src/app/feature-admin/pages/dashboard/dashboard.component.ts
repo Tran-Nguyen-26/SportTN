@@ -133,26 +133,24 @@ export class DashboardComponent implements OnInit {
 
     const to   = new Date();
     const from = new Date();
+    from.setHours(0, 0, 0, 0);
 
-    // Tính from dựa theo period đang chọn
     switch (this.selectedPeriod) {
       case 'today':
-        from.setHours(0, 0, 0, 0); // từ đầu ngày hôm nay
         break;
       case 'week':
-        from.setDate(from.getDate() - 7);
+        from.setDate(from.getDate() - 6);
         break;
       case 'month':
         from.setDate(from.getDate() - 30);
         break;
       default:
-        from.setDate(from.getDate() - 7);
+        from.setDate(from.getDate() - 6);
     }
 
     const fromStr = this.formatDate(from);
     const toStr   = this.formatDate(to);
 
-    // Tên file theo period
     const periodName: Record<string, string> = {
       today: 'hom-nay',
       week:  '7-ngay',
@@ -257,6 +255,9 @@ export class DashboardComponent implements OnInit {
   }
 
   private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0]; // yyyy-MM-dd
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 }

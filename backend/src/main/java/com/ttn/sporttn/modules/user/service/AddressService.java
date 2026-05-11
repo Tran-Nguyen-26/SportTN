@@ -7,6 +7,8 @@ import com.ttn.sporttn.modules.user.entity.User;
 import com.ttn.sporttn.modules.user.repository.AddressRepository;
 import com.ttn.sporttn.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
+    @Cacheable(value = "addresses", key = "'user:' + #userId + ':list'")
     public List<AddressResponse> getMyAddresses(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -31,6 +34,7 @@ public class AddressService {
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = "addresses", key = "'user:' + #userId + ':list'")
     @Transactional
     public AddressResponse createAddress(Long userId, AddressRequest request) {
         User user = userRepository.findById(userId)
@@ -56,6 +60,7 @@ public class AddressService {
         return mapToResponse(address);
     }
 
+    @CacheEvict(value = "addresses", key = "'user:' + #userId + ':list'")
     @Transactional
     public AddressResponse updateAddress(Long userId, Long addressId, AddressRequest request) {
         Address address = getAddressByUserIdAndId(userId, addressId);
@@ -77,18 +82,18 @@ public class AddressService {
         return mapToResponse(address);
     }
 
+    @CacheEvict(value = "addresses", key = "'user:' + #userId + ':list'")
     @Transactional
     public void deleteAddress(Long userId, Long addressId) {
         Address address = getAddressByUserIdAndId(userId, addressId);
         addressRepository.delete(address);
     }
 
+    @CacheEvict(value = "addresses", key = "'user:' + #userId + ':list'")
     @Transactional
     public AddressResponse setDefault(Long userId, Long addressId) {
-        // Unset tất cả default addresses của user
         addressRepository.unsetDefaultAddresses(userId);
 
-        // Set address này thành default
         Address address = getAddressByUserIdAndId(userId, addressId);
         address.setIsDefault(true);
         address = addressRepository.save(address);

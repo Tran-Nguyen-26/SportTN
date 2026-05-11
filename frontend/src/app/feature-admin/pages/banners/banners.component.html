@@ -227,24 +227,24 @@
       <div class="section">
         <div class="section-label">Hình ảnh banner</div>
 
-        <div class="img-upload-zone" (click)="fileInput.click()" *ngIf="!form.previewUrl">
-          <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">
-          <div class="upload-icon-wrap">
-            <mat-icon>cloud_upload</mat-icon>
-          </div>
-          <div class="upload-main-text">Kéo thả hoặc click để chọn ảnh</div>
-          <div class="upload-hint-text">
-            PNG, JPG · Khuyến nghị 1920×600px cho HERO, 800×400px cho sub-banner
-          </div>
-        </div>
+<!--        <div class="img-upload-zone" (click)="fileInput.click()" *ngIf="!form.previewUrl">-->
+<!--          <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">-->
+<!--          <div class="upload-icon-wrap">-->
+<!--            <mat-icon>cloud_upload</mat-icon>-->
+<!--          </div>-->
+<!--          <div class="upload-main-text">Kéo thả hoặc click để chọn ảnh</div>-->
+<!--          <div class="upload-hint-text">-->
+<!--            PNG, JPG · Khuyến nghị 1920×600px cho HERO, 800×400px cho sub-banner-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <div class="img-preview-wrap" *ngIf="form.previewUrl">
-          <img [src]="form.previewUrl" class="img-preview" alt="Banner preview">
-          <button class="remove-img-btn" (click)="removeImage()">
-            <mat-icon>close</mat-icon>
-          </button>
-          <div class="img-resolution">{{ form.imageWidth }}×{{ form.imageHeight }}px</div>
-        </div>
+<!--        <div class="img-preview-wrap" *ngIf="form.previewUrl">-->
+<!--          <img [src]="form.previewUrl" class="img-preview" alt="Banner preview">-->
+<!--          <button class="remove-img-btn" (click)="removeImage()">-->
+<!--            <mat-icon>close</mat-icon>-->
+<!--          </button>-->
+<!--          <div class="img-resolution">{{ form.imageWidth }}×{{ form.imageHeight }}px</div>-->
+<!--        </div>-->
 
         <div class="field" style="margin-top: 10px">
           <label>Hoặc nhập URL ảnh</label>
@@ -261,11 +261,11 @@
           <input type="text" [(ngModel)]="form.title" placeholder="VD: Banner mùa hè 2025">
         </div>
 
-        <div class="field">
-          <label>Alt text</label>
-          <input type="text" [(ngModel)]="form.altText" placeholder="Mô tả ảnh cho SEO & accessibility">
-          <span class="hint">Quan trọng cho SEO và người dùng khiếm thị</span>
-        </div>
+<!--        <div class="field">-->
+<!--          <label>Alt text</label>-->
+<!--          <input type="text" [(ngModel)]="form.altText" placeholder="Mô tả ảnh cho SEO & accessibility">-->
+<!--          <span class="hint">Quan trọng cho SEO và người dùng khiếm thị</span>-->
+<!--        </div>-->
 
         <div class="field">
           <label>Link URL</label>
@@ -368,22 +368,22 @@
       </div>
 
       <!-- Thời gian -->
-      <div class="section">
-        <div class="section-label">Thời gian hiển thị (tuỳ chọn)</div>
-        <div class="form-row-2">
-          <div class="field">
-            <label>Ngày bắt đầu</label>
-            <input type="date" [(ngModel)]="form.startDate">
-          </div>
-          <div class="field">
-            <label>Ngày kết thúc</label>
-            <input type="date" [(ngModel)]="form.endDate">
-          </div>
-        </div>
-        <span class="hint" style="display:block; margin-top:-4px">
-          Để trống nếu banner hiển thị vĩnh viễn
-        </span>
-      </div>
+<!--      <div class="section">-->
+<!--        <div class="section-label">Thời gian hiển thị (tuỳ chọn)</div>-->
+<!--        <div class="form-row-2">-->
+<!--          <div class="field">-->
+<!--            <label>Ngày bắt đầu</label>-->
+<!--            <input type="date" [(ngModel)]="form.startDate">-->
+<!--          </div>-->
+<!--          <div class="field">-->
+<!--            <label>Ngày kết thúc</label>-->
+<!--            <input type="date" [(ngModel)]="form.endDate">-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <span class="hint" style="display:block; margin-top:-4px">-->
+<!--          Để trống nếu banner hiển thị vĩnh viễn-->
+<!--        </span>-->
+<!--      </div>-->
 
       <!-- Trạng thái -->
       <div class="section">

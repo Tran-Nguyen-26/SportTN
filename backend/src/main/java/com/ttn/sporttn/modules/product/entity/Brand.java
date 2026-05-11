@@ -9,11 +9,14 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name = "brands")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "brands", indexes = {
+        @Index(name = "idx_brands_slug",   columnList = "slug"),
+        @Index(name = "idx_brands_active", columnList = "active")
+})
 public class Brand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

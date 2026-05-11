@@ -11,11 +11,18 @@ import java.util.Set;
 
 @Builder
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users", indexes = {
+        @Index(name = "idx_users_email",      columnList = "email"),
+        @Index(name = "idx_users_username",   columnList = "username"),
+        @Index(name = "idx_users_status",     columnList = "status"),
+        @Index(name = "idx_users_role",       columnList = "role"),
+        @Index(name = "idx_users_provider",   columnList = "provider"),
+        @Index(name = "idx_users_created_at", columnList = "created_at")
+})
 public class User {
 
     @Id

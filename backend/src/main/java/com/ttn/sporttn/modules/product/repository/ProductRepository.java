@@ -6,13 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ttn.sporttn.modules.product.entity.Product;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
     List<Product> findTop10ByActiveTrueOrderBySearchCountDesc();
 
@@ -52,5 +54,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LEFT JOIN p.variants v " +
             "GROUP BY p.id, p.name, c.name, b.name, p.soldCount, p.rating, p.active, p.mainImageUrl")
     Page<ProductAdminResponse> findAllForAdmin(Pageable pageable);
+
+    @Query("""
+    SELECT DISTINCT p FROM Product p
+    LEFT JOIN FETCH p.brand b
+    LEFT JOIN FETCH p.category c
+    WHERE p.active = true
+      AND (
+        LOWER(p.name)        LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(p.description) LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(b.name)        LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(c.name)        LIKE LOWER(CONCAT('%', :q, '%'))
+      )
+    ORDER BY p.soldCount DESC, p.rating DESC
+    """)
+    Page<Product> searchProducts(@Param("q") String q, Pageable pageable);
 
 }

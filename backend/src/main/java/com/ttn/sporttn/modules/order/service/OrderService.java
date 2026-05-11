@@ -149,7 +149,7 @@ public class OrderService {
                     .order(order)
                     .paymentMethod("COD")
                     .amount(finalAmount)
-                    .paymentStatus("PENDING")  // sẽ → COMPLETED khi DELIVERED
+                    .paymentStatus("PENDING")
                     .build();
             paymentRepository.save(payment);
             log.info("[ORDER] Tạo Payment COD. orderId={}", order.getId());
@@ -159,25 +159,21 @@ public class OrderService {
         log.info("Tạo đơn hàng thành công: code={}, user={}", order.getOrderCode(), msg.getUserId());
     }
 
-
     @Transactional
     public OrderDetailResponse createOrder(Long userId, CreateOrderRequest request) {
         log.info("[ORDER] Tạo đơn hàng mới. userId={}, itemCount={}", userId, request.getItems().size());
 
-        // Get user
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.warn("[ORDER] Người dùng không tìm thấy. userId={}", userId);
                 return new BusinessException(ErrorCode.USER_NOT_FOUND);
             });
 
-        // Validate items
         if (request.getItems() == null || request.getItems().isEmpty()) {
             log.warn("[ORDER] Giỏ hàng trống. userId={}", userId);
             throw new BusinessException(ErrorCode.INVALID_REQUEST);
         }
 
-        // Create order
         String orderCode = generateOrderCode();
         Order order = new Order();
         order.setOrderCode(orderCode);
@@ -186,11 +182,10 @@ public class OrderService {
         order.setPaymentStatus("UNPAID");
         order.setPaymentMethod(request.getPaymentMethod());
         order.setCustomerNote(request.getCustomerNote());
-        order.setShippingFee(BigDecimal.valueOf(50000)); // Fixed shipping fee for now
+        order.setShippingFee(BigDecimal.valueOf(50000));
         order.setCreatedAt(LocalDateTime.now());
         order.setItems(new ArrayList<>());
 
-        // Add order items and calculate total
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (var itemRequest : request.getItems()) {
             ProductVariant variant = productVariantRepository.findById(itemRequest.getVariantId())
@@ -199,14 +194,12 @@ public class OrderService {
                     return new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
                 });
 
-            // Check stock
             if (variant.getStockQuantity() < itemRequest.getQuantity()) {
                 log.warn("[ORDER] Tồn kho không đủ. variantId={}, available={}, requested={}",
                     itemRequest.getVariantId(), variant.getStockQuantity(), itemRequest.getQuantity());
                 throw new BusinessException(ErrorCode.INSUFFICIENT_STOCK);
             }
 
-            // Create order item
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProductVariant(variant);
@@ -214,7 +207,6 @@ public class OrderService {
             orderItem.setPriceAtPurchase(variant.getEffectivePrice());
             order.getItems().add(orderItem);
 
-            // Calculate subtotal
             BigDecimal subtotal = variant.getEffectivePrice()
                 .multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
             totalAmount = totalAmount.add(subtotal);
@@ -229,10 +221,8 @@ public class OrderService {
         order.setPointsDiscountAmount(BigDecimal.ZERO);
         order.setFinalAmount(totalAmount.add(order.getShippingFee()));
 
-        // Apply voucher if provided (placeholder for now)
         if (request.getVoucherId() != null) {
             log.debug("[ORDER] Áp dụng voucher. voucherId={}", request.getVoucherId());
-            // TODO: Implement voucher logic when Voucher module is ready
         }
 
         // Save order
@@ -243,9 +233,6 @@ public class OrderService {
         return OrderDetailResponse.from(savedOrder);
     }
 
-    /**
-     * Get user's orders with pagination
-     */
     @Transactional(readOnly = true)
     public Page<OrderResponse> getUserOrders(Long userId, Pageable pageable) {
         log.info("[ORDER] Lấy danh sách đơn hàng. userId={}, page={}", userId, pageable.getPageNumber());
@@ -288,28 +275,29 @@ public class OrderService {
 
         order.setStatus(request.getStatus());
 
-        // ✅ COD: khi DELIVERED → đánh dấu đã thanh toán
-        if ("DELIVERED".equals(request.getStatus())
-                && "COD".equals(order.getPaymentMethod())
-                && "UNPAID".equals(order.getPaymentStatus())) {
+        if ("DELIVERED".equals(request.getStatus())) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProductVariant().getProduct();
+                product.setSoldCount(product.getSoldCount() + item.getQuantity());
+                productRepository.save(product);
+            }
 
-            // Cập nhật Order
-            order.setPaymentStatus("PAID");
-
-            // Cập nhật bảng payments
-            paymentRepository.findByOrderIdAndPaymentStatus(orderId, "PENDING")
-                    .ifPresent(payment -> {
-                        payment.setPaymentStatus("COMPLETED");
-                        payment.setPaidAt(LocalDateTime.now());
-                        paymentRepository.save(payment);
-                        log.info("[ORDER] COD - Cập nhật Payment=COMPLETED. orderId={}", orderId);
-                    });
+            if ("COD".equals(order.getPaymentMethod())
+                    && "UNPAID".equals(order.getPaymentStatus())) {
+                order.setPaymentStatus("PAID");
+                paymentRepository.findByOrderIdAndPaymentStatus(orderId, "PENDING")
+                        .ifPresent(payment -> {
+                            payment.setPaymentStatus("COMPLETED");
+                            payment.setPaidAt(LocalDateTime.now());
+                            paymentRepository.save(payment);
+                            log.info("[ORDER] COD - Cập nhật Payment=COMPLETED. orderId={}", orderId);
+                        });
+            }
         }
 
         Order updated = orderRepository.save(order);
         log.info("[ORDER] Cập nhật trạng thái thành công. orderId={}, status={}, paymentStatus={}",
                 orderId, updated.getStatus(), updated.getPaymentStatus());
-
         return OrderResponse.from(updated);
     }
 
@@ -318,41 +306,31 @@ public class OrderService {
      */
     @Transactional
     public OrderResponse cancelOrder(Long orderId, Long userId, String cancelReason) {
-        log.info("[ORDER] Hủy đơn hàng. orderId={}, userId={}", orderId, userId);
-        
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> {
-                log.warn("[ORDER] Đơn hàng không tìm thấy. orderId={}", orderId);
-                return new BusinessException(ErrorCode.INVALID_REQUEST);
-            });
+        log.info("[ORDER] Customer hủy đơn. orderId={}, userId={}", orderId, userId);
 
-        // Check authorization
-        if (!order.getUser().getId().equals(userId)) {
-            log.warn("[ORDER] Người dùng không có quyền hủy đơn hàng. orderId={}, userId={}", orderId, userId);
-            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        String currentStatus = order.getStatus();
+        if (!"PENDING".equals(currentStatus) && !"CONFIRMED".equals(currentStatus)) {
+            throw new RuntimeException("Không thể hủy đơn hàng");
         }
 
-        // Validate status
-        if (!order.getStatus().equals("PENDING")) {
-            log.warn("[ORDER] Chỉ có thể hủy đơn hàng PENDING. orderId={}, status={}", orderId, order.getStatus());
-            throw new BusinessException(ErrorCode.INVALID_REQUEST);
-        }
-
-        // Restore stock
         for (OrderItem item : order.getItems()) {
             ProductVariant variant = item.getProductVariant();
-            variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
-            productVariantRepository.save(variant);
-            log.debug("[ORDER] Khôi phục tồn kho. variantId={}, quantity={}", 
-                variant.getId(), item.getQuantity());
+            if (variant != null && variant.getStockQuantity() != null) {
+                variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+                productVariantRepository.save(variant);
+            }
         }
 
         order.setStatus("CANCELLED");
         order.setCancelReason(cancelReason);
-        Order updated = orderRepository.save(order);
 
-        log.info("[ORDER] Hủy đơn hàng thành công. orderId={}", orderId);
-        return OrderResponse.from(updated);
+        Order updatedOrder = orderRepository.save(order);
+
+        log.info("[ORDER] Hủy thành công. orderId={}", orderId);
+        return OrderResponse.from(updatedOrder);
     }
 
     /**

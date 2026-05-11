@@ -102,17 +102,47 @@
         </span>
       </div>
 
-    </div><div class="drawer-footer">
-    <button
-      class="btn-add-to-cart"
-      [class.btn-add-to-cart--success]="addSuccess"
-      (click)="addToCart()"
-      [disabled]="addSuccess"
-    >
-      <mat-icon *ngIf="!addSuccess">shopping_cart</mat-icon>
-      <mat-icon *ngIf="addSuccess">check_circle</mat-icon>
-      <span>{{ addSuccess ? 'ĐÃ THÊM VÀO GIỎ' : 'THÊM VÀO GIỎ' }}</span>
-    </button>
+<!--    </div><div class="drawer-footer">-->
+<!--    <button-->
+<!--      class="btn-add-to-cart"-->
+<!--      [class.btn-add-to-cart&#45;&#45;success]="addSuccess"-->
+<!--      (click)="addToCart()"-->
+<!--      [disabled]="addSuccess"-->
+<!--    >-->
+<!--      <mat-icon *ngIf="!addSuccess">shopping_cart</mat-icon>-->
+<!--      <mat-icon *ngIf="addSuccess">check_circle</mat-icon>-->
+<!--      <span>{{ addSuccess ? 'ĐÃ THÊM VÀO GIỎ' : 'THÊM VÀO GIỎ' }}</span>-->
+<!--    </button>-->
+
+      <br/>
+
+      <div class="drawer-footer">
+
+        <ng-container *ngIf="!(isLoggedIn$ | async)">
+          <button
+            class="btn-add-to-cart"
+            mat-raised-button
+            color="accent"
+            (click)="goToLogin()"
+            type="button">
+            <mat-icon>login</mat-icon>
+            Đăng nhập để thêm giỏ
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="(isLoggedIn$ | async)">
+          <button
+            class="btn-add-to-cart"
+            [class.btn-add-to-cart--success]="addSuccess"
+            (click)="addToCart()"
+            [disabled]="addSuccess">
+            <mat-icon *ngIf="!addSuccess">shopping_cart</mat-icon>
+            <mat-icon *ngIf="addSuccess">check_circle</mat-icon>
+            <span>{{ addSuccess ? 'ĐÃ THÊM VÀO GIỎ' : 'THÊM VÀO GIỎ' }}</span>
+          </button>
+        </ng-container>
+
+      </div>
   </div>
 
   </aside>

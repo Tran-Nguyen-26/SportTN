@@ -30,6 +30,7 @@ public class ReportController {
         try {
             LocalDate fromDate = LocalDate.parse(from, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             LocalDate toDate   = LocalDate.parse(to,   DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            log.info("[REPORT] Yêu cầu Xuất báo cáo doanh thu. from={}, to={}", from, to);
 
             byte[] pdf = reportService.exportRevenuePdf(fromDate, toDate);
 

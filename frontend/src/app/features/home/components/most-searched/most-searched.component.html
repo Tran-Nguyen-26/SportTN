@@ -2,7 +2,7 @@
   <h2>{{ title }}</h2>
   <div class="circle-list">
     <div class="circle-item" *ngFor="let product of products">
-      <div class="circle">
+      <div class="circle" (click)="gotToProductPage(product.slug)">
         <img [src]="product.mainImageUrl" alt="{{ product.name }}">
       </div>
       <span class="product-name">{{ product.name }}</span>

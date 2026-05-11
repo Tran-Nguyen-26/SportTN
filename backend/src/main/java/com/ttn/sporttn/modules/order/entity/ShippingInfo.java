@@ -1,14 +1,6 @@
 package com.ttn.sporttn.modules.order.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,11 +9,14 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "shipping_info")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "shipping_info", indexes = {
+        @Index(name = "idx_shipping_order_id",        columnList = "order_id"),
+        @Index(name = "idx_shipping_tracking_number", columnList = "tracking_number")
+})
 public class ShippingInfo {
 
     @Id

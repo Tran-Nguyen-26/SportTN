@@ -67,18 +67,18 @@ export class BannersComponent implements OnInit {
   positionTabs = [
     { value: '',          label: 'Tất cả'     },
     { value: 'HERO',      label: 'Hero Slider' },
-    { value: 'SUB_LEFT',  label: 'Sub trái'   },
-    { value: 'SUB_RIGHT', label: 'Sub phải'   },
+    // { value: 'SUB_LEFT',  label: 'Sub trái'   },
+    // { value: 'SUB_RIGHT', label: 'Sub phải'   },
     { value: 'CATEGORY',  label: 'Danh mục'   },
-    { value: 'POPUP',     label: 'Popup'       },
+    // { value: 'POPUP',     label: 'Popup'       },
   ];
 
   positionOptions = [
     { value: 'HERO',      label: 'Hero Slider', icon: 'panorama',     desc: 'Banner chính, toàn chiều rộng trang'   },
-    { value: 'SUB_LEFT',  label: 'Sub trái',    icon: 'view_sidebar', desc: 'Banner phụ bên trái dưới hero'         },
-    { value: 'SUB_RIGHT', label: 'Sub phải',    icon: 'view_sidebar', desc: 'Banner phụ bên phải dưới hero'         },
+    // { value: 'SUB_LEFT',  label: 'Sub trái',    icon: 'view_sidebar', desc: 'Banner phụ bên trái dưới hero'         },
+    // { value: 'SUB_RIGHT', label: 'Sub phải',    icon: 'view_sidebar', desc: 'Banner phụ bên phải dưới hero'         },
     { value: 'CATEGORY',  label: 'Danh mục',    icon: 'grid_view',    desc: 'Banner trong section danh mục'         },
-    { value: 'POPUP',     label: 'Popup',       icon: 'open_in_new',  desc: 'Hiện dạng popup khi vào trang'         },
+    // { value: 'POPUP',     label: 'Popup',       icon: 'open_in_new',  desc: 'Hiện dạng popup khi vào trang'         },
   ];
 
   banners = signal<BannerResponse[]>([]);

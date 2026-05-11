@@ -13,7 +13,8 @@ export interface TopbarNotif {
 
 export interface ProfileForm {
   name: string;
-  phone: string;
+  fullname: string;
+  phone: string | null;
   title: string;
 }
 
@@ -69,6 +70,7 @@ export class TopbarComponent {
 
   profileForm: ProfileForm = {
     name:  '',
+    fullname: '',
     phone: '',
     title: '',
   };
@@ -189,17 +191,28 @@ export class TopbarComponent {
 
   get currentUserInfo() {
     const user = this.authService.currentUserValue;
-    const fullName = user?.username ?? 'Admin';
+    const username = user?.username ?? 'Admin';
+    const fullName = user?.fullname?? '';
+    const phone    = user?.phone ?? null;
     const parts    = fullName.trim().split(' ');
     const initials = parts.length >= 2
       ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
       : fullName.substring(0, 2).toUpperCase();
 
+    const roleMap: Record<string, string> = {
+      SUPER_ADMIN: 'Super Admin',
+      ADMIN:       'Quản trị viên',
+      STAFF:       'Nhân viên',
+      WAREHOUSE:   'Thủ kho',
+    };
+
     return {
-      name:      fullName,
+      name:      username,
       email:     user?.email ?? '',
+      fullname: fullName,
+      phone,
       initials,
-      roleLabel: user?.role === 'ADMIN' ? 'Quản trị viên' : (user?.role ?? ''),
+      roleLabel: roleMap[user?.role ?? ''] ?? user?.role ?? '',
       color:     '#7c3aed',
     };
   }
@@ -285,7 +298,8 @@ export class TopbarComponent {
   openProfile(): void {
     this.profileForm = {
       name:  this.currentUserInfo.name,
-      phone: '',
+      fullname: this.currentUserInfo.fullname,
+      phone: this.currentUserInfo.phone,
       title: this.currentUserInfo.roleLabel,
     };
     this.profileModalOpen = true;

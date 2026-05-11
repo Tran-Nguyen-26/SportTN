@@ -19,15 +19,13 @@ export class ProductCardComponent {
 
   @Output() addToCart     = new EventEmitter<ProductCardResponse>();
   @Output() addToWishlist = new EventEmitter<ProductCardResponse>();
+  @Output() openDrawer    = new EventEmitter<void>();
 
-  wishlisted  = false;
-  drawerOpen  = false;
-
+  wishlisted    = false;
+  drawerOpen    = false;
   drawerProduct: ProductCardResponse | null = null;
 
   constructor(private router: Router) {}
-
-  // ── Navigation ─────────────────────────────────────────────────────────────
 
   goToProduct(): void {
     if (this.product?.slug) {
@@ -35,18 +33,13 @@ export class ProductCardComponent {
     }
   }
 
-  // ── Cart / Wishlist ────────────────────────────────────────────────────────
-
   onAddToCart(event: Event): void {
     event.stopPropagation();
-    this.openDrawer();
+    this.triggerDrawer();  // ← đổi tên
   }
 
   onAddedToCart(item: CartItem): void {
-    // TODO: gọi CartService.add(item)
     console.log('Thêm vào giỏ:', item);
-    // Nếu cần emit lên parent:
-    // this.addToCart.emit(this.product);
   }
 
   toggleWish(e: Event): void {
@@ -55,27 +48,21 @@ export class ProductCardComponent {
     this.addToWishlist.emit(this.product);
   }
 
-  // ── Drawer helpers ─────────────────────────────────────────────────────────
-
-  openDrawer(): void {
+  triggerDrawer(): void {
     this.drawerProduct = this.product;
-    this.drawerOpen = true;
+    this.drawerOpen    = true;
+    this.openDrawer.emit();
   }
 
   closeDrawer(): void {
     this.drawerOpen = false;
   }
 
-  // ── Computed getters ───────────────────────────────────────────────────────
+  isSaleBadge(): boolean { return !!this.label && this.label.startsWith('-'); }
 
-  isSaleBadge(): boolean {
-    return !!this.label && this.label.startsWith('-');
-  }
-
-  get name(): string   { return this.product?.name        ?? ''; }
-  get brand(): string  { return this.product?.brandName   ?? ''; }
-  get image(): string  { return this.product?.mainImageUrl ?? ''; }
-
+  get name(): string            { return this.product?.name         ?? ''; }
+  get brand(): string           { return this.product?.brandName    ?? ''; }
+  get image(): string           { return this.product?.mainImageUrl ?? ''; }
   get rating(): number | undefined  { return this.product?.rating; }
   get reviews(): number | undefined { return this.product?.reviewCount; }
 

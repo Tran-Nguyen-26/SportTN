@@ -51,13 +51,14 @@ public class CartController {
             .body(ApiResponse.ok(cartResponse, "Thêm sản phẩm vào giỏ hàng thành công"));
     }
 
-    @PutMapping("/items")
+    @PutMapping("/items/{cartItemId}")
     public ResponseEntity<ApiResponse<CartResponse>> updateItemQuantity(
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        @Valid @RequestBody UpdateQuantityRequest request
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long cartItemId,
+            @RequestBody UpdateQuantityRequest request
     ) {
         Long userId = userDetails.getId();
-        CartResponse cartResponse = cartService.updateItemQuantity(userId, request.getCartItemId(), request.getQuantity());
+        CartResponse cartResponse = cartService.updateItemQuantity(userId, cartItemId, request.getQuantity());
         return ResponseEntity.ok(ApiResponse.ok(cartResponse, "Cập nhật số lượng thành công"));
     }
 

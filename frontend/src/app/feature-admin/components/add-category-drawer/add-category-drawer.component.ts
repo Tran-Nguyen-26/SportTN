@@ -30,7 +30,7 @@ export class AddCategoryDrawerComponent implements OnChanges {
   @Output() saved = new EventEmitter<CategoryForm>();
 
   previewUrl:  string | null = null;
-  imageSource: 'upload' | 'url' = 'upload';
+  imageSource: 'upload' | 'url' = 'url';
   urlPreview:  string = '';
   urlValid:    boolean | null = null;
   form:        CategoryForm = this.emptyForm();
@@ -80,7 +80,7 @@ export class AddCategoryDrawerComponent implements OnChanges {
   private resetForm(): void {
     this.form        = this.emptyForm();
     this.previewUrl  = null;
-    this.imageSource = 'upload';
+    this.imageSource = 'url';
     this.urlPreview  = '';
     this.urlValid    = null;
     this.errors = { name: '', slug: '' };

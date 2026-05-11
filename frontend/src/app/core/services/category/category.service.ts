@@ -69,6 +69,38 @@ export class CategoryService {
     );
   }
 
+  getCategoryOptionByParentSlug(parentSlug: string): Observable<ApiResponse<CategoryOption[]>> {
+    return this.getCategoryAdminResponse().pipe(
+      map(res => {
+        const categories = res.data ?? [];
+        const parentCategory = categories.find(
+          (item: CategoryAdminResponse) => item.slug === parentSlug
+        );
+        if (!parentCategory) {
+          return {
+            ...res,
+            data: []
+          };
+        }
+        const optionData = categories
+          .filter(
+            (item: CategoryAdminResponse) =>
+              item.parentId === parentCategory.categoryId
+          )
+          .map((item: CategoryAdminResponse) => ({
+            id: item.categoryId,
+            name: item.name,
+            slug: item.slug
+          }));
+
+        return {
+          ...res,
+          data: optionData
+        };
+      })
+    );
+  }
+
   createCategory(request: CategoryCreateRequest): Observable<ApiResponse<CategoryAdminResponse>> {
     return this.http.post<ApiResponse<CategoryAdminResponse>>(`${this.API_URL}`, request);
   }

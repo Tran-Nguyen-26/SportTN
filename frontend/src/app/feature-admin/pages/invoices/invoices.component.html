@@ -2,10 +2,10 @@
 
   <app-page-header
     title="Hóa đơn"
-    subtitle="Quản lý hóa đơn và thanh toán"
-    btnLabel="Tạo hóa đơn"
-    btnIcon="add"
-    (btnClick)="openCreate()">
+    subtitle="Quản lý hóa đơn và thanh toán">
+<!--    btnLabel="Tạo hóa đơn"-->
+<!--    btnIcon="add"-->
+<!--    (btnClick)="openCreate()"-->
   </app-page-header>
 
   <!-- Stats -->
@@ -57,10 +57,10 @@
           {{ s.label }}
         </option>
       </select>
-      <button class="btn-export">
-        <mat-icon>download</mat-icon>
-        Xuất PDF
-      </button>
+<!--      <button class="btn-export">-->
+<!--        <mat-icon>download</mat-icon>-->
+<!--        Xuất PDF-->
+<!--      </button>-->
     </div>
 
     <div class="table-wrap">
@@ -107,9 +107,9 @@
               <button class="action-btn view" (click)="openInvoice(inv)" title="Xem chi tiết">
                 <mat-icon>visibility</mat-icon>
               </button>
-              <button class="action-btn download" title="Tải PDF">
-                <mat-icon>download</mat-icon>
-              </button>
+<!--              <button class="action-btn download" title="Tải PDF">-->
+<!--                <mat-icon>download</mat-icon>-->
+<!--              </button>-->
             </div>
           </td>
         </tr>
@@ -159,14 +159,14 @@
         </span>
       </div>
       <div class="modal-header-right">
-        <button class="btn-print" (click)="printInvoice()">
-          <mat-icon>print</mat-icon>
-          In hóa đơn
-        </button>
-        <button class="btn-download">
-          <mat-icon>download</mat-icon>
-          Tải PDF
-        </button>
+<!--        <button class="btn-print" (click)="printInvoice()">-->
+<!--          <mat-icon>print</mat-icon>-->
+<!--          In hóa đơn-->
+<!--        </button>-->
+<!--        <button class="btn-download">-->
+<!--          <mat-icon>download</mat-icon>-->
+<!--          Tải PDF-->
+<!--        </button>-->
         <button class="close-btn" (click)="closeInvoice()">
           <mat-icon>close</mat-icon>
         </button>
@@ -320,11 +320,11 @@
     <!-- Modal Footer -->
     <div class="modal-footer">
       <button class="btn-close-modal" (click)="closeInvoice()">Đóng</button>
-      <div class="footer-right">
-        <button class="btn-print" (click)="printInvoice()">
-          <mat-icon>print</mat-icon>
-          In hóa đơn
-        </button>
+<!--      <div class="footer-right">-->
+<!--        <button class="btn-print" (click)="printInvoice()">-->
+<!--          <mat-icon>print</mat-icon>-->
+<!--          In hóa đơn-->
+<!--        </button>-->
 <!--        <button-->
 <!--          class="btn-mark-paid"-->
 <!--          *ngIf="selectedInvoice.status !== 'PAID'"-->
@@ -332,7 +332,7 @@
 <!--          <mat-icon>check_circle</mat-icon>-->
 <!--          Đánh dấu đã thanh toán-->
 <!--        </button>-->
-      </div>
+<!--      </div>-->
     </div>
 
   </div>

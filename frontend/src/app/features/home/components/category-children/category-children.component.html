@@ -1,7 +1,7 @@
 <div class="children-circle">
   <div class="circle-list">
     <div class="circle-item" *ngFor="let child of childrenCategories | slice:0:10">
-      <div class="circle">
+      <div class="circle" (click)="goToCategoryPage(child.slug)">
         <img [src]="child.imageUrl" alt="{{ child.name }}">
       </div>
       <span class="category-name">{{ child.name }}</span>

@@ -20,7 +20,6 @@ import { CartItemResponse } from "../../../../core/services/cart/cart.service";
   ]
 })
 export class CartItemComponent {
-  // 1. Tạo Signal nội bộ để chứa dữ liệu item
   itemSignal = signal<CartItemResponse | null>(null);
 
   @Input() set item(value: CartItemResponse) {
@@ -56,8 +55,6 @@ export class CartItemComponent {
     const item = this.itemSignal();
     return item ? item.variant.originalPrice * item.quantity : 0;
   });
-
-  // --- 3. Logic Methods ---
 
   increaseQuantity(): void {
     const item = this.itemSignal();

@@ -112,21 +112,54 @@
       </div>
 
       <!-- Actions -->
+<!--      <div class="actions">-->
+<!--        <button-->
+<!--          class="btn-cart"-->
+<!--          [disabled]="!canAddToCart"-->
+<!--          (click)="addToCart()">-->
+<!--          <mat-icon>shopping_cart</mat-icon>-->
+<!--          {{ canAddToCart ? 'Thêm vào giỏ hàng' : 'Chọn màu & size' }}-->
+<!--        </button>-->
+<!--        <button-->
+<!--          class="btn-wish"-->
+<!--          [class.on]="isWishlisted"-->
+<!--          (click)="toggleWishlist()"-->
+<!--          [attr.aria-label]="isWishlisted ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'">-->
+<!--          <mat-icon>{{ isWishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+      <!-- Actions -->
       <div class="actions">
-        <button
-          class="btn-cart"
-          [disabled]="!canAddToCart"
-          (click)="addToCart()">
-          <mat-icon>shopping_cart</mat-icon>
-          {{ canAddToCart ? 'Thêm vào giỏ hàng' : 'Chọn màu & size' }}
-        </button>
-        <button
-          class="btn-wish"
-          [class.on]="isWishlisted"
-          (click)="toggleWishlist()"
-          [attr.aria-label]="isWishlisted ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'">
-          <mat-icon>{{ isWishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
-        </button>
+
+        <ng-container *ngIf="!(isLoggedIn$ | async)">
+          <button
+            class="btn-cart"
+            mat-raised-button
+            color="accent"
+            (click)="goToLogin()"
+            type="button">
+            <mat-icon>login</mat-icon>
+            Đăng nhập để mua hàng
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="(isLoggedIn$ | async)">
+          <button
+            class="btn-cart"
+            [disabled]="!canAddToCart"
+            (click)="addToCart()">
+            <mat-icon>shopping_cart</mat-icon>
+            {{ canAddToCart ? 'Thêm vào giỏ hàng' : 'Chọn màu & size' }}
+          </button>
+          <button
+            class="btn-wish"
+            [class.on]="isWishlisted"
+            (click)="toggleWishlist()"
+            [attr.aria-label]="isWishlisted ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'">
+            <mat-icon>{{ isWishlisted ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+        </ng-container>
+
       </div>
 
       <!-- Policy -->
@@ -154,11 +187,11 @@
       [description]="productDetail.productCardResponse.description">
     </app-product-description>
 
-    <app-product-review
-      [productId]="productId"
-      [rating]="productDetail.productCardResponse.rating"
-      [totalReviews]="totalReviewCount">
-    </app-product-review>
+<!--    <app-product-review-->
+<!--      [productId]="productId"-->
+<!--      [rating]="productDetail.productCardResponse.rating"-->
+<!--      [totalReviews]="totalReviewCount">-->
+<!--    </app-product-review>-->
   </div>
 
 </div>

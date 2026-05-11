@@ -1,54 +1,54 @@
 <div class="coupon-card">
-  <div class="coupon-header">
-    <svg class="coupon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-      <line x1="7" y1="7" x2="7.01" y2="7"/>
-    </svg>
-    <span class="coupon-title">Mã giảm giá</span>
-  </div>
+<!--  <div class="coupon-header">-->
+<!--    <svg class="coupon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">-->
+<!--      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>-->
+<!--      <line x1="7" y1="7" x2="7.01" y2="7"/>-->
+<!--    </svg>-->
+<!--    <span class="coupon-title">Mã giảm giá</span>-->
+<!--  </div>-->
 
-  <!-- Input area -->
-  <div class="coupon-input-area" *ngIf="!appliedCoupon" [@fadeSlide]>
-    <div class="input-row" [formGroup]="couponForm">
-      <div class="input-wrap" [class.has-error]="errorMessage">
-        <input
-          matInput
-          formControlName="couponCode"
-          class="coupon-input"
-          placeholder="Nhập mã ưu đãi (VD: SAVE20)"
-          (input)="clearError()"
-          (keydown.enter)="applyCoupon()"
-          autocomplete="off"
-          spellcheck="false"
-        />
-      </div>
-      <button
-        class="apply-btn"
-        [class.loading]="isLoading"
-        [disabled]="couponForm.invalid || isLoading"
-        (click)="applyCoupon()"
-      >
-        <span *ngIf="!isLoading">Áp dụng</span>
-        <span *ngIf="isLoading" class="spinner"></span>
-      </button>
-    </div>
+<!--  &lt;!&ndash; Input area &ndash;&gt;-->
+<!--  <div class="coupon-input-area" *ngIf="!appliedCoupon" [@fadeSlide]>-->
+<!--    <div class="input-row" [formGroup]="couponForm">-->
+<!--      <div class="input-wrap" [class.has-error]="errorMessage">-->
+<!--        <input-->
+<!--          matInput-->
+<!--          formControlName="couponCode"-->
+<!--          class="coupon-input"-->
+<!--          placeholder="Nhập mã ưu đãi (VD: SAVE20)"-->
+<!--          (input)="clearError()"-->
+<!--          (keydown.enter)="applyCoupon()"-->
+<!--          autocomplete="off"-->
+<!--          spellcheck="false"-->
+<!--        />-->
+<!--      </div>-->
+<!--      <button-->
+<!--        class="apply-btn"-->
+<!--        [class.loading]="isLoading"-->
+<!--        [disabled]="couponForm.invalid || isLoading"-->
+<!--        (click)="applyCoupon()"-->
+<!--      >-->
+<!--        <span *ngIf="!isLoading">Áp dụng</span>-->
+<!--        <span *ngIf="isLoading" class="spinner"></span>-->
+<!--      </button>-->
+<!--    </div>-->
 
-    <div class="error-msg" *ngIf="errorMessage" [@fadeIn]>
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      {{ errorMessage }}
-    </div>
+<!--    <div class="error-msg" *ngIf="errorMessage" [@fadeIn]>-->
+<!--      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">-->
+<!--        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>-->
+<!--      </svg>-->
+<!--      {{ errorMessage }}-->
+<!--    </div>-->
 
-    <div class="hint-coupons">
-      <span class="hint-label">Mã thử:</span>
-      <button
-        *ngFor="let code of hintCodes"
-        class="hint-chip"
-        (click)="fillCoupon(code)"
-      >{{ code }}</button>
-    </div>
-  </div>
+<!--    <div class="hint-coupons">-->
+<!--      <span class="hint-label">Mã thử:</span>-->
+<!--      <button-->
+<!--        *ngFor="let code of hintCodes"-->
+<!--        class="hint-chip"-->
+<!--        (click)="fillCoupon(code)"-->
+<!--      >{{ code }}</button>-->
+<!--    </div>-->
+<!--  </div>-->
 
   <!-- Applied state -->
   <div class="applied-area" *ngIf="appliedCoupon" [@fadeSlide]>

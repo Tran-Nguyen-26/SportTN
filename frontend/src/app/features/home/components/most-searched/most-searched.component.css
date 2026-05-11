@@ -12,9 +12,9 @@
 
 .circle-list {
   display: flex;
-  justify-content: space-evenly; /* chia đều trên chiều ngang */
+  justify-content: space-evenly;
   gap: 20px;
-  overflow-x: auto;              /* scroll ngang khi nhiều item */
+  overflow-x: auto;
   padding: 10px 0;
 }
 

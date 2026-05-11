@@ -21,13 +21,30 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {
     const savedUser = localStorage.getItem('auth_data');
+    console.log('[Auth] raw từ localStorage:', savedUser);
+
     if (savedUser) {
       try {
-        this.currentUserSubject.next(JSON.parse(savedUser));
+        const parsed = JSON.parse(savedUser);
+        console.log('[Auth] parsed:', parsed);
+        console.log('[Auth] userResponse:', parsed?.userResponse);
+        console.log('[Auth] role:', parsed?.userResponse?.role);
+        this.currentUserSubject.next(parsed);
       } catch (e) {
+        console.error('[Auth] Parse lỗi:', e);
         localStorage.removeItem('auth_data');
       }
+    } else {
+      console.warn('[Auth] Không có auth_data trong localStorage');
     }
+  }
+
+  get isSuperAdmin(): boolean {
+    return this.currentUserSubject.getValue()?.userResponse.role === 'SUPER_ADMIN';
+  }
+
+  getRole(): string | null {
+    return this.currentUserSubject.getValue()?.userResponse?.role ?? null;
   }
 
   login(credentials: LoginRequest): Observable<any> {

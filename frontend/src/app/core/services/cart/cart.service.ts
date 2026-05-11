@@ -59,4 +59,11 @@ export class CartService {
   clearCart(): Observable<ApiResponse<any>> {
     return this.http.delete<ApiResponse<any>>(this.apiUrl);
   }
+
+  updateQuantity(cartItemId: number, quantity: number): Observable<ApiResponse<CartResponse>> {
+    return this.http.put<ApiResponse<CartResponse>>(
+      `${this.apiUrl}/items/${cartItemId}`,
+      { quantity }
+    );
+  }
 }

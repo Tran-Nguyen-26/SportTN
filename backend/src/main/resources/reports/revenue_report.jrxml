@@ -221,7 +221,7 @@
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="0" y="40" width="200" height="18" forecolor="#FFFFFF" backcolor="#1A1A2E" uuid="603493d0-e2b2-4a59-81ce-49c82adf3439"/>
-				<textElement verticalAlignment="Middle">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tên sản phẩm]]></text>
@@ -242,7 +242,7 @@
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="400" y="40" width="135" height="18" forecolor="#FFFFFF" backcolor="#1A1A2E" uuid="1eef86f8-581e-446a-b6c1-ccc4deb20bd3"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Doanh thu]]></text>

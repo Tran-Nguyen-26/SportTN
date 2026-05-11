@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {ProductCardResponse} from "../../../../core/models/home-response/home-response";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-most-searched',
@@ -9,4 +10,11 @@ import {ProductCardResponse} from "../../../../core/models/home-response/home-re
 export class MostSearchedComponent {
   @Input() title: string = '';
   @Input() products: ProductCardResponse[] = [];
+
+  constructor(private router: Router) {
+  }
+
+  gotToProductPage(slug: string) {
+    this.router.navigate(['/product', slug]);
+  }
 }

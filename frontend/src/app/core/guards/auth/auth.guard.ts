@@ -1,17 +1,26 @@
-import {CanActivateFn, Router} from '@angular/router';
-import {inject} from "@angular/core";
-import {AuthService} from "../../services/auth/auth.service";
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { map } from 'rxjs/operators';
+import { AuthService } from "../../services/auth/auth.service";
 
-export const authGuard: CanActivateFn = (route, state) => {
+const ADMIN_ROLES = ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'WAREHOUSE'];
+
+export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
-  const router = inject(Router);
+  const router      = inject(Router);
 
-  const user = localStorage.getItem('auth_data');
+  return authService.currentUser$.pipe(
+    map(authRes => {
+      if (!authRes) return true;
 
-  if (user) {
-    return true;
-  }
+      const role = authRes.userResponse.role;
 
-  router.navigate(['/auth/login'], {queryParams: {returnUrl: state.url}});
-  return false;
+      // Là admin role → redirect về admin
+      if (ADMIN_ROLES.includes(role)) {
+        return router.createUrlTree(['/admin']);
+      }
+
+      return true; // CUSTOMER → cho vào bình thường
+    })
+  );
 };

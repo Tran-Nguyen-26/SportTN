@@ -15,130 +15,130 @@
   <div class="topbar-right">
 
     <!-- Search -->
-    <div class="search-wrap" [class.focused]="searchFocused">
-      <mat-icon class="search-icon">search</mat-icon>
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Tìm kiếm..."
-        [(ngModel)]="searchQuery"
-        (focus)="searchFocused = true"
-        (blur)="searchFocused = false">
-      <span class="search-shortcut">⌘K</span>
-    </div>
+<!--    <div class="search-wrap" [class.focused]="searchFocused">-->
+<!--      <mat-icon class="search-icon">search</mat-icon>-->
+<!--      <input-->
+<!--        type="text"-->
+<!--        class="search-input"-->
+<!--        placeholder="Tìm kiếm..."-->
+<!--        [(ngModel)]="searchQuery"-->
+<!--        (focus)="searchFocused = true"-->
+<!--        (blur)="searchFocused = false">-->
+<!--      <span class="search-shortcut">⌘K</span>-->
+<!--    </div>-->
 
     <!-- Notifications bell -->
-    <div class="dropdown-host" [class.open]="notifOpen">
-      <button class="icon-btn" (click)="toggleNotif()">
-        <mat-icon>notifications</mat-icon>
-        <span class="notif-badge" *ngIf="unreadNotifs > 0">{{ unreadNotifs }}</span>
-      </button>
+<!--    <div class="dropdown-host" [class.open]="notifOpen">-->
+<!--      <button class="icon-btn" (click)="toggleNotif()">-->
+<!--        <mat-icon>notifications</mat-icon>-->
+<!--        <span class="notif-badge" *ngIf="unreadNotifs > 0">{{ unreadNotifs }}</span>-->
+<!--      </button>-->
 
-      <div class="dropdown notif-dropdown" *ngIf="notifOpen">
-        <div class="dd-header">
-          <span class="dd-title">Thông báo</span>
-          <button class="dd-action-btn" (click)="markAllRead()">
-            <mat-icon>done_all</mat-icon>
-            Đánh dấu đã đọc
-          </button>
-        </div>
+<!--      <div class="dropdown notif-dropdown" *ngIf="notifOpen">-->
+<!--        <div class="dd-header">-->
+<!--          <span class="dd-title">Thông báo</span>-->
+<!--          <button class="dd-action-btn" (click)="markAllRead()">-->
+<!--            <mat-icon>done_all</mat-icon>-->
+<!--            Đánh dấu đã đọc-->
+<!--          </button>-->
+<!--        </div>-->
 
-        <div class="notif-list">
-          <div
-            class="notif-item"
-            *ngFor="let n of recentNotifs"
-            [class.unread]="!n.read"
-            (click)="openNotifItem(n)">
-            <div class="ni-icon" [ngClass]="n.type">
-              <mat-icon>{{ getNotifIcon(n.type) }}</mat-icon>
-            </div>
-            <div class="ni-content">
-              <div class="ni-title">{{ n.title }}</div>
-              <div class="ni-body">{{ n.body }}</div>
-              <div class="ni-time">{{ n.timeAgo }}</div>
-            </div>
-            <div class="ni-dot" *ngIf="!n.read"></div>
-          </div>
-        </div>
+<!--        <div class="notif-list">-->
+<!--          <div-->
+<!--            class="notif-item"-->
+<!--            *ngFor="let n of recentNotifs"-->
+<!--            [class.unread]="!n.read"-->
+<!--            (click)="openNotifItem(n)">-->
+<!--            <div class="ni-icon" [ngClass]="n.type">-->
+<!--              <mat-icon>{{ getNotifIcon(n.type) }}</mat-icon>-->
+<!--            </div>-->
+<!--            <div class="ni-content">-->
+<!--              <div class="ni-title">{{ n.title }}</div>-->
+<!--              <div class="ni-body">{{ n.body }}</div>-->
+<!--              <div class="ni-time">{{ n.timeAgo }}</div>-->
+<!--            </div>-->
+<!--            <div class="ni-dot" *ngIf="!n.read"></div>-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <div class="dd-footer">
-          <div class="dd-view-all" (click)="goToNotifications(); notifOpen = false">
-            Xem tất cả thông báo
-            <mat-icon>arrow_forward</mat-icon>
-          </div>
-        </div>
-      </div>
-    </div>
+<!--        <div class="dd-footer">-->
+<!--          <div class="dd-view-all" (click)="goToNotifications(); notifOpen = false">-->
+<!--            Xem tất cả thông báo-->
+<!--            <mat-icon>arrow_forward</mat-icon>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <!-- Settings gear -->
-    <div class="dropdown-host" [class.open]="settingsOpen">
-      <button class="icon-btn" (click)="toggleSettings()">
-        <mat-icon>settings</mat-icon>
-      </button>
+<!--    <div class="dropdown-host" [class.open]="settingsOpen">-->
+<!--      <button class="icon-btn" (click)="toggleSettings()">-->
+<!--        <mat-icon>settings</mat-icon>-->
+<!--      </button>-->
 
-      <div class="dropdown settings-dropdown" *ngIf="settingsOpen">
-        <div class="dd-header">
-          <span class="dd-title">Cài đặt nhanh</span>
-        </div>
+<!--      <div class="dropdown settings-dropdown" *ngIf="settingsOpen">-->
+<!--        <div class="dd-header">-->
+<!--          <span class="dd-title">Cài đặt nhanh</span>-->
+<!--        </div>-->
 
-        <div class="settings-list">
+<!--        <div class="settings-list">-->
 
-          <!-- Theme toggle -->
-          <div class="settings-item">
-            <div class="si-left">
-              <div class="si-icon"><mat-icon>dark_mode</mat-icon></div>
-              <div class="si-info">
-                <span class="si-label">Giao diện tối</span>
-                <span class="si-desc">Chuyển sang dark mode</span>
-              </div>
-            </div>
-            <div class="toggle-sm" [class.on]="darkMode" (click)="darkMode = !darkMode">
-              <div class="toggle-sm-thumb"></div>
-            </div>
-          </div>
+<!--          &lt;!&ndash; Theme toggle &ndash;&gt;-->
+<!--          <div class="settings-item">-->
+<!--            <div class="si-left">-->
+<!--              <div class="si-icon"><mat-icon>dark_mode</mat-icon></div>-->
+<!--              <div class="si-info">-->
+<!--                <span class="si-label">Giao diện tối</span>-->
+<!--                <span class="si-desc">Chuyển sang dark mode</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="toggle-sm" [class.on]="darkMode" (click)="darkMode = !darkMode">-->
+<!--              <div class="toggle-sm-thumb"></div>-->
+<!--            </div>-->
+<!--          </div>-->
 
-          <!-- Language -->
-          <div class="settings-item">
-            <div class="si-left">
-              <div class="si-icon"><mat-icon>language</mat-icon></div>
-              <div class="si-info">
-                <span class="si-label">Ngôn ngữ</span>
-                <span class="si-desc">Tiếng Việt</span>
-              </div>
-            </div>
-            <mat-icon class="si-arrow">chevron_right</mat-icon>
-          </div>
+<!--          &lt;!&ndash; Language &ndash;&gt;-->
+<!--          <div class="settings-item">-->
+<!--            <div class="si-left">-->
+<!--              <div class="si-icon"><mat-icon>language</mat-icon></div>-->
+<!--              <div class="si-info">-->
+<!--                <span class="si-label">Ngôn ngữ</span>-->
+<!--                <span class="si-desc">Tiếng Việt</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <mat-icon class="si-arrow">chevron_right</mat-icon>-->
+<!--          </div>-->
 
-          <!-- Notifications settings -->
-          <div class="settings-item">
-            <div class="si-left">
-              <div class="si-icon"><mat-icon>notifications_active</mat-icon></div>
-              <div class="si-info">
-                <span class="si-label">Thông báo âm thanh</span>
-                <span class="si-desc">Phát âm khi có đơn mới</span>
-              </div>
-            </div>
-            <div class="toggle-sm" [class.on]="soundEnabled" (click)="soundEnabled = !soundEnabled">
-              <div class="toggle-sm-thumb"></div>
-            </div>
-          </div>
+<!--          &lt;!&ndash; Notifications settings &ndash;&gt;-->
+<!--          <div class="settings-item">-->
+<!--            <div class="si-left">-->
+<!--              <div class="si-icon"><mat-icon>notifications_active</mat-icon></div>-->
+<!--              <div class="si-info">-->
+<!--                <span class="si-label">Thông báo âm thanh</span>-->
+<!--                <span class="si-desc">Phát âm khi có đơn mới</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="toggle-sm" [class.on]="soundEnabled" (click)="soundEnabled = !soundEnabled">-->
+<!--              <div class="toggle-sm-thumb"></div>-->
+<!--            </div>-->
+<!--          </div>-->
 
-        </div>
+<!--        </div>-->
 
-        <div class="settings-divider"></div>
+<!--        <div class="settings-divider"></div>-->
 
-        <div class="settings-links">
-          <a class="settings-link" (click)="goToSettings(); settingsOpen = false">
-            <mat-icon>tune</mat-icon>
-            Cài đặt hệ thống
-          </a>
-          <a class="settings-link" (click)="openHelp()">
-           <mat-icon>help_outline</mat-icon>
-           Trợ giúp & hướng dẫn
-          </a>
-        </div>
-      </div>
-    </div>
+<!--        <div class="settings-links">-->
+<!--          <a class="settings-link" (click)="goToSettings(); settingsOpen = false">-->
+<!--            <mat-icon>tune</mat-icon>-->
+<!--            Cài đặt hệ thống-->
+<!--          </a>-->
+<!--          <a class="settings-link" (click)="openHelp()">-->
+<!--           <mat-icon>help_outline</mat-icon>-->
+<!--           Trợ giúp & hướng dẫn-->
+<!--          </a>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <!-- User avatar + dropdown -->
     <div class="dropdown-host user-host" [class.open]="userOpen">
@@ -177,10 +177,10 @@
             <mat-icon>lock</mat-icon>
             Đổi mật khẩu
           </a>
-          <a class="udm-item" (click)="goToUsers(); userOpen = false">
-            <mat-icon>manage_accounts</mat-icon>
-            Quản lý tài khoản
-          </a>
+<!--          <a class="udm-item" (click)="goToUsers(); userOpen = false">-->
+<!--            <mat-icon>manage_accounts</mat-icon>-->
+<!--            Quản lý tài khoản-->
+<!--          </a>-->
         </div>
 
         <div class="user-dd-divider"></div>
@@ -240,12 +240,23 @@
 
         <div class="form-row-2">
           <div class="field">
-            <label>Họ và tên <span class="req">*</span></label>
+            <label>Tài khoản<span class="req">*</span></label>
             <input type="text" [(ngModel)]="profileForm.name" placeholder="Nguyễn Văn A">
           </div>
+
+          <div class="field">
+            <label>Họ và tên<span class="req">*</span></label>
+            <input type="text" [(ngModel)]="profileForm.fullname" placeholder="Nguyễn Văn A">
+          </div>
+
           <div class="field">
             <label>Số điện thoại</label>
             <input type="tel" [(ngModel)]="profileForm.phone" placeholder="0912 345 678">
+          </div>
+
+          <div class="field">
+            <label>Chức danh</label>
+            <input type="text" [(ngModel)]="profileForm.title" disabled class="input-disabled">
           </div>
         </div>
 
@@ -253,11 +264,6 @@
           <label>Email</label>
           <input type="email" [value]="currentUserInfo.email" disabled class="input-disabled">
           <span class="hint">Email không thể thay đổi</span>
-        </div>
-
-        <div class="field">
-          <label>Chức danh</label>
-          <input type="text" [(ngModel)]="profileForm.title" placeholder="VD: Quản lý cửa hàng">
         </div>
 
       </div>

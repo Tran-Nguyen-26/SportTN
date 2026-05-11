@@ -1,43 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
 /* ═══════════════════════════════════════════════════
-   PRODUCT CARD  —  Sport-Commerce  —  Sky-blue theme
+   PRODUCT CARD — Decathlon style
    ═══════════════════════════════════════════════════ */
 
 .pc {
-  --accent:      #0EA5E9;
-  --accent-dark: #0284C7;
-  --danger:      #E53935;
-  --gold:        #F59E0B;
-  --text-1:      #0F172A;
-  --text-2:      #475569;
-  --text-3:      #94A3B8;
-  --surface:     #F8FAFC;
-  --border:      #E2E8F0;
-  --radius:      16px;
+  --danger:   #E53935;
+  --gold:     #F59E0B;
+  --accent:   #0057A8;
+  --text-1:   #1a1a1a;
+  --text-2:   #555;
+  --text-3:   #999;
+  --border:   #f0f0f0;
 
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 220px;
-  border-radius: var(--radius);
+  width: 100%;
+  max-width: 300px;
   background: #fff;
-  border: 1px solid var(--border);
-  overflow: hidden;
   cursor: pointer;
-  transition: transform .22s cubic-bezier(.34,1.56,.64,1),
-  box-shadow .22s ease;
-  font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
+  font-family: 'DM Sans', sans-serif;
+  border: 1px solid transparent;
+  transition: border-color .15s;
 }
 
 .pc:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 40px rgba(14,165,233,.15), 0 4px 12px rgba(0,0,0,.06);
+  border-color: #e0e0e0;
+  z-index: 1;
 }
 
 /* ── Image zone ─────────────────────────────────── */
 .pc-img-zone {
   position: relative;
-  height: 210px;
-  background: var(--surface);
+  aspect-ratio: 1 / 1;
+  background: #f7f7f7;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -49,34 +46,34 @@
   transition: transform .4s ease;
 }
 
-.pc:hover .pc-img { transform: scale(1.06); }
+.pc:hover .pc-img { transform: scale(1.04); }
 
-/* Badges */
+/* Badges — Decathlon style: flat, left-top */
 .pc-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 11px;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 4px 9px;
-  border-radius: 6px;
-  letter-spacing: .4px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: .3px;
   z-index: 2;
-  backdrop-filter: blur(4px);
+  text-transform: uppercase;
 }
 
 .pc-badge--sale {
-  background: linear-gradient(135deg, #FF416C, #FF4B2B);
-  color: #fff;
+  background: #FFE600;
+  color: #1a1a1a;
 }
 
 .pc-badge--new {
-  background: var(--accent);
+  background: #0057A8;
   color: #fff;
 }
 
 .pc-badge--hot {
-  background: var(--gold);
+  background: #E53935;
   color: #fff;
 }
 
@@ -85,31 +82,33 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,.88);
-  backdrop-filter: blur(6px);
+  background: rgba(255,255,255,.9);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
-  transition: transform .18s, background .18s;
+  transition: background .15s;
+  opacity: 0;
 }
+
+.pc:hover .pc-wish { opacity: 1; }
+.pc-wish--active { opacity: 1 !important; }
 
 .pc-wish mat-icon {
-  font-size: 17px;
-  width: 17px;
-  height: 17px;
-  color: var(--text-3);
-  transition: color .18s;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #999;
+  transition: color .15s;
 }
 
-.pc-wish:hover { transform: scale(1.12); background: #fff; }
 .pc-wish:hover mat-icon,
-.pc-wish--active mat-icon { color: #FF416C; }
+.pc-wish--active mat-icon { color: #E53935; }
 .pc-wish--active mat-icon { font-variation-settings: 'FILL' 1; }
 
 /* Quick-add overlay */
@@ -118,13 +117,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 20px 12px 12px;
-  background: linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 100%);
   display: flex;
   justify-content: center;
+  padding: 12px;
+  background: rgba(255,255,255,.95);
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity .2s, transform .2s;
+  transform: translateY(4px);
+  transition: opacity .18s, transform .18s;
 }
 
 .pc:hover .pc-quick {
@@ -136,16 +135,20 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 18px;
-  border: none;
-  border-radius: 20px;
+  padding: 8px 20px;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 3px;
   background: #fff;
-  color: var(--text-1);
+  color: #1a1a1a;
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background .14s, transform .14s;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  transition: background .14s, color .14s;
+  width: 100%;
+  justify-content: center;
 }
 
 .pc-quick-btn mat-icon {
@@ -155,84 +158,38 @@
 }
 
 .pc-quick-btn:hover {
-  background: #f0f0f0;
-  transform: scale(1.03);
+  background: #1a1a1a;
+  color: #fff;
 }
 
-/* ── Specs strip ─────────────────────────────────── */
-.pc-specs {
-  display: flex;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.pc-spec {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 7px 4px;
-  gap: 3px;
-  border-right: 1px solid var(--border);
-}
-
-.pc-spec:last-child { border-right: none; }
-
-.pc-spec-icon {
-  font-size: 15px !important;
-  width: 15px !important;
-  height: 15px !important;
-  color: var(--accent) !important;
-}
-
-.pc-spec-text {
-  font-size: 9.5px;
-  color: var(--text-2);
-  text-align: center;
-  line-height: 1.25;
-}
+/* ── Specs strip — ẩn đi cho clean ── */
+.pc-specs { display: none; }
 
 /* ── Info ────────────────────────────────────────── */
 .pc-info {
-  padding: 12px 14px 14px;
+  padding: 10px 8px 12px;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.pc-brand {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin: 0 0 4px;
-}
-
-.pc-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-1);
-  line-height: 1.35;
-  margin: 0 0 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Price */
+/* Price lên đầu — như Decathlon */
 .pc-price-row {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
+  order: -1;
 }
 
 .pc-price-new {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
+  color: var(--text-1);
+}
+
+/* Khi có sale thì đỏ */
+.pc-price-row:has(.pc-price-old) .pc-price-new {
   color: var(--danger);
 }
 
@@ -242,26 +199,46 @@
   text-decoration: line-through;
 }
 
-/* Footer */
+.pc-brand {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin: 0 0 2px;
+}
+
+.pc-name {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-2);
+  line-height: 1.4;
+  margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer: rating + cart */
 .pc-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
+  padding-top: 8px;
 }
 
 .pc-rating {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .pc-star {
-  font-size: 14px !important;
-  width: 14px !important;
-  height: 14px !important;
+  font-size: 13px !important;
+  width: 13px !important;
+  height: 13px !important;
   color: var(--gold) !important;
 }
 
@@ -274,33 +251,34 @@
 .pc-review-count {
   font-size: 11px;
   color: var(--text-3);
+  margin-left: 2px;
 }
 
-/* Cart button */
+/* Cart button — Decathlon: icon giỏ hàng đơn giản */
 .pc-cart-btn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  border: 1.5px solid var(--accent);
-  background: transparent;
+  border-radius: 50%;
+  border: 1.5px solid #ddd;
+  background: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .15s, transform .15s;
+  transition: background .14s, border-color .14s;
 }
 
 .pc-cart-btn mat-icon {
   font-size: 15px;
   width: 15px;
   height: 15px;
-  color: var(--accent);
-  transition: color .15s;
+  color: #555;
+  transition: color .14s;
 }
 
 .pc-cart-btn:hover {
-  background: var(--accent);
-  transform: scale(1.08);
+  background: #1a1a1a;
+  border-color: #1a1a1a;
 }
 
 .pc-cart-btn:hover mat-icon { color: #fff; }

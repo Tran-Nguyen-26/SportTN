@@ -27,6 +27,8 @@ export class CartPageComponent implements OnInit {
   selectedPaymentMethodId: PaymentMethod = "COD";
   appliedVoucherId: number | null = null;
 
+  loadingItemId = signal<number | null>(null);
+
 
   paymentMethods: { id: PaymentMethod; label: string; description: string }[] = [
     { id: 'COD',          label: 'Thanh toán khi nhận hàng', description: 'Thanh toán tiền mặt khi đơn được giao.' },
@@ -65,30 +67,36 @@ export class CartPageComponent implements OnInit {
   }
 
   updateQuantity(event: { itemId: number; currentQty: number; delta: number }): void {
+    const itemId = event.itemId;
     const newQty = event.currentQty + event.delta;
-    if (newQty < 1) return;
 
     const currentCart = this.cart();
+    const item = currentCart?.cartItems.find(i => i.cartItemId === itemId);
+    if (!item) return;
 
-    const item = currentCart?.cartItems?.find(i => i.cartItemId === event.itemId);
-
-    if (item && newQty > item.variant.stockQuantity) {
-      alert(`Rất tiếc, sản phẩm này chỉ còn ${item.variant.stockQuantity} món.`);
+    if (newQty < 1 || newQty > item.variant.stockQuantity) {
+      if (newQty > item.variant.stockQuantity)
+        alert(`Chỉ còn ${item.variant.stockQuantity} sản phẩm`);
       return;
     }
 
-    this.isLoading = true;
-    // this.cartService.updateQuantity(event.itemId, newQty).subscribe({
-    //   next: (res) => {
-    //     // Vì trong Service bạn đã dùng tap() để set signal,
-    //     // nên giao diện sẽ tự động cập nhật ở đây.
-    //     this.isLoading = false;
-    //   },
-    //   error: (err) => {
-    //     console.error('Lỗi cập nhật số lượng:', err);
-    //     this.isLoading = false;
-    //   }
-    // });
+    this.loadingItemId.set(itemId);
+
+    const updatedItems = currentCart!.cartItems.map(i =>
+      i.cartItemId === itemId ? {...i, quantity: newQty} : i
+    );
+    this.cart.set({...currentCart!, cartItems: updatedItems});
+
+    this.cartService.updateQuantity(itemId, newQty).subscribe({
+      next: (res) => {
+        this.cart.set(res.data);
+        this.loadingItemId.set(null);
+      },
+      error: () => {
+        this.loadingItemId.set(null);
+        this.loadCart();
+      }
+    });
   }
 
   removeItem(cartItemId: number): void {
@@ -151,15 +159,13 @@ export class CartPageComponent implements OnInit {
   }
 
   clearCart(): void {
-    //   if (confirm('Xóa toàn bộ giỏ hàng?')) {
-    //     this.isLoading = true;
-    //     // Giả sử bạn có api clear giỏ hàng, nếu không thì lặp qua list để xóa
-    //     this.cartService.clearCart().subscribe({
-    //       next: () => this.loadCart(),
-    //       error: () => (this.isLoading = false)
-    //     });
-    //   }
-    // }
+      if (confirm('Xóa toàn bộ giỏ hàng?')) {
+        this.isLoading = true;
+        this.cartService.clearCart().subscribe({
+          next: () => this.loadCart(),
+          error: () => (this.isLoading = false)
+        });
+      }
   }
 
   onOrderPlaced(): void {

@@ -1,17 +1,12 @@
 <nav class="sidebar-nav">
-
   <div>
     <img src="assets/images/logos/sporttn-logo.png" alt="Dashboard Icon" height="60" *ngIf="!collapsed">
     <img src="assets/images/logos/log-rm-bg-1.png" height="45" *ngIf="collapsed">
   </div>
 
-  <ng-container *ngFor="let group of menuGroups">
-
-    <div class="nav-group-label" *ngIf="!collapsed">
-      {{ group.groupLabel }}
-    </div>
+  <ng-container *ngFor="let group of visibleGroups$ | async">
+    <div class="nav-group-label" *ngIf="!collapsed">{{ group.groupLabel }}</div>
     <div class="nav-group-divider" *ngIf="collapsed"></div>
-
     <a class="nav-item"
        *ngFor="let item of group.items"
        [routerLink]="item.route"
@@ -20,17 +15,8 @@
        routerLinkActive="active"
        (click)="onItemClick(item.label)"
        [routerLinkActiveOptions]="{ exact: item.route === '/admin' }">
-
       <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
-
-      <span class="nav-label" *ngIf="!collapsed">
-        {{ item.label }}
-      </span>
-
-      <span class="nav-badge" *ngIf="item.badge && !collapsed">
-        {{ item.badge }}
-      </span>
-
+      <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
       <span class="nav-badge-dot" *ngIf="item.badge && collapsed"></span>
     </a>
   </ng-container>

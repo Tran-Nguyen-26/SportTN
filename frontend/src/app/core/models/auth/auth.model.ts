@@ -18,6 +18,7 @@ export interface UserResponse {
   id: number;
   username: string;
   email: string;
+  fullname: string;
   phone: string;
   role: string;
   status: string;

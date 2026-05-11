@@ -1,4 +1,12 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+export interface ServiceItem {
+  title: string;
+  description: string;
+  icon: string;
+  route?: string;
+}
 
 @Component({
   selector: 'app-services',
@@ -6,12 +14,51 @@ import { Component } from '@angular/core';
   styleUrls: ['./services.component.css']
 })
 export class ServicesComponent {
-  services = [
-    { title: 'Chương trình tích điểm', description: 'Tích Điểm Dễ Dàng - Thêm Ngàn Ưu Đãi.', icon: 'assets/icon-points.png' },
-    { title: 'Cửa Hàng Decathlon', description: 'Tìm cửa hàng Decathlon gần nhất và mua sắm nào.', icon: 'assets/icon-store.png' },
-    { title: 'Dịch vụ Click & Collect', description: 'Miễn phí vận chuyển cùng dịch vụ Click & Collect.', icon: 'assets/icon-collect.png' },
-    { title: 'Đơn Hàng Doanh Nghiệp', description: 'Nhận chiết khấu ưu đãi khi mua hàng số lượng lớn.', icon: 'assets/icon-business.png' },
-    { title: 'Blog Thể Thao', description: 'Kiến thức thể thao cho tất cả!', icon: 'assets/icon-blog.png' },
-    { title: 'Thiết Kế Sinh Thái', description: 'Tìm hiểu về thiết kế sinh thái tại Decathlon.', icon: 'assets/icon-eco.png' }
+
+  services: ServiceItem[] = [
+    {
+      title: 'Chương trình tích điểm',
+      description: 'Tích điểm dễ dàng, đổi ngàn ưu đãi hấp dẫn.',
+      icon: 'assets/icon-points.png',
+      route: '/loyalty'
+    },
+    {
+      title: 'Hệ thống cửa hàng',
+      description: 'Tìm cửa hàng SportTN gần nhất để mua sắm.',
+      icon: 'assets/icon-store.png',
+      route: '/stores'
+    },
+    {
+      title: 'Click & Collect',
+      description: 'Đặt online, nhận tại cửa hàng miễn phí vận chuyển.',
+      icon: 'assets/icon-collect.png',
+      route: '/click-collect'
+    },
+    {
+      title: 'Đơn hàng doanh nghiệp',
+      description: 'Chiết khấu ưu đãi khi mua số lượng lớn.',
+      icon: 'assets/icon-business.png',
+      route: '/b2b'
+    },
+    {
+      title: 'Blog thể thao',
+      description: 'Kiến thức và tips luyện tập cho mọi bộ môn.',
+      icon: 'assets/icon-blog.png',
+      route: '/blog'
+    },
+    {
+      title: 'Sản phẩm bền vững',
+      description: 'Cam kết vật liệu thân thiện với môi trường.',
+      icon: 'assets/icon-eco.png',
+      route: '/eco'
+    }
   ];
+
+  constructor(private router: Router) {}
+
+  onServiceClick(service: ServiceItem): void {
+    if (service.route) {
+      this.router.navigate([service.route]);
+    }
+  }
 }

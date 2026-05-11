@@ -4,6 +4,7 @@ import {ProductPageResponse, VariantResponse} from "../../../../core/models/prod
 import {ImageResponse} from "../../../../core/models/image";
 import {ProductService} from "../../../../core/services/product/product.service";
 import {AddToCartRequest, CartService} from "../../../../core/services/cart/cart.service";
+import {AuthService} from "../../../../core/services/auth/auth.service";
 
 
 @Component({
@@ -101,8 +102,11 @@ export class ProductPageComponent implements OnInit {
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
+    private authService: AuthService,
     // private wishlistService: WishlistService // TODO: inject khi có service
   ) {}
+
+  isLoggedIn$ = this.authService.isLoggedIn$;
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug');
@@ -166,6 +170,9 @@ export class ProductPageComponent implements OnInit {
         console.log('[ProductPage] Thêm vào giỏ hàng thành công:', res);
         alert('Đã thêm sản phẩm vào giỏ hàng!');
         this.isLoading = false;
+        setTimeout(() => {
+          this.router.navigate(['/cart']);
+        }, 800);
       },
       error: (err) => {
         console.error('[ProductPage] Lỗi thêm vào giỏ:', err);
@@ -183,5 +190,11 @@ export class ProductPageComponent implements OnInit {
     this.isWishlisted = !this.isWishlisted;
     // TODO: this.wishlistService.toggle(this.productId)
     console.log('[ProductPage] Wishlist:', this.isWishlisted);
+  }
+
+  goToLogin() {
+    this.router.navigate(['/auth/login'], {
+      queryParams: { returnUrl: this.router.url }
+    });
   }
 }

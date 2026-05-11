@@ -32,7 +32,7 @@ import { ChartsComponent } from './pages/charts/charts.component';
 import { OrderModalComponent } from './components/order-modal/order-modal.component';
 import {SharedModule} from "../shared/shared.module";
 import {AddCategoryDrawerComponent} from "./components/add-category-drawer/add-category-drawer.component";
-import {ProductDetailComponent} from "./components/product-detail/product-detail.component";
+import {ProductPageComponent} from "./components/product-detail/product-page.component";
 
 
 @NgModule({
@@ -64,7 +64,7 @@ import {ProductDetailComponent} from "./components/product-detail/product-detail
     ChartsComponent,
     OrderModalComponent,
     AddCategoryDrawerComponent,
-    ProductDetailComponent
+    ProductPageComponent
   ],
   imports: [
     CommonModule,

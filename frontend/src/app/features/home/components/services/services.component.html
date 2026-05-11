@@ -1,11 +1,21 @@
 <div class="services">
-  <h2>Khám Phá Các Dịch Vụ Từ Decathlon</h2>
-  <div class="service-list">
-    <div class="service-card" *ngFor="let service of services">
-      <img [src]="service.icon" alt="{{ service.title }}">
-      <h3>{{ service.title }}</h3>
-      <p>{{ service.description }}</p>
-      <button>Khám phá ngay</button>
+
+  <div class="services-header">
+    <div>
+      <h2 class="services-title">Dịch vụ từ <span>SportTN</span></h2>
+      <p class="services-subtitle">Trải nghiệm mua sắm thể thao toàn diện</p>
     </div>
   </div>
+
+  <div class="service-list">
+    <div class="service-card" *ngFor="let service of services" (click)="onServiceClick(service)">
+      <div class="service-icon-wrap">
+        <img [src]="service.icon" [alt]="service.title">
+      </div>
+      <h3>{{ service.title }}</h3>
+      <p>{{ service.description }}</p>
+      <span class="service-btn">Khám phá</span>
+    </div>
+  </div>
+
 </div>

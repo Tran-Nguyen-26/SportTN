@@ -3,7 +3,7 @@ import {
   AdminCustomer,
   AdminCustomerService,
   CustomerOrder,
-  ToggleActiveRequest
+  ToggleActiveRequest, UpdateCustomerRequest
 } from '../../../core/services/user/admin-customer.service';
 
 export interface CustomerForm {
@@ -192,14 +192,42 @@ export class CustomersComponent implements OnInit {
   }
 
   saveEdit(): void {
-    if (!this.editingCustomer) return;
-    this.customers.update(list =>
-      list.map(c => c.id === this.editingCustomer!.id
-        ? { ...c, ...this.form }
-        : c
-      )
-    );
-    this.closeDrawer();
+    if (!this.editingCustomer || !this.isFormValid()) return;
+
+    this.isLoading.set(true);
+
+    const updateRequest: UpdateCustomerRequest = {
+      fullName: this.form.fullName,
+      phone: this.form.phone,
+      address: this.form.address,
+      gender: this.form.gender,
+      birthday: this.form.birthday,
+      note: this.form.note,
+      status: this.form.status
+    };
+
+    this.adminCustomerService.updateCustomer(this.editingCustomer.id, updateRequest).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const updatedData = res.data;
+          this.customers.update(list =>
+            list.map(c => c.id === updatedData.id ? { ...c, ...updatedData } : c)
+          );
+
+          if (this.detailCustomer?.id === updatedData.id) {
+            this.detailCustomer = { ...this.detailCustomer, ...updatedData };
+          }
+          alert('Cập nhật thông tin khách hàng thành công!');
+          this.closeDrawer();
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Lỗi khi cập nhật customer:', err);
+        alert('Có lỗi xảy ra khi lưu thông tin.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   openEditFromDetail(): void {

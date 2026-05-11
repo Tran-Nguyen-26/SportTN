@@ -1,4 +1,4 @@
-<app-auth-form-layout title="Login to Your Account">
+<app-auth-form-layout title="Đăng nhập tài khoản">
   <div form-content class="login-form">
     <div *ngIf="errorMessage" class="error-message">
       <mat-icon>error</mat-icon>
@@ -36,7 +36,7 @@
       </mat-form-field>
 
       <div class="login-options">
-        <mat-checkbox formControlName="rememberMe">Ghi nhớ đăng nhập</mat-checkbox>
+<!--        <mat-checkbox formControlName="rememberMe">Ghi nhớ đăng nhập</mat-checkbox>-->
         <a href="#" (click)="forgotPassword(); $event.preventDefault()" class="forgot-password">Quên mật khẩu?</a>
       </div>
 

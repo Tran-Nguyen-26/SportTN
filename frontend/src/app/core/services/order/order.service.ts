@@ -229,17 +229,19 @@ export class OrderService {
     return this.http.get<OrderResponse>(`${this.apiCustomer}/code/${orderCode}`);
   }
 
-  /** Hủy đơn (chỉ khi PENDING / CONFIRMED) */
-  // cancelOrder(id: number, reason?: string): Observable<ApiResponse<OrderSummary>> {
-  //   const url = reason
-  //     ? `${this.apiCustomer}/${id}/cancel?reason=${encodeURIComponent(reason)}`
-  //     : `${this.apiCustomer}/${id}/cancel`;
-  //   return this.http.post<ApiResponse<OrderSummary>>(url);
-  // }
+  /** Hủy đơn hàng (Customer) */
+  cancelOrder(id: number, reason?: string): Observable<ApiResponse<OrderSummary>> {
+    const body: CancelOrderRequest = {
+      cancelReason: reason || 'Khách hàng hủy đơn'
+    };
 
+    return this.http.post<ApiResponse<OrderSummary>>(
+      `${this.apiCustomer}/${id}/cancel`,
+      body
+    );
+  }
   // ── Admin endpoints ─────────────────────────────────────────────────────────
 
-  // Sửa adminGetOrders trả về ApiResponse
   adminGetOrders(params: OrderFilterParams = {}): Observable<ApiResponse<OrderPage>> {
     const httpParams = this.buildParams(params);
     return this.http.get<ApiResponse<OrderPage>>(this.apiAdmin, { params: httpParams });

@@ -61,15 +61,15 @@
       <mat-icon>photo_library</mat-icon>
       Hình ảnh
     </button>
-    <button
-      class="tab"
-      [class.active]="activeTab === 'reviews'"
-      (click)="activeTab = 'reviews'"
-      *ngIf="isEditMode">
-      <mat-icon>star</mat-icon>
-      Reviews
-      <span class="tab-badge">{{ reviews.length }}</span>
-    </button>
+<!--    <button-->
+<!--      class="tab"-->
+<!--      [class.active]="activeTab === 'reviews'"-->
+<!--      (click)="activeTab = 'reviews'"-->
+<!--      *ngIf="isEditMode">-->
+<!--      <mat-icon>star</mat-icon>-->
+<!--      Reviews-->
+<!--      <span class="tab-badge">{{ reviews.length }}</span>-->
+<!--    </button>-->
   </div>
 
   <!-- ── TAB: THÔNG TIN CƠ BẢN ─────────────── -->
@@ -557,206 +557,206 @@
   </div>
 
   <!-- ── TAB: REVIEWS ─────────────────────────── -->
-  <div class="tab-content" *ngIf="activeTab === 'reviews'">
+<!--  <div class="tab-content" *ngIf="activeTab === 'reviews'">-->
 
-    <div class="reviews-layout">
+<!--    <div class="reviews-layout">-->
 
-      <!-- Cột trái: tổng quan rating -->
-      <div class="rating-overview">
+<!--      &lt;!&ndash; Cột trái: tổng quan rating &ndash;&gt;-->
+<!--      <div class="rating-overview">-->
 
-        <div class="form-card">
-          <div class="form-card-title">Tổng quan đánh giá</div>
+<!--        <div class="form-card">-->
+<!--          <div class="form-card-title">Tổng quan đánh giá</div>-->
 
-          <!-- Điểm trung bình -->
-          <div class="avg-rating-wrap">
-            <div class="avg-number">{{ avgRating }}</div>
-            <div class="avg-right">
-              <div class="avg-stars">
-                <mat-icon
-                  *ngFor="let s of getStars(5)"
-                  class="star"
-                  [class.filled]="s <= avgRating"
-                  [class.half]="s > avgRating && s < avgRating + 1">
-                  {{ s <= avgRating ? 'star' : 'star_border' }}
-                </mat-icon>
-              </div>
-              <div class="avg-count">{{ reviews.length }} đánh giá</div>
-            </div>
-          </div>
+<!--          &lt;!&ndash; Điểm trung bình &ndash;&gt;-->
+<!--          <div class="avg-rating-wrap">-->
+<!--            <div class="avg-number">{{ avgRating }}</div>-->
+<!--            <div class="avg-right">-->
+<!--              <div class="avg-stars">-->
+<!--                <mat-icon-->
+<!--                  *ngFor="let s of getStars(5)"-->
+<!--                  class="star"-->
+<!--                  [class.filled]="s <= avgRating"-->
+<!--                  [class.half]="s > avgRating && s < avgRating + 1">-->
+<!--                  {{ s <= avgRating ? 'star' : 'star_border' }}-->
+<!--                </mat-icon>-->
+<!--              </div>-->
+<!--              <div class="avg-count">{{ reviews.length }} đánh giá</div>-->
+<!--            </div>-->
+<!--          </div>-->
 
-          <!-- Breakdown theo sao -->
-          <div class="breakdown-list">
-            <div
-              class="breakdown-item"
-              *ngFor="let b of ratingBreakdown"
-              [class.active]="selectedRating === b.star"
-              (click)="selectedRating = selectedRating === b.star ? 0 : b.star">
+<!--          &lt;!&ndash; Breakdown theo sao &ndash;&gt;-->
+<!--          <div class="breakdown-list">-->
+<!--            <div-->
+<!--              class="breakdown-item"-->
+<!--              *ngFor="let b of ratingBreakdown"-->
+<!--              [class.active]="selectedRating === b.star"-->
+<!--              (click)="selectedRating = selectedRating === b.star ? 0 : b.star">-->
 
-              <span class="breakdown-star">{{ b.star }}</span>
-              <mat-icon class="breakdown-icon">star</mat-icon>
+<!--              <span class="breakdown-star">{{ b.star }}</span>-->
+<!--              <mat-icon class="breakdown-icon">star</mat-icon>-->
 
-              <div class="breakdown-bar">
-                <div
-                  class="breakdown-fill"
-                  [style.width.%]="b.percent">
-                </div>
-              </div>
+<!--              <div class="breakdown-bar">-->
+<!--                <div-->
+<!--                  class="breakdown-fill"-->
+<!--                  [style.width.%]="b.percent">-->
+<!--                </div>-->
+<!--              </div>-->
 
-              <span class="breakdown-count">{{ b.count }}</span>
-            </div>
-          </div>
+<!--              <span class="breakdown-count">{{ b.count }}</span>-->
+<!--            </div>-->
+<!--          </div>-->
 
-          <!-- Filter tag -->
-          <div class="filter-tag" *ngIf="selectedRating">
-            <mat-icon>filter_list</mat-icon>
-            Lọc: {{ selectedRating }} sao
-            <button class="clear-filter" (click)="selectedRating = 0">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
+<!--          &lt;!&ndash; Filter tag &ndash;&gt;-->
+<!--          <div class="filter-tag" *ngIf="selectedRating">-->
+<!--            <mat-icon>filter_list</mat-icon>-->
+<!--            Lọc: {{ selectedRating }} sao-->
+<!--            <button class="clear-filter" (click)="selectedRating = 0">-->
+<!--              <mat-icon>close</mat-icon>-->
+<!--            </button>-->
+<!--          </div>-->
 
-        </div>
+<!--        </div>-->
 
-        <!-- Stats nhanh -->
-        <div class="form-card quick-stats">
-          <div class="quick-stat">
-          <span class="qs-value green">
-            {{ visibleReviewsCount }}
-          </span>
-            <span class="qs-label">Đang hiện</span>
-          </div>
-          <div class="qs-divider"></div>
-          <div class="quick-stat">
-          <span class="qs-value red">
-            {{ hiddenReviewsCount }}
-          </span>
-            <span class="qs-label">Đã ẩn</span>
-          </div>
-          <div class="qs-divider"></div>
-          <div class="quick-stat">
-          <span class="qs-value blue">
-            {{ repliedReviewsCount }}
-          </span>
-            <span class="qs-label">Đã trả lời</span>
-          </div>
-        </div>
+<!--        &lt;!&ndash; Stats nhanh &ndash;&gt;-->
+<!--        <div class="form-card quick-stats">-->
+<!--          <div class="quick-stat">-->
+<!--          <span class="qs-value green">-->
+<!--            {{ visibleReviewsCount }}-->
+<!--          </span>-->
+<!--            <span class="qs-label">Đang hiện</span>-->
+<!--          </div>-->
+<!--          <div class="qs-divider"></div>-->
+<!--          <div class="quick-stat">-->
+<!--          <span class="qs-value red">-->
+<!--            {{ hiddenReviewsCount }}-->
+<!--          </span>-->
+<!--            <span class="qs-label">Đã ẩn</span>-->
+<!--          </div>-->
+<!--          <div class="qs-divider"></div>-->
+<!--          <div class="quick-stat">-->
+<!--          <span class="qs-value blue">-->
+<!--            {{ repliedReviewsCount }}-->
+<!--          </span>-->
+<!--            <span class="qs-label">Đã trả lời</span>-->
+<!--          </div>-->
+<!--        </div>-->
 
-      </div>
+<!--      </div>-->
 
-      <!-- Cột phải: danh sách reviews -->
-      <div class="reviews-list">
+<!--      &lt;!&ndash; Cột phải: danh sách reviews &ndash;&gt;-->
+<!--      <div class="reviews-list">-->
 
-        <!-- Empty state -->
-        <div class="review-empty" *ngIf="filteredReviews.length === 0">
-          <mat-icon>rate_review</mat-icon>
-          <p>Không có đánh giá nào</p>
-        </div>
+<!--        &lt;!&ndash; Empty state &ndash;&gt;-->
+<!--        <div class="review-empty" *ngIf="filteredReviews.length === 0">-->
+<!--          <mat-icon>rate_review</mat-icon>-->
+<!--          <p>Không có đánh giá nào</p>-->
+<!--        </div>-->
 
-        <!-- Review items -->
-        <div
-          class="review-item"
-          *ngFor="let review of filteredReviews"
-          [class.hidden-review]="!review.isVisible">
+<!--        &lt;!&ndash; Review items &ndash;&gt;-->
+<!--        <div-->
+<!--          class="review-item"-->
+<!--          *ngFor="let review of filteredReviews"-->
+<!--          [class.hidden-review]="!review.isVisible">-->
 
-          <!-- Header -->
-          <div class="review-header">
-            <div class="reviewer-info">
-              <div class="reviewer-avatar">{{ review.customerAvatar }}</div>
-              <div>
-                <div class="reviewer-name">{{ review.customerName }}</div>
-                <div class="reviewer-date">{{ review.date }}</div>
-              </div>
-            </div>
+<!--          &lt;!&ndash; Header &ndash;&gt;-->
+<!--          <div class="review-header">-->
+<!--            <div class="reviewer-info">-->
+<!--              <div class="reviewer-avatar">{{ review.customerAvatar }}</div>-->
+<!--              <div>-->
+<!--                <div class="reviewer-name">{{ review.customerName }}</div>-->
+<!--                <div class="reviewer-date">{{ review.date }}</div>-->
+<!--              </div>-->
+<!--            </div>-->
 
-            <!-- Actions -->
-            <div class="review-actions">
-            <span class="hidden-badge" *ngIf="!review.isVisible">
-              <mat-icon>visibility_off</mat-icon>
-              Đã ẩn
-            </span>
+<!--            &lt;!&ndash; Actions &ndash;&gt;-->
+<!--            <div class="review-actions">-->
+<!--            <span class="hidden-badge" *ngIf="!review.isVisible">-->
+<!--              <mat-icon>visibility_off</mat-icon>-->
+<!--              Đã ẩn-->
+<!--            </span>-->
 
-              <button
-                class="review-action-btn"
-                [class.active]="!review.isVisible"
-                (click)="toggleVisibility(review)"
-                [title]="review.isVisible ? 'Ẩn review' : 'Hiện review'">
-                <mat-icon>
-                  {{ review.isVisible ? 'visibility' : 'visibility_off' }}
-                </mat-icon>
-              </button>
+<!--              <button-->
+<!--                class="review-action-btn"-->
+<!--                [class.active]="!review.isVisible"-->
+<!--                (click)="toggleVisibility(review)"-->
+<!--                [title]="review.isVisible ? 'Ẩn review' : 'Hiện review'">-->
+<!--                <mat-icon>-->
+<!--                  {{ review.isVisible ? 'visibility' : 'visibility_off' }}-->
+<!--                </mat-icon>-->
+<!--              </button>-->
 
-              <button
-                class="review-action-btn reply-btn"
-                (click)="startReply(review.id)"
-                title="Trả lời">
-                <mat-icon>reply</mat-icon>
-              </button>
+<!--              <button-->
+<!--                class="review-action-btn reply-btn"-->
+<!--                (click)="startReply(review.id)"-->
+<!--                title="Trả lời">-->
+<!--                <mat-icon>reply</mat-icon>-->
+<!--              </button>-->
 
-              <button
-                class="review-action-btn danger-btn"
-                (click)="deleteReview(review.id)"
-                title="Xóa">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
+<!--              <button-->
+<!--                class="review-action-btn danger-btn"-->
+<!--                (click)="deleteReview(review.id)"-->
+<!--                title="Xóa">-->
+<!--                <mat-icon>delete</mat-icon>-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </div>-->
 
-          <!-- Rating -->
-          <div class="review-stars">
-            <mat-icon
-              *ngFor="let s of getStars(5)"
-              class="star"
-              [class.filled]="s <= review.rating">
-              {{ s <= review.rating ? 'star' : 'star_border' }}
-            </mat-icon>
-            <span class="review-rating-num">{{ review.rating }}/5</span>
-          </div>
+<!--          &lt;!&ndash; Rating &ndash;&gt;-->
+<!--          <div class="review-stars">-->
+<!--            <mat-icon-->
+<!--              *ngFor="let s of getStars(5)"-->
+<!--              class="star"-->
+<!--              [class.filled]="s <= review.rating">-->
+<!--              {{ s <= review.rating ? 'star' : 'star_border' }}-->
+<!--            </mat-icon>-->
+<!--            <span class="review-rating-num">{{ review.rating }}/5</span>-->
+<!--          </div>-->
 
-          <!-- Comment -->
-          <p class="review-comment">{{ review.comment }}</p>
+<!--          &lt;!&ndash; Comment &ndash;&gt;-->
+<!--          <p class="review-comment">{{ review.comment }}</p>-->
 
-          <!-- Admin reply đã có -->
-          <div class="admin-reply" *ngIf="review.adminReply && replyingId !== review.id">
-            <div class="reply-header">
-              <mat-icon>storefront</mat-icon>
-              <span>Phản hồi từ SportZone Admin</span>
-              <button
-                class="edit-reply-btn"
-                (click)="startReply(review.id)">
-                <mat-icon>edit</mat-icon>
-              </button>
-            </div>
-            <p class="reply-text">{{ review.adminReply }}</p>
-          </div>
+<!--          &lt;!&ndash; Admin reply đã có &ndash;&gt;-->
+<!--          <div class="admin-reply" *ngIf="review.adminReply && replyingId !== review.id">-->
+<!--            <div class="reply-header">-->
+<!--              <mat-icon>storefront</mat-icon>-->
+<!--              <span>Phản hồi từ SportZone Admin</span>-->
+<!--              <button-->
+<!--                class="edit-reply-btn"-->
+<!--                (click)="startReply(review.id)">-->
+<!--                <mat-icon>edit</mat-icon>-->
+<!--              </button>-->
+<!--            </div>-->
+<!--            <p class="reply-text">{{ review.adminReply }}</p>-->
+<!--          </div>-->
 
-          <!-- Form trả lời -->
-          <div class="reply-form" *ngIf="replyingId === review.id">
-            <div class="reply-form-header">
-              <mat-icon>reply</mat-icon>
-              <span>Trả lời đánh giá này</span>
-            </div>
-            <textarea
-              class="reply-textarea"
-              rows="3"
-              placeholder="Nhập phản hồi của bạn..."
-              [(ngModel)]="replyText">
-          </textarea>
-            <div class="reply-form-footer">
-              <button class="btn-cancel-reply" (click)="cancelReply()">Hủy</button>
-              <button
-                class="btn-submit-reply"
-                [disabled]="!replyText.trim()"
-                (click)="submitReply(review)">
-                <mat-icon>send</mat-icon>
-                {{ review.adminReply ? 'Cập nhật' : 'Gửi phản hồi' }}
-              </button>
-            </div>
-          </div>
+<!--          &lt;!&ndash; Form trả lời &ndash;&gt;-->
+<!--          <div class="reply-form" *ngIf="replyingId === review.id">-->
+<!--            <div class="reply-form-header">-->
+<!--              <mat-icon>reply</mat-icon>-->
+<!--              <span>Trả lời đánh giá này</span>-->
+<!--            </div>-->
+<!--            <textarea-->
+<!--              class="reply-textarea"-->
+<!--              rows="3"-->
+<!--              placeholder="Nhập phản hồi của bạn..."-->
+<!--              [(ngModel)]="replyText">-->
+<!--          </textarea>-->
+<!--            <div class="reply-form-footer">-->
+<!--              <button class="btn-cancel-reply" (click)="cancelReply()">Hủy</button>-->
+<!--              <button-->
+<!--                class="btn-submit-reply"-->
+<!--                [disabled]="!replyText.trim()"-->
+<!--                (click)="submitReply(review)">-->
+<!--                <mat-icon>send</mat-icon>-->
+<!--                {{ review.adminReply ? 'Cập nhật' : 'Gửi phản hồi' }}-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </div>-->
 
-        </div>
-      </div>
-    </div>
-  </div>
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
 
   <!-- Bottom bar -->
   <div class="bottom-bar">

@@ -14,11 +14,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "orders", indexes = {
+        @Index(name = "idx_orders_order_code",     columnList = "order_code"),
+        @Index(name = "idx_orders_user_id",        columnList = "user_id"),
+        @Index(name = "idx_orders_status",         columnList = "status"),
+        @Index(name = "idx_orders_payment_status", columnList = "payment_status"),
+        @Index(name = "idx_orders_created_at",     columnList = "created_at"),
+        @Index(name = "idx_orders_voucher_id",     columnList = "voucher_id"),
+        @Index(name = "idx_orders_user_status",    columnList = "user_id, status"),
+        @Index(name = "idx_orders_user_created",   columnList = "user_id, created_at")
+})
 public class Order {
 
     @Id

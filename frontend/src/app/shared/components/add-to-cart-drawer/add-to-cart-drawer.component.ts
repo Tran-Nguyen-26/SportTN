@@ -12,6 +12,8 @@ import {
 import { ProductService } from '../../../core/services/product/product.service';
 import { VariantResponse } from '../../../core/models/product/product.model';
 import { ProductCardResponse } from '../../../core/models/home-response/home-response';
+import {Router} from "@angular/router";
+import {AuthService} from "../../../core/services/auth/auth.service";
 
 export interface CartItem {
   productId: number;
@@ -46,7 +48,13 @@ export class AddToCartDrawerComponent implements OnInit, OnChanges {
   addSuccess = false;
   variants = signal<VariantResponse[]>([]);
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private router: Router,
+    private productService: ProductService,
+    private authService: AuthService
+  ) {}
+
+  isLoggedIn$ = this.authService.isLoggedIn$;
 
   get availableColors(): string[] {
     return [...new Set(this.variants().map((v) => v.color))];
@@ -196,7 +204,13 @@ export class AddToCartDrawerComponent implements OnInit, OnChanges {
     if (this.product?.isOnSale) {
       return this.product.originalPrice ?? null;
     }
-
     return null;
+  }
+
+  goToLogin() {
+    this.close();
+    this.router.navigate(['/auth/login'], {
+      queryParams: { returnUrl: window.location.pathname }
+    });
   }
 }

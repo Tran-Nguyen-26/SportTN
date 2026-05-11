@@ -1,6 +1,8 @@
 package com.ttn.sporttn.modules.product.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
+import com.ttn.sporttn.common.dto.PageResponse;
+import com.ttn.sporttn.modules.payment.dto.request.ProductFilterRequest;
 import com.ttn.sporttn.modules.product.dto.request.ProductRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.ProductCreateRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.ProductUpdateRequest;
@@ -21,15 +23,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -109,5 +105,40 @@ public class ProductController {
         List<VariantResponse> responses = productService.getVariantsByProductId(id);
         return ResponseEntity.ok(ApiResponse.ok(responses));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<PageResponse<ProductCardResponse>>> searchProducts(
+            @RequestParam String q,
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        PageResponse<ProductCardResponse> result = productService.searchProducts(q, pageable);
+        return ResponseEntity.ok(ApiResponse.ok(result, "Tìm kiếm thành công"));
+    }
+
+    @GetMapping("/filtered")
+    public ResponseEntity<ApiResponse<PageResponse<ProductCardResponse>>> getFilteredProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "soldCount,desc") String sort,
+            @RequestParam(defaultValue = "0") BigDecimal minPrice,
+            @RequestParam(defaultValue = "999999999") BigDecimal maxPrice,
+            @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) String subCategory,
+            @RequestParam(required = false) String brands) {
+
+        ProductFilterRequest filter = ProductFilterRequest.builder()
+                .page(page)
+                .size(size)
+                .sort(sort)
+                .minPrice(minPrice)
+                .maxPrice(maxPrice)
+                .categorySlug(categorySlug)
+                .subCategory(subCategory)
+                .brands(brands  != null ? List.of(brands.split(","))  : List.of())
+                .build();
+
+        PageResponse<ProductCardResponse> result = productService.filterProducts(filter);
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
 
 }

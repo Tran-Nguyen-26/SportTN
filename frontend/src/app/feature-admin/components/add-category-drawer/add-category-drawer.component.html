@@ -79,13 +79,13 @@
 
         <!-- Source tabs -->
         <div class="img-source-tabs">
-          <button
-            class="img-source-tab"
-            [class.active]="imageSource === 'upload'"
-            (click)="imageSource = 'upload'">
-            <mat-icon>upload</mat-icon>
-            Tải lên
-          </button>
+<!--          <button-->
+<!--            class="img-source-tab"-->
+<!--            [class.active]="imageSource === 'upload'"-->
+<!--            (click)="imageSource = 'upload'">-->
+<!--            <mat-icon>upload</mat-icon>-->
+<!--            Tải lên-->
+<!--          </button>-->
           <button
             class="img-source-tab"
             [class.active]="imageSource === 'url'"
@@ -96,20 +96,20 @@
         </div>
 
         <!-- Upload mode -->
-        <ng-container *ngIf="imageSource === 'upload'">
-          <div class="img-upload" (click)="fileInput.click()" *ngIf="!previewUrl">
-            <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">
-            <mat-icon class="upload-icon">image</mat-icon>
-            <span class="upload-text"><strong>Chọn ảnh</strong> hoặc kéo thả</span>
-            <span class="upload-sub">PNG, JPG · Tối đa 2MB</span>
-          </div>
-          <div class="preview-wrap" *ngIf="previewUrl">
-            <img [src]="previewUrl" class="img-preview">
-            <button class="remove-img" (click)="removeImage()">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-        </ng-container>
+<!--        <ng-container *ngIf="imageSource === 'upload'">-->
+<!--          <div class="img-upload" (click)="fileInput.click()" *ngIf="!previewUrl">-->
+<!--            <input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)">-->
+<!--            <mat-icon class="upload-icon">image</mat-icon>-->
+<!--            <span class="upload-text"><strong>Chọn ảnh</strong> hoặc kéo thả</span>-->
+<!--            <span class="upload-sub">PNG, JPG · Tối đa 2MB</span>-->
+<!--          </div>-->
+<!--          <div class="preview-wrap" *ngIf="previewUrl">-->
+<!--            <img [src]="previewUrl" class="img-preview">-->
+<!--            <button class="remove-img" (click)="removeImage()">-->
+<!--              <mat-icon>close</mat-icon>-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </ng-container>-->
 
         <!-- URL mode -->
         <ng-container *ngIf="imageSource === 'url'">

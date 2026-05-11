@@ -1,5 +1,6 @@
 package com.ttn.sporttn.modules.order.controller;
 
+import com.ttn.sporttn.modules.order.dto.request.CancelOrderRequest;
 import com.ttn.sporttn.modules.order.dto.request.OrderMessage;
 import com.ttn.sporttn.modules.order.producer.OrderProducer;
 import org.springframework.data.domain.Page;
@@ -77,16 +78,18 @@ public class OrderController {
         return ApiResponse.ok(response, "Lấy chi tiết đơn hàng thành công");
     }
 
-
     @PostMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<OrderResponse> cancelOrder(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id,
-            @RequestParam(required = false) String reason) {
+            @RequestBody(required = false) CancelOrderRequest request) {
+
         log.info("[ORDER] Hủy đơn hàng. orderId={}, userId={}", id, userDetails.getId());
-        
+
+        String reason = request != null ? request.getCancelReason() : null;
         OrderResponse response = orderService.cancelOrder(id, userDetails.getId(), reason);
+
         return ApiResponse.ok(response, "Hủy đơn hàng thành công");
     }
 }

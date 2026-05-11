@@ -13,51 +13,51 @@
   <ng-container *ngIf="user$ | async as user">
 
     <!-- Profile Hero -->
-    <div class="profile-hero">
-      <div class="avatar-section">
-        <div class="avatar-ring">
-          <div class="avatar-circle">
-            <span class="avatar-initials">{{ getInitials(user.username) }}</span>
-          </div>
-          <button class="avatar-upload-btn" mat-icon-button matTooltip="Thay ảnh đại diện">
-            <mat-icon>photo_camera</mat-icon>
-          </button>
-        </div>
-        <div class="hero-identity">
-          <h2>{{ user.username }}</h2>
-          <span class="hero-email">{{ user.email }}</span>
-          <div class="hero-badges">
-            <span class="rank-chip silver">
-              <mat-icon>workspace_premium</mat-icon> Hạng Bạc
-            </span>
-            <span class="member-since">Thành viên từ 2024</span>
-          </div>
-        </div>
-      </div>
+<!--    <div class="profile-hero">-->
+<!--      <div class="avatar-section">-->
+<!--        <div class="avatar-ring">-->
+<!--          <div class="avatar-circle">-->
+<!--            <span class="avatar-initials">{{ getInitials(user.username) }}</span>-->
+<!--          </div>-->
+<!--          <button class="avatar-upload-btn" mat-icon-button matTooltip="Thay ảnh đại diện">-->
+<!--            <mat-icon>photo_camera</mat-icon>-->
+<!--          </button>-->
+<!--        </div>-->
+<!--        <div class="hero-identity">-->
+<!--          <h2>{{ user.username }}</h2>-->
+<!--          <span class="hero-email">{{ user.email }}</span>-->
+<!--          <div class="hero-badges">-->
+<!--            <span class="rank-chip silver">-->
+<!--              <mat-icon>workspace_premium</mat-icon> Hạng Bạc-->
+<!--            </span>-->
+<!--            <span class="member-since">Thành viên từ 2024</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <!-- Membership progress -->
-      <div class="membership-bar">
-        <div class="membership-left">
-          <span class="points-label">Điểm tích lũy</span>
-          <span class="points-value">{{ user.totalPoints | number }}</span>
-        </div>
-        <div class="membership-progress">
-          <div class="progress-track">
-            <div class="progress-fill" [style.width]="getProgressPercent(user.totalPoints) + '%'"></div>
-            <div class="progress-thumb" [style.left]="getProgressPercent(user.totalPoints) + '%'"></div>
-          </div>
-          <div class="progress-labels">
-            <span class="rank-start">
-              <mat-icon>shield</mat-icon> Bạc
-            </span>
-            <span class="rank-gap">Còn {{ getRemainingPoints(user.totalPoints) }} điểm → Vàng</span>
-            <span class="rank-end">
-              <mat-icon>stars</mat-icon> Vàng
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+<!--      &lt;!&ndash; Membership progress &ndash;&gt;-->
+<!--      <div class="membership-bar">-->
+<!--        <div class="membership-left">-->
+<!--          <span class="points-label">Điểm tích lũy</span>-->
+<!--          <span class="points-value">{{ user.totalPoints | number }}</span>-->
+<!--        </div>-->
+<!--        <div class="membership-progress">-->
+<!--          <div class="progress-track">-->
+<!--            <div class="progress-fill" [style.width]="getProgressPercent(user.totalPoints) + '%'"></div>-->
+<!--            <div class="progress-thumb" [style.left]="getProgressPercent(user.totalPoints) + '%'"></div>-->
+<!--          </div>-->
+<!--          <div class="progress-labels">-->
+<!--            <span class="rank-start">-->
+<!--              <mat-icon>shield</mat-icon> Bạc-->
+<!--            </span>-->
+<!--            <span class="rank-gap">Còn {{ getRemainingPoints(user.totalPoints) }} điểm → Vàng</span>-->
+<!--            <span class="rank-end">-->
+<!--              <mat-icon>stars</mat-icon> Vàng-->
+<!--            </span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <!-- Two-column layout -->
     <div class="account-grid">

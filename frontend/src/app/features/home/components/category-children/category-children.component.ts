@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {CategoryResponse} from "../../../../core/models/home-response/home-response";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-category-children',
@@ -8,4 +9,11 @@ import {CategoryResponse} from "../../../../core/models/home-response/home-respo
 })
 export class CategoryChildrenComponent {
   @Input() childrenCategories: CategoryResponse[] = [];
+
+  constructor(private router: Router) {
+  }
+
+  goToCategoryPage(slug: string) {
+    this.router.navigate(['/category', slug]);
+  }
 }

@@ -6,6 +6,7 @@ import {
   AdminUserUpdateRequest,
   PermissionOption
 } from '../../../core/services/user/user.service';
+import {AuthService} from "../../../core/services/auth/auth.service";
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'STAFF' | 'WAREHOUSE';
 
@@ -105,7 +106,11 @@ export class UsersComponent implements OnInit {
 
   users = signal<AdminUser[]>([]);
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    public authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.loadPermissions();

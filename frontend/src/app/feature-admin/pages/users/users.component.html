@@ -72,7 +72,7 @@
           <th>Tài khoản</th>
           <th>Họ và tên</th>
           <th>Vai trò</th>
-          <th>Phân quyền</th>
+<!--          <th>Phân quyền</th>-->
           <th>Đăng nhập gần nhất</th>
           <th>Ngày tạo</th>
           <th>Trạng thái</th>
@@ -113,19 +113,19 @@
           </td>
 
           <!-- Phân quyền -->
-          <td>
-            <div class="perms-wrap">
-                <span
-                  class="perm-tag"
-                  *ngFor="let p of u.permissions.slice(0, 6)"
-                  [title]="p">
-                  {{ getPermShort(p.name) }}
-                </span>
-              <span class="perm-more" *ngIf="u.permissions.length > 6">
-                  +{{ u.permissions.length - 6 }}
-                </span>
-            </div>
-          </td>
+<!--          <td>-->
+<!--            <div class="perms-wrap">-->
+<!--                <span-->
+<!--                  class="perm-tag"-->
+<!--                  *ngFor="let p of u.permissions.slice(0, 6)"-->
+<!--                  [title]="p">-->
+<!--                  {{ getPermShort(p.name) }}-->
+<!--                </span>-->
+<!--              <span class="perm-more" *ngIf="u.permissions.length > 6">-->
+<!--                  +{{ u.permissions.length - 6 }}-->
+<!--                </span>-->
+<!--            </div>-->
+<!--          </td>-->
 
           <!-- Đăng nhập -->
           <td>
@@ -262,24 +262,24 @@
         </div>
 
         <!-- Custom permissions -->
-        <div class="field" *ngIf="form.role">
-          <label>Phân quyền chi tiết</label>
-          <div class="permissions-grid">
-            <div
-              class="perm-item"
-              *ngFor="let p of allPermissions"
-              [class.checked]="form.permissions.includes(p.value)"
-              (click)="togglePerm(p.value)">
-              <div class="perm-checkbox">
-                <mat-icon>{{ form.permissions.includes(p.value) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-              </div>
-              <div class="perm-info">
-                <span class="perm-name">{{ p.label }}</span>
-                <span class="perm-desc">{{ p.desc }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+<!--        <div class="field" *ngIf="form.role">-->
+<!--          <label>Phân quyền chi tiết</label>-->
+<!--          <div class="permissions-grid">-->
+<!--            <div-->
+<!--              class="perm-item"-->
+<!--              *ngFor="let p of allPermissions"-->
+<!--              [class.checked]="form.permissions.includes(p.value)"-->
+<!--              (click)="togglePerm(p.value)">-->
+<!--              <div class="perm-checkbox">-->
+<!--                <mat-icon>{{ form.permissions.includes(p.value) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>-->
+<!--              </div>-->
+<!--              <div class="perm-info">-->
+<!--                <span class="perm-name">{{ p.label }}</span>-->
+<!--                <span class="perm-desc">{{ p.desc }}</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
 
       <!-- Trạng thái -->
@@ -352,55 +352,55 @@
               <div class="act-value">{{ detailUser.createdAt }}</div>
             </div>
           </div>
-          <div class="act-item">
-            <mat-icon>task_alt</mat-icon>
-            <div>
-              <div class="act-label">Tổng thao tác</div>
-              <div class="act-value">{{ detailUser.actionCount | number }} hành động</div>
-            </div>
-          </div>
-          <div class="act-item">
-            <mat-icon>devices</mat-icon>
-            <div>
-              <div class="act-label">Thiết bị đăng nhập</div>
-              <div class="act-value">{{ detailUser.device || 'Không có dữ liệu' }}</div>
-            </div>
-          </div>
+<!--          <div class="act-item">-->
+<!--            <mat-icon>task_alt</mat-icon>-->
+<!--            <div>-->
+<!--              <div class="act-label">Tổng thao tác</div>-->
+<!--              <div class="act-value">{{ detailUser.actionCount | number }} hành động</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="act-item">-->
+<!--            <mat-icon>devices</mat-icon>-->
+<!--            <div>-->
+<!--              <div class="act-label">Thiết bị đăng nhập</div>-->
+<!--              <div class="act-value">{{ detailUser.device || 'Không có dữ liệu' }}</div>-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
       </div>
 
       <!-- Permissions -->
-      <div class="modal-section">
-        <div class="modal-section-title">Danh sách quyền</div>
-        <div class="perm-full-list">
-          <div
-            class="perm-full-item"
-            *ngFor="let p of allPermissions"
-            [class.has-perm]="hasPermission(detailUser, p.value)">
-            <mat-icon>{{ hasPermission(detailUser, p.value) ? 'check_circle' : 'cancel' }}</mat-icon>
-            <div class="pfl-info">
-              <span class="pfl-label">{{ p.label }}</span>
-              <span class="pfl-desc">{{ p.desc }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<!--      <div class="modal-section">-->
+<!--        <div class="modal-section-title">Danh sách quyền</div>-->
+<!--        <div class="perm-full-list">-->
+<!--          <div-->
+<!--            class="perm-full-item"-->
+<!--            *ngFor="let p of allPermissions"-->
+<!--            [class.has-perm]="hasPermission(detailUser, p.value)">-->
+<!--            <mat-icon>{{ hasPermission(detailUser, p.value) ? 'check_circle' : 'cancel' }}</mat-icon>-->
+<!--            <div class="pfl-info">-->
+<!--              <span class="pfl-label">{{ p.label }}</span>-->
+<!--              <span class="pfl-desc">{{ p.desc }}</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <!-- Recent actions log -->
-      <div class="modal-section">
-        <div class="modal-section-title">Lịch sử hoạt động gần đây</div>
-        <div class="activity-log">
-          <div class="log-item" *ngFor="let log of detailUser.activityLog">
-            <div class="log-icon" [ngClass]="log.type">
-              <mat-icon>{{ getLogIcon(log.type) }}</mat-icon>
-            </div>
-            <div class="log-content">
-              <div class="log-action">{{ log.action }}</div>
-              <div class="log-time">{{ log.time }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+<!--      <div class="modal-section">-->
+<!--        <div class="modal-section-title">Lịch sử hoạt động gần đây</div>-->
+<!--        <div class="activity-log">-->
+<!--          <div class="log-item" *ngFor="let log of detailUser.activityLog">-->
+<!--            <div class="log-icon" [ngClass]="log.type">-->
+<!--              <mat-icon>{{ getLogIcon(log.type) }}</mat-icon>-->
+<!--            </div>-->
+<!--            <div class="log-content">-->
+<!--              <div class="log-action">{{ log.action }}</div>-->
+<!--              <div class="log-time">{{ log.time }}</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
     </div>
 

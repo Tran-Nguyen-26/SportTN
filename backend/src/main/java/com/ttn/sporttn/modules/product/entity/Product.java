@@ -8,12 +8,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "products", indexes = {
+        @Index(name = "idx_products_slug",        columnList = "slug"),
+        @Index(name = "idx_products_category_id", columnList = "category_id"),
+        @Index(name = "idx_products_brand_id",    columnList = "brand_id"),
+        @Index(name = "idx_products_active",      columnList = "active"),
+        @Index(name = "idx_products_sold_count",  columnList = "sold_count"),
+        @Index(name = "idx_products_rating",      columnList = "rating"),
+        @Index(name = "idx_products_created_at",  columnList = "created_at"),
+        @Index(name = "idx_products_active_category", columnList = "active, category_id")
+})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

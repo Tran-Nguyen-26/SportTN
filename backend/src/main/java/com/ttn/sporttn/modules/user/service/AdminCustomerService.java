@@ -5,6 +5,7 @@ import com.ttn.sporttn.common.exception.ErrorCode;
 import com.ttn.sporttn.modules.order.entity.Order;
 import com.ttn.sporttn.modules.order.repository.OrderRepository;
 import com.ttn.sporttn.modules.user.dto.request.admin.ToggleActiveRequest;
+import com.ttn.sporttn.modules.user.dto.request.admin.UpdateCustomerRequest;
 import com.ttn.sporttn.modules.user.dto.response.admin.AdminCustomerResponse;
 import com.ttn.sporttn.modules.user.dto.response.admin.CustomerOrderResponse;
 import com.ttn.sporttn.modules.user.entity.Profile;
@@ -84,6 +85,45 @@ public class AdminCustomerService {
         }
 
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public AdminCustomerResponse updateCustomer(Long id, UpdateCustomerRequest request) {
+        log.info("[AdminCustomerService] Updating customer ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (!UserRole.CUSTOMER.equals(user.getRole())) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (request.getFullName() != null) user.setFullname(request.getFullName());
+        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        if (request.getStatus() != null) {
+            user.setStatus(UserStatus.valueOf(request.getStatus()));
+        }
+        user.setUpdatedAt(LocalDateTime.now());
+
+        Profile profile = user.getProfile();
+        if (profile == null) {
+            profile = new Profile();
+            profile.setUser(user);
+            user.setProfile(profile);
+        }
+
+        if (request.getGender() != null) profile.setGender(request.getGender());
+        if (request.getNote() != null) profile.setNote(request.getNote());
+        if (request.getBirthday() != null && !request.getBirthday().isEmpty()) {
+            try {
+                profile.setBirthday(java.time.LocalDate.parse(request.getBirthday()));
+            } catch (Exception e) {
+                log.error("Error parsing birthday: {}", request.getBirthday());
+            }
+        }
+
+        User savedUser = userRepository.save(user);
+
+        return convertToResponse(savedUser, false);
     }
 
     // ── MAPPING ───────────────────────────────────────────────────
