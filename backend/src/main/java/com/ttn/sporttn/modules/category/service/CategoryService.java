@@ -8,6 +8,7 @@ import com.ttn.sporttn.modules.category.dto.response.CategoryAdminResponse;
 import com.ttn.sporttn.modules.category.dto.response.CategoryResponse;
 import com.ttn.sporttn.modules.category.entity.Category;
 import com.ttn.sporttn.modules.category.repository.CategoryRepository;
+import com.ttn.sporttn.modules.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
@@ -161,13 +163,27 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         log.info("[CATEGORY] Xóa danh mục. id={}", id);
-        
+
         Category category = categoryRepository.findById(id)
-            .orElseThrow(() -> {
-                log.warn("[CATEGORY] Danh mục không tìm thấy. id={}", id);
-                return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
-            });
-        
+                .orElseThrow(() -> {
+                    log.warn("[CATEGORY] Danh mục không tìm thấy. id={}", id);
+                    return new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+                });
+
+        // Kiểm tra có category con không
+        boolean hasChildren = categoryRepository.existsByParentId(category.getId());
+        if (hasChildren) {
+            log.warn("[CATEGORY] Danh mục có danh mục con, không thể xóa. id={}", id);
+            throw new BusinessException(ErrorCode.CATEGORY_HAS_CHILDREN);
+        }
+
+        // Kiểm tra có sản phẩm đang dùng category này không
+        boolean hasProducts = productRepository.existsByCategoryId(category.getId());
+        if (hasProducts) {
+            log.warn("[CATEGORY] Danh mục đang có sản phẩm, không thể xóa. id={}", id);
+            throw new BusinessException(ErrorCode.CATEGORY_HAS_PRODUCTS);
+        }
+
         categoryRepository.delete(category);
         log.info("[CATEGORY] Xóa danh mục thành công. id={}", id);
     }

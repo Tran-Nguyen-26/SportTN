@@ -17,6 +17,7 @@ import com.ttn.sporttn.modules.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -66,13 +67,10 @@ public class ProductController {
      * Delete product (Admin only)
      * DELETE /api/v1/products/{id}
      */
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteProduct(
-        @PathVariable Long id
-    ) {
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok(ApiResponse.ok("Xóa sản phẩm thành công"));
+        return ResponseEntity.ok(ApiResponse.ok(null, "Xóa sản phẩm thành công"));
     }
 
     @GetMapping("/popular")
@@ -82,10 +80,16 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<ApiResponse<Page<ProductAdminResponse>>> getProductsForAdmin(
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ProductAdminResponse> products = productService.getProductsForAdmin(pageable);
-        return ResponseEntity.ok(ApiResponse.ok(products, "Lấy danh sách sản phẩm thành công"));
+    public ResponseEntity<ApiResponse<PageResponse<ProductAdminResponse>>> getProductsForAdmin(
+            @RequestParam(defaultValue = "0")   int page,
+            @RequestParam(defaultValue = "10")  int size,
+            @RequestParam(required = false)     String keyword,
+            @RequestParam(required = false)     String categorySlug,
+            @RequestParam(required = false)     Boolean active) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<ProductAdminResponse> result = productService.getProductsForAdmin(pageable, keyword, categorySlug, active);
+        return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(result), "Lấy danh sách sản phẩm thành công"));
     }
 
     @PutMapping("/{id}")

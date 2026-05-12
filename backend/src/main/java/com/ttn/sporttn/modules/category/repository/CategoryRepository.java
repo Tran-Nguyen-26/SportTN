@@ -63,4 +63,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query("SELECT MAX(c.displayOrder) FROM Category c")
     Integer findMaxDisplayOrder();
+
+    boolean existsByParentId(Long id);
 }

@@ -140,10 +140,16 @@
             <div class="form-group">
               <label class="form-label" [class.required]="!isViewMode">Danh mục</label>
               <ng-container *ngIf="!isViewMode">
-                <select class="form-select" [(ngModel)]="form.categoryId" [compareWith]="compareById">
-                  <option [ngValue]="null" disabled>Chọn danh mục</option>
-                  <option *ngFor="let cat of categories()" [ngValue]="cat.id">{{ cat.name }}</option>
-                </select>
+<!--                <select class="form-select" [(ngModel)]="form.categoryId" [compareWith]="compareById">-->
+<!--                  <option [ngValue]="null" disabled>Chọn danh mục</option>-->
+<!--                  <option *ngFor="let cat of categories()" [ngValue]="cat.id">{{ cat.name }}</option>-->
+<!--                </select>-->
+                <app-searchable-select
+                  [options]="categories()"
+                  [value]="form.categoryId"
+                  (valueChange)="form.categoryId = $event"
+                  placeholder="Chọn danh mục">
+                </app-searchable-select>
               </ng-container>
               <div class="view-field" *ngIf="isViewMode">
                 <span class="category-tag">{{ getCategoryName(product?.categoryId ?? null ) }}</span>

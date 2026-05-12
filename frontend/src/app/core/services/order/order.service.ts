@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/enviroment';
 import {ApiResponse} from "../../models/home-response/home-response";
+import {PageResponse} from "../../models/page-response";
 
 // ── Enums / Union Types ───────────────────────────────────────────────────────
 
@@ -77,7 +78,6 @@ export interface OrderResponse {
 // ── Request DTOs gửi lên BE ───────────────────────────────────────────────────
 
 export interface OrderItemRequest {
-  /** variantId bắt buộc — BE entity chỉ join qua ProductVariant */
   variantId: number;
   quantity: number;
 }
@@ -194,8 +194,6 @@ export interface OrderStatsResponse {
   cancelled: number;
 }
 
-// ── Service ───────────────────────────────────────────────────────────────────
-
 @Injectable({
   providedIn: 'root'
 })
@@ -242,9 +240,17 @@ export class OrderService {
   }
   // ── Admin endpoints ─────────────────────────────────────────────────────────
 
-  adminGetOrders(params: OrderFilterParams = {}): Observable<ApiResponse<OrderPage>> {
-    const httpParams = this.buildParams(params);
-    return this.http.get<ApiResponse<OrderPage>>(this.apiAdmin, { params: httpParams });
+  adminGetOrders(params: OrderFilterParams = {}): Observable<ApiResponse<PageResponse<OrderResponse>>> {
+    let httpParams = new HttpParams()
+      .set('page', params.page ?? 0)
+      .set('size', params.size ?? 10);
+
+    if (params.keyword) httpParams = httpParams.set('keyword', params.keyword);
+    if (params.status)  httpParams = httpParams.set('status',  params.status);
+
+    return this.http.get<ApiResponse<PageResponse<OrderResponse>>>(
+      this.apiAdmin, { params: httpParams }
+    );
   }
 
   adminGetOrderById(id: number): Observable<ApiResponse<OrderResponse>> {

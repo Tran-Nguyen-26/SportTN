@@ -1,129 +1,142 @@
-import {Component, computed, OnInit, signal} from '@angular/core';
-import {Router} from "@angular/router";
-import {ProductService} from "../../../core/services/product/product.service";
-import {ProductAdminResponse} from "../../../core/models/product/product.model";
-
-// export interface AdminProduct {
-//   id: number;
-//   name: string;
-//   category: string;
-//   brand: string;
-//   price: number;
-//   salePrice: number | null;
-//   stock: number;
-//   sold: number;
-//   rating: number;
-//   status: string;
-//   image: string;
-// }
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Router } from "@angular/router";
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ProductService } from "../../../core/services/product/product.service";
+import { ProductAdminResponse } from "../../../core/models/product/product.model";
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
 
-  constructor(private router: Router, private productService: ProductService) {
-  }
+  // ── State ─────────────────────────────────────────────────────────────────
+  isLoading      = false;
+  products       = signal<ProductAdminResponse[]>([]);
+  totalElements  = signal(0);
+  totalPages     = signal(0);
+  currentPage    = signal(0);
+  pageSize       = signal(20);
 
-  searchQuery = '';
+  searchKeyword    = '';
   selectedCategory = '';
+  selectedActive: boolean | undefined = undefined;
   viewMode: 'table' | 'grid' = 'table';
-
   openDropdownId: number | null = null;
-
   isAddPanelOpen = signal(false);
 
-  categories = [
-    { value: '',           label: 'Tất cả danh mục' },
-    { value: 'Bơi lội',   label: 'Bơi lội' },
-    { value: 'Chạy bộ',   label: 'Chạy bộ' },
-    { value: 'Chống nắng', label: 'Chống nắng' },
+  private searchSubject = new Subject<string>();
+
+  // ── Filter options ────────────────────────────────────────────────────────
+  // categories = [
+  //   { value: '',            label: 'Tất cả danh mục' },
+  //   { value: 'boi-loi',    label: 'Bơi lội'          },
+  //   { value: 'chay-bo',    label: 'Chạy bộ'          },
+  //   { value: 'chong-nang', label: 'Chống nắng'       },
+  // ];
+
+  statusOptions = [
+    { value: undefined, label: 'Tất cả'         },
+    { value: true,      label: 'Đang bán'        },
+    { value: false,     label: 'Đã ẩn'           },
   ];
-
-  products = signal<ProductAdminResponse[]>([]);
-
-  totalElements = signal(0);
-  totalPages = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(10);
 
   pagesArray = computed(
     () => Array.from({ length: this.totalPages() }, (_, i) => i));
 
-  ngOnInit() {
+  constructor(
+    private router: Router,
+    private productService: ProductService
+  ) {}
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  ngOnInit(): void {
     this.loadProducts();
+
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.searchKeyword = keyword;
+      this.currentPage.set(0);
+      this.loadProducts();
+    });
   }
 
-  loadProducts() {
-    const params = {
-      page: this.currentPage(),
-      size: this.pageSize(),
-    }
+  ngOnDestroy(): void {
+    this.searchSubject.complete();
+  }
 
-    this.productService.getProductsForAdmin(params).subscribe({
+  // ── Load ──────────────────────────────────────────────────────────────────
+  loadProducts(): void {
+    this.isLoading = true;
+
+    this.productService.getProductsForAdmin({
+      page:         this.currentPage(),
+      size:         this.pageSize(),
+      keyword:      this.searchKeyword     || undefined,
+      categorySlug: this.selectedCategory  || undefined,
+      active:       this.selectedActive,
+    }).subscribe({
       next: (res) => {
         if (res.data) {
-          console.log("Danh sách sản phẩm: ", res.data);
           this.products.set(res.data.content);
           this.totalElements.set(res.data.totalElements);
           this.totalPages.set(res.data.totalPages);
         }
+        this.isLoading = false;
       },
       error: (err) => {
-        console.error('Lỗi tải sản phẩm:', err);
+        console.error('[PRODUCT] Lỗi tải sản phẩm:', err);
+        this.isLoading = false;
       }
-    })
-  }
-
-  get filteredProducts(): ProductAdminResponse[] {
-    const data = this.products();
-
-    return data.filter(p => {
-      const matchCat    = !this.selectedCategory || p.categoryName === this.selectedCategory;
-      const matchSearch = !this.searchQuery
-        || p.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-        || p.brandName.toLowerCase().includes(this.searchQuery.toLowerCase());
-      return matchCat && matchSearch;
     });
   }
 
-  formatPrice(price: number | null | undefined): string {
-    if (price === null || price === undefined) {
-      return '0đ';
+  // ── Search & Filter ───────────────────────────────────────────────────────
+  onSearchInput(keyword: string): void {
+    this.searchSubject.next(keyword);
+  }
+
+  onCategoryChange(categorySlug: string): void {
+    this.selectedCategory = categorySlug;
+    this.currentPage.set(0);
+    this.loadProducts();
+  }
+
+  onStatusChange(active: boolean | undefined): void {
+    this.selectedActive = active;
+    this.currentPage.set(0);
+    this.loadProducts();
+  }
+
+  // ── Pagination ────────────────────────────────────────────────────────────
+  onPageChange(pageIndex: number): void {
+    if (pageIndex >= 0 && pageIndex < this.totalPages()) {
+      this.currentPage.set(pageIndex);
+      this.loadProducts();
     }
-    return price.toLocaleString('vi-VN') + 'đ';
   }
 
-  getInitials(name: string): string {
-    if (!name) return 'TN';
-
-    const normalizedName = name
-      .normalize('NFD') // Tách dấu ra khỏi chữ cái (vd: Á -> A + dấu sắc)
-      .replace(/[\u0300-\u036f]/g, '') // Xóa các ký tự dấu đó đi
-      .replace(/đ/g, 'd').replace(/Đ/g, 'D'); // Xử lý riêng chữ đ/Đ
-
-    const words = normalizedName.trim().split(/\s+/); // split(/\s+/) để xử lý nhiều khoảng trắng thừa
-
-    if (words.length >= 2) {
-      // Lấy chữ cái đầu của 2 từ đầu tiên
-      return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+  goToPreviousPage(): void {
+    if (this.currentPage() > 0) {
+      this.onPageChange(this.currentPage() - 1);
     }
-
-    // Nếu chỉ có 1 từ, lấy 2 chữ cái đầu của từ đó
-    return words[0].slice(0, 2).toUpperCase();
   }
 
-  openAddProduct() {
-    this.isAddPanelOpen.set(true);
+  goToNextPage(): void {
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.onPageChange(this.currentPage() + 1);
+    }
   }
 
-  // 3. Hàm đóng Panel
-  closePanel() {
-    this.isAddPanelOpen.set(false);
+  trackByPageIndex(index: number, item: number): number {
+    return item;
   }
 
+  // ── Navigate ──────────────────────────────────────────────────────────────
   goToAdd(): void {
     this.router.navigate(['/admin/products/add']);
   }
@@ -138,6 +151,7 @@ export class ProductsComponent implements OnInit {
     this.closeDropdown();
   }
 
+  // ── Dropdown ──────────────────────────────────────────────────────────────
   toggleDropdown(id: number, event: Event): void {
     event.stopPropagation();
     this.openDropdownId = this.openDropdownId === id ? null : id;
@@ -147,38 +161,56 @@ export class ProductsComponent implements OnInit {
     this.openDropdownId = null;
   }
 
+  // ── Actions ───────────────────────────────────────────────────────────────
   onDeleteProduct(id: number): void {
     this.openDropdownId = null;
-    // TODO: mở confirm dialog
-    console.log('Delete product:', id);
+    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+
+    this.productService.deleteProduct(id).subscribe({
+      next: () => {
+        this.products.update(list => list.filter(p => p.id !== id));
+      },
+      error: (err) => {
+        console.error('[PRODUCT] Lỗi xóa sản phẩm:', err);
+        alert(err.error?.message || 'Xóa sản phẩm thất bại');
+      }
+    });
   }
 
-  onToggleStatus(product: any): void {
-    product.status = product.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    this.openDropdownId = null;
+  onToggleStatus(product: ProductAdminResponse): void {
+    // this.openDropdownId = null;
+    // this.productService.updateProductStatus(product.id, !product.active).subscribe({
+    //   next: () => this.loadProducts(),
+    //   error: (err) => console.error('[PRODUCT] Lỗi đổi trạng thái:', err)
+    // });
   }
 
-  onPageChange(pageIndex: number) {
-    if (pageIndex >= 0 && pageIndex < this.totalPages()) {
-      this.currentPage.set(pageIndex);
-      this.loadProducts();
-    }
+  // ── Panel ─────────────────────────────────────────────────────────────────
+  openAddProduct(): void {
+    this.isAddPanelOpen.set(true);
   }
 
-  goToPreviousPage() {
-    if (this.currentPage() > 0) {
-      this.onPageChange(this.currentPage() - 1);
-    }
+  closePanel(): void {
+    this.isAddPanelOpen.set(false);
   }
 
-  goToNextPage() {
-    if (this.currentPage() < this.totalPages() - 1) {
-      this.onPageChange(this.currentPage() + 1);
-    }
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  formatPrice(price: number | null | undefined): string {
+    if (price == null) return '0đ';
+    return price.toLocaleString('vi-VN') + 'đ';
   }
 
-  trackByPageIndex(index: number, item: number) {
-    return item;
+  getInitials(name: string): string {
+    if (!name) return 'TN';
+    const normalized = name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D');
+    const words = normalized.trim().split(/\s+/);
+    return words.length >= 2
+      ? (words[0][0] + words[1][0]).toUpperCase()
+      : words[0].slice(0, 2).toUpperCase();
   }
 
   protected readonly close = close;

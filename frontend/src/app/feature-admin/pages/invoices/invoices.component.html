@@ -49,8 +49,7 @@
           type="text"
           class="search-input"
           placeholder="Tìm mã HĐ, khách hàng, mã đơn..."
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)">
+          (input)="onSearchInput($any($event.target).value)">
       </div>
       <select class="filter-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
         <option *ngFor="let s of statusOptions" [value]="s.value">
@@ -130,10 +129,24 @@
       </div>
       <div class="summary-spacer"></div>
       <div class="pagination">
-        <button class="page-btn" disabled><mat-icon>chevron_left</mat-icon></button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
+        <button class="page-btn"
+                [disabled]="pageIndex === 0"
+                (click)="onPageChange({pageIndex: pageIndex - 1, pageSize: pageSize, length: totalElements})">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <button class="page-btn"
+                *ngFor="let p of totalPages"
+                [class.active]="p === pageIndex"
+                (click)="onPageChange({pageIndex: p, pageSize: pageSize, length: totalElements})">
+          {{ p + 1 }}
+        </button>
+
+        <button class="page-btn"
+                [disabled]="pageIndex >= totalPages.length - 1"
+                (click)="onPageChange({pageIndex: pageIndex + 1, pageSize: pageSize, length: totalElements})">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
       </div>
     </div>
 

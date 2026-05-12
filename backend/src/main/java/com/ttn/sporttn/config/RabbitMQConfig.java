@@ -16,7 +16,6 @@ public class RabbitMQConfig {
     public static final String ORDER_EXCHANGE     = "order.exchange";
     public static final String ORDER_KEY          = "order.routing.key";
 
-    // Dead Letter Queue
     public static final String ORDER_DLQ          = "order.queue.dlq";
     public static final String ORDER_DL_EXCHANGE  = "order.exchange.dlx";
     public static final String ORDER_DL_KEY       = "order.routing.key.dlq";
@@ -63,7 +62,6 @@ public class RabbitMQConfig {
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter());
-        // Confirm khi message đến exchange
         template.setConfirmCallback((correlation, ack, reason) -> {
             if (!ack) log.error("[MQ] Message không đến exchange: {}", reason);
         });

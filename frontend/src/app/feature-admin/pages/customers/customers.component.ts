@@ -1,9 +1,11 @@
-import { Component, computed, signal, OnInit } from '@angular/core';
+import { Component, computed, signal, OnInit, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import {
   AdminCustomer,
   AdminCustomerService,
-  CustomerOrder,
-  ToggleActiveRequest, UpdateCustomerRequest
+  ToggleActiveRequest,
+  UpdateCustomerRequest
 } from '../../../core/services/user/admin-customer.service';
 
 export interface CustomerForm {
@@ -16,25 +18,39 @@ export interface CustomerForm {
   status:   string;
 }
 
+export interface CustomerFilterParams {
+  page?:    number;
+  size?:    number;
+  keyword?: string;
+  status?:  string;
+}
+
 @Component({
   selector:    'app-customers',
   templateUrl: './customers.component.html',
   styleUrls:   ['./customers.component.css']
 })
-export class CustomersComponent implements OnInit {
+export class CustomersComponent implements OnInit, OnDestroy {
 
   // ── State ─────────────────────────────────────────────────────────────────
-  searchQuery    = signal('');
-  selectedStatus = signal('');
-  isLoading      = signal(false);
+  isLoading      = false;
+  customers      = signal<AdminCustomer[]>([]);
+  totalElements  = 0;
+  totalPages     = 0;
+  pageIndex      = 0;
+  pageSize       = 20;
 
-  customers       = signal<AdminCustomer[]>([]);
-  detailCustomer: AdminCustomer | null = null;
+  searchKeyword  = '';
+  selectedStatus = '';
+
+  detailCustomer:  AdminCustomer | null = null;
   editingCustomer: AdminCustomer | null = null;
-  drawerVisible   = false;
-  showPassword    = false;
+  drawerVisible    = false;
+  showPassword     = false;
 
   form: CustomerForm = this.emptyForm();
+
+  private searchSubject = new Subject<string>();
 
   // ── Options ───────────────────────────────────────────────────────────────
   statusOptions = [
@@ -51,30 +67,52 @@ export class CustomersComponent implements OnInit {
 
   constructor(private adminCustomerService: AdminCustomerService) {}
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
     this.loadCustomers();
+
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.searchKeyword = keyword;
+      this.pageIndex     = 0;
+      this.loadCustomers();
+    });
   }
 
-  // ── LOAD DATA ─────────────────────────────────────────────────────────────
+  ngOnDestroy(): void {
+    this.searchSubject.complete();
+  }
 
+  // ── Load ──────────────────────────────────────────────────────────────────
   loadCustomers(): void {
-    this.isLoading.set(true);
-    this.adminCustomerService.getAll().subscribe({
+    this.isLoading = true;
+
+    const params: CustomerFilterParams = {
+      page:    this.pageIndex,
+      size:    this.pageSize,
+      keyword: this.searchKeyword  || undefined,
+      status:  this.selectedStatus || undefined,
+    };
+
+    this.adminCustomerService.getAll(params).subscribe({
       next: (res) => {
-        if (res.success && res.data) {
-          this.customers.set(res.data);
+        if (res.data) {
+          this.customers.set(res.data.content);
+          this.totalElements = res.data.totalElements;
+          this.totalPages    = res.data.totalPages;
         }
-        this.isLoading.set(false);
+        this.isLoading = false;
       },
       error: (err) => {
-        console.error('Lỗi tải danh sách customer:', err);
-        this.isLoading.set(false);
+        console.error('[CUSTOMER] Lỗi tải danh sách:', err);
+        this.isLoading = false;
       }
     });
   }
 
-  // ── COMPUTED ──────────────────────────────────────────────────────────────
-
+  // ── Computed stats (từ data hiện tại trên trang) ──────────────────────────
   totalCustomers  = computed(() => this.customers().length);
 
   activeCustomers = computed(() =>
@@ -90,35 +128,40 @@ export class CustomersComponent implements OnInit {
     return (total / 1_000_000).toFixed(1);
   });
 
-  filteredCustomers = computed(() => {
-    const query  = this.searchQuery().toLowerCase();
-    const status = this.selectedStatus();
-    return this.customers().filter(c => {
-      const matchStatus = !status || c.status === status;
-      const matchSearch = !query
-        || c.fullName?.toLowerCase().includes(query)
-        || c.email?.toLowerCase().includes(query)
-        || c.phone?.includes(query);
-      return matchStatus && matchSearch;
-    });
-  });
+  // ── Search & Filter ───────────────────────────────────────────────────────
+  onSearchInput(keyword: string): void {
+    this.searchSubject.next(keyword);
+  }
 
-  // ── DETAIL MODAL ──────────────────────────────────────────────────────────
+  onStatusChange(): void {
+    this.pageIndex = 0;
+    this.loadCustomers();
+  }
 
+  // ── Pagination ────────────────────────────────────────────────────────────
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.pageIndex = page;
+      this.loadCustomers();
+    }
+  }
+
+  goToPreviousPage(): void { this.goToPage(this.pageIndex - 1); }
+  goToNextPage(): void     { this.goToPage(this.pageIndex + 1); }
+
+  get pagesArray(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  // ── Detail Modal ──────────────────────────────────────────────────────────
   openDetail(customer: AdminCustomer): void {
     this.adminCustomerService.getById(customer.id).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.detailCustomer = res.data;
-        }
-      },
-      error: (err) => console.error('Lỗi lấy chi tiết customer:', err)
+      next: (res) => { if (res.data) this.detailCustomer = res.data; },
+      error: (err) => console.error('[CUSTOMER] Lỗi lấy chi tiết:', err)
     });
   }
 
-  closeDetail(): void {
-    this.detailCustomer = null;
-  }
+  closeDetail(): void { this.detailCustomer = null; }
 
   onDetailOverlayClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
@@ -126,15 +169,14 @@ export class CustomersComponent implements OnInit {
     }
   }
 
-  // ── TOGGLE ACTIVE ─────────────────────────────────────────────────────────
-
+  // ── Toggle Active ─────────────────────────────────────────────────────────
   toggleActive(customer: AdminCustomer): void {
     const newStatus = customer.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     const request: ToggleActiveRequest = { status: newStatus };
 
     this.adminCustomerService.toggleActive(customer.id, request).subscribe({
       next: (res) => {
-        if (res.success) {
+        if (res.data) {
           this.customers.update(list =>
             list.map(c => c.id === customer.id ? { ...c, status: newStatus } : c)
           );
@@ -143,14 +185,14 @@ export class CustomersComponent implements OnInit {
           }
         }
       },
-      error: (err) => console.error('Lỗi toggle active:', err)
+      error: (err) => console.error('[CUSTOMER] Lỗi toggle active:', err)
     });
   }
 
-  // ── DELETE ────────────────────────────────────────────────────────────────
-
+  // ── Delete ────────────────────────────────────────────────────────────────
   deleteCustomer(id: number): void {
     if (!confirm('Bạn có chắc muốn xóa khách hàng này?')) return;
+
     this.adminCustomerService.delete(id).subscribe({
       next: (res) => {
         if (res.success) {
@@ -159,12 +201,11 @@ export class CustomersComponent implements OnInit {
           if (this.editingCustomer?.id === id) this.closeDrawer();
         }
       },
-      error: (err) => console.error('Lỗi xóa customer:', err)
+      error: (err) => console.error('[CUSTOMER] Lỗi xóa:', err)
     });
   }
 
-  // ── EDIT DRAWER ───────────────────────────────────────────────────────────
-
+  // ── Edit Drawer ───────────────────────────────────────────────────────────
   openEdit(customer: AdminCustomer): void {
     this.editingCustomer = customer;
     this.form = {
@@ -191,53 +232,48 @@ export class CustomersComponent implements OnInit {
     }
   }
 
-  saveEdit(): void {
-    if (!this.editingCustomer || !this.isFormValid()) return;
-
-    this.isLoading.set(true);
-
-    const updateRequest: UpdateCustomerRequest = {
-      fullName: this.form.fullName,
-      phone: this.form.phone,
-      address: this.form.address,
-      gender: this.form.gender,
-      birthday: this.form.birthday,
-      note: this.form.note,
-      status: this.form.status
-    };
-
-    this.adminCustomerService.updateCustomer(this.editingCustomer.id, updateRequest).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          const updatedData = res.data;
-          this.customers.update(list =>
-            list.map(c => c.id === updatedData.id ? { ...c, ...updatedData } : c)
-          );
-
-          if (this.detailCustomer?.id === updatedData.id) {
-            this.detailCustomer = { ...this.detailCustomer, ...updatedData };
-          }
-          alert('Cập nhật thông tin khách hàng thành công!');
-          this.closeDrawer();
-        }
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Lỗi khi cập nhật customer:', err);
-        alert('Có lỗi xảy ra khi lưu thông tin.');
-        this.isLoading.set(false);
-      }
-    });
-  }
-
   openEditFromDetail(): void {
     const customer = this.detailCustomer;
     this.closeDetail();
     if (customer) setTimeout(() => this.openEdit(customer), 100);
   }
 
-  // ── HELPERS ───────────────────────────────────────────────────────────────
+  saveEdit(): void {
+    if (!this.editingCustomer || !this.isFormValid()) return;
 
+    this.isLoading = true;
+
+    const updateRequest: UpdateCustomerRequest = {
+      fullName: this.form.fullName,
+      phone:    this.form.phone,
+      address:  this.form.address,
+      gender:   this.form.gender,
+      birthday: this.form.birthday,
+      note:     this.form.note,
+      status:   this.form.status
+    };
+
+    this.adminCustomerService.updateCustomer(this.editingCustomer.id, updateRequest).subscribe({
+      next: (res) => {
+        if (res.data) {
+          this.customers.update(list =>
+            list.map(c => c.id === res.data!.id ? { ...c, ...res.data } : c)
+          );
+          if (this.detailCustomer?.id === res.data.id) {
+            this.detailCustomer = { ...this.detailCustomer, ...res.data };
+          }
+          this.closeDrawer();
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('[CUSTOMER] Lỗi cập nhật:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
   private emptyForm(): CustomerForm {
     return {
       fullName: '',

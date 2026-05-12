@@ -9,11 +9,11 @@ import {
   OrderStatusSummary
 } from "../../../core/services/overview/dashboard.service";
 import { forkJoin } from 'rxjs';
-import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR } from '../../../core/services/order/order.service';
-import {ReportService} from "../../../core/services/report/report.service";
+import { ORDER_STATUS_LABEL } from '../../../core/services/order/order.service';
+import { ReportService } from "../../../core/services/report/report.service";
 
 interface StatItem {
-  icon: string;
+  icon:  string;
   color: string;
   value: string;
   label: string;
@@ -21,28 +21,27 @@ interface StatItem {
 }
 
 interface OrderStatusItem {
-  label: string;
-  count: number;
+  label:   string;
+  count:   number;
   percent: number;
-  color: string;
+  color:   string;
 }
 
 @Component({
-  selector: 'app-dashboard',
+  selector:    'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls:   ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
 
-  isExporting = false;
+  isExporting    = false;
+  loading        = false;
+  error: string | null = null;
+  selectedPeriod = 'today';
 
   today: string = new Date().toLocaleDateString('vi-VN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
-
-  selectedPeriod: string = 'today';
-  loading = false;
-  error: string | null = null;
 
   periods = [
     { value: 'today', label: 'Hôm nay' },
@@ -50,55 +49,47 @@ export class DashboardComponent implements OnInit {
     { value: 'month', label: '30 ngày' },
   ];
 
-  get periodLabel(): string {
-    const map: Record<string, string> = {
-      today: 'hôm qua', week: 'tuần', month: 'tháng'
-    };
-    return map[this.selectedPeriod] || '';
-  }
-
-  // API Data
-  stats: StatItem[]                    = [];
-  revenueData: RevenueChartResponse[]  = [];
-  topProducts: TopProductResponse[]    = [];
-  lowStockItems: LowStockResponse[]    = [];
-  recentOrders: RecentOrderResponse[]  = [];
-  orderStatuses: OrderStatusItem[]     = [];
-
-  yLabels = ['60tr', '45tr', '30tr', '15tr', '0'];
+  // ── API Data ───────────────────────────────────────────────────────────────
+  stats: StatItem[]                   = [];
+  revenueData: RevenueChartResponse[] = [];
+  topProducts: TopProductResponse[]   = [];
+  lowStockItems: LowStockResponse[]   = [];
+  recentOrders: RecentOrderResponse[] = [];
+  orderStatuses: OrderStatusItem[]    = [];
 
   private readonly statusColorMap: Record<string, string> = {
-    PENDING:   'yellow',
-    CONFIRMED: 'blue',
-    PROCESSING:'blue',
-    SHIPPING:  'orange',
-    DELIVERED: 'green',
-    CANCELLED: 'red',
-    REFUNDED:  'red',
+    PENDING:    'yellow',
+    CONFIRMED:  'blue',
+    PROCESSING: 'blue',
+    SHIPPING:   'orange',
+    DELIVERED:  'green',
+    CANCELLED:  'red',
+    REFUNDED:   'red',
   };
 
   private readonly statusClassMap: Record<string, string> = {
-    PENDING:   'badge-yellow',
-    CONFIRMED: 'badge-blue',
-    PROCESSING:'badge-blue',
-    SHIPPING:  'badge-orange',
-    DELIVERED: 'badge-green',
-    CANCELLED: 'badge-red',
-    REFUNDED:  'badge-red',
+    PENDING:    'badge-yellow',
+    CONFIRMED:  'badge-blue',
+    PROCESSING: 'badge-blue',
+    SHIPPING:   'badge-orange',
+    DELIVERED:  'badge-green',
+    CANCELLED:  'badge-red',
+    REFUNDED:   'badge-red',
   };
 
   constructor(
     private dashboardService: DashboardService,
-    private reportService: ReportService
+    private reportService:    ReportService
   ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
   }
 
+  // ── Load ───────────────────────────────────────────────────────────────────
   loadDashboardData(): void {
     this.loading = true;
-    this.error = null;
+    this.error   = null;
 
     const period = this.selectedPeriod === 'today' ? 'week' : this.selectedPeriod as any;
 
@@ -114,20 +105,24 @@ export class DashboardComponent implements OnInit {
         this.mapStatsData(stats.data);
         this.revenueData   = this.processRevenueData(revenueChart.data   ?? []);
         this.topProducts   = topProducts.data   ?? [];
-        this.lowStockItems = lowStock.data      ?? [];
-        this.recentOrders  = recentOrders.data  ?? [];
+        this.lowStockItems = lowStock.data       ?? [];
+        this.recentOrders  = recentOrders.data   ?? [];
         this.orderStatuses = this.mapOrderStatuses(orderStatuses.data ?? []);
         this.loading = false;
       },
       error: (err) => {
-        console.error('Lỗi load dashboard:', err);
-        this.error = 'Không thể tải dữ liệu dashboard. Vui lòng thử lại.';
+        console.error('[DASHBOARD] Lỗi load:', err);
+        this.error   = 'Không thể tải dữ liệu dashboard. Vui lòng thử lại.';
         this.loading = false;
       }
     });
   }
 
-  // ── Export ────────────────────────────────────────────────────────────────
+  onPeriodChange(): void {
+    this.loadDashboardData();
+  }
+
+  // ── Export ─────────────────────────────────────────────────────────────────
   exportRevenue(): void {
     this.isExporting = true;
 
@@ -136,20 +131,9 @@ export class DashboardComponent implements OnInit {
     from.setHours(0, 0, 0, 0);
 
     switch (this.selectedPeriod) {
-      case 'today':
-        break;
-      case 'week':
-        from.setDate(from.getDate() - 6);
-        break;
-      case 'month':
-        from.setDate(from.getDate() - 30);
-        break;
-      default:
-        from.setDate(from.getDate() - 6);
+      case 'week':  from.setDate(from.getDate() - 6);  break;
+      case 'month': from.setDate(from.getDate() - 30); break;
     }
-
-    const fromStr = this.formatDate(from);
-    const toStr   = this.formatDate(to);
 
     const periodName: Record<string, string> = {
       today: 'hom-nay',
@@ -157,12 +141,12 @@ export class DashboardComponent implements OnInit {
       month: '30-ngay'
     };
 
-    this.reportService.exportRevenue(fromStr, toStr).subscribe({
+    this.reportService.exportRevenue(this.formatDate(from), this.formatDate(to)).subscribe({
       next: (blob) => {
         const url     = window.URL.createObjectURL(blob);
         const link    = document.createElement('a');
         link.href     = url;
-        link.download = `bao-cao-doanh-thu-${periodName[this.selectedPeriod]}-${toStr}.pdf`;
+        link.download = `bao-cao-doanh-thu-${periodName[this.selectedPeriod]}-${this.formatDate(to)}.pdf`;
         link.click();
         window.URL.revokeObjectURL(url);
         this.isExporting = false;
@@ -174,27 +158,31 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  private mapOrderStatuses(data: OrderStatusSummary[]): OrderStatusItem[] {
-    const total = data.reduce((sum, s) => sum + s.count, 0);
-    return data.map(s => ({
-      label:   ORDER_STATUS_LABEL[s.status as keyof typeof ORDER_STATUS_LABEL] ?? s.status,
-      count:   s.count,
-      percent: total > 0 ? Math.round((s.count / total) * 100) : 0,
-      color:   this.statusColorMap[s.status] ?? 'blue'
-    }));
+  // ── Y Labels động ─────────────────────────────────────────────────────────
+  get yLabels(): string[] {
+    if (!this.revenueData.length) return ['0', '0', '0', '0', '0'];
+
+    const maxRevenue = Math.max(...this.revenueData.map(d => d.revenue));
+    if (maxRevenue === 0) return ['0', '0', '0', '0', '0'];
+
+    const step = maxRevenue / 4;
+    return [
+      this.formatShort(maxRevenue),
+      this.formatShort(step * 3),
+      this.formatShort(step * 2),
+      this.formatShort(step),
+      '0'
+    ];
   }
 
-  private processRevenueData(data: RevenueChartResponse[]): RevenueChartResponse[] {
-    if (!data.length) return [];
-    const maxRevenue = Math.max(...data.map(d => d.revenue));
-    const maxOrders  = Math.max(...data.map(d => d.orders));
-    return data.map(item => ({
-      ...item,
-      revenuePercent: maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0,
-      orderPercent:   maxOrders  > 0 ? (item.orders  / maxOrders)  * 100 : 0,
-    }));
+  private formatShort(value: number): string {
+    if (value >= 1_000_000_000) return (value / 1_000_000_000).toFixed(1).replace('.0', '') + 'tỷ';
+    if (value >= 1_000_000)     return (value / 1_000_000).toFixed(1).replace('.0', '')     + 'tr';
+    if (value >= 1_000)         return (value / 1_000).toFixed(1).replace('.0', '')         + 'k';
+    return value.toFixed(0);
   }
 
+  // ── Map helpers ────────────────────────────────────────────────────────────
   private mapStatsData(apiStats: DashboardStatsResponse): void {
     this.stats = [
       {
@@ -228,8 +216,37 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
-  onPeriodChange(): void {
-    this.loadDashboardData();
+  private mapOrderStatuses(data: OrderStatusSummary[]): OrderStatusItem[] {
+    const total = data.reduce((sum, s) => sum + s.count, 0);
+    return data.map(s => ({
+      label:   ORDER_STATUS_LABEL[s.status as keyof typeof ORDER_STATUS_LABEL] ?? s.status,
+      count:   s.count,
+      percent: total > 0 ? Math.round((s.count / total) * 100) : 0,
+      color:   this.statusColorMap[s.status] ?? 'blue'
+    }));
+  }
+
+  private processRevenueData(data: RevenueChartResponse[]): RevenueChartResponse[] {
+    if (!data.length) return [];
+    const maxRevenue = Math.max(...data.map(d => d.revenue));
+    const maxOrders  = Math.max(...data.map(d => d.orders));
+    return data.map(item => ({
+      ...item,
+      revenuePercent: maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0,
+      orderPercent:   maxOrders  > 0 ? (item.orders  / maxOrders)  * 100 : 0,
+    }));
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  get periodLabel(): string {
+    const map: Record<string, string> = {
+      today: 'hôm qua', week: 'tuần trước', month: 'tháng trước'
+    };
+    return map[this.selectedPeriod] ?? '';
+  }
+
+  get currentPeriodLabel(): string {
+    return this.periods.find(p => p.value === this.selectedPeriod)?.label ?? '';
   }
 
   getStatusClass(status: string): string {
@@ -248,10 +265,6 @@ export class DashboardComponent implements OnInit {
 
   trackByFn(index: number, item: any): any {
     return item.id || index;
-  }
-
-  get currentPeriodLabel(): string {
-    return this.periods.find(p => p.value === this.selectedPeriod)?.label ?? '';
   }
 
   private formatDate(date: Date): string {

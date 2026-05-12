@@ -23,20 +23,20 @@
         <span class="stat-label">Đang hoạt động</span>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon orange"><mat-icon>shopping_bag</mat-icon></div>
-      <div class="stat-info">
-        <span class="stat-value">{{ totalOrders() }}</span>
-        <span class="stat-label">Tổng đơn hàng</span>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon purple"><mat-icon>payments</mat-icon></div>
-      <div class="stat-info">
-        <span class="stat-value">₫{{ totalRevenueM() }}M</span>
-        <span class="stat-label">Tổng doanh thu</span>
-      </div>
-    </div>
+<!--    <div class="stat-card">-->
+<!--      <div class="stat-icon orange"><mat-icon>shopping_bag</mat-icon></div>-->
+<!--      <div class="stat-info">-->
+<!--        <span class="stat-value">{{ totalOrders() }}</span>-->
+<!--        <span class="stat-label">Tổng đơn hàng</span>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="stat-card">-->
+<!--      <div class="stat-icon purple"><mat-icon>payments</mat-icon></div>-->
+<!--      <div class="stat-info">-->
+<!--        <span class="stat-value">₫{{ totalRevenueM() }}M</span>-->
+<!--        <span class="stat-label">Tổng doanh thu</span>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 
   <div class="table-card">
@@ -48,13 +48,12 @@
           type="text"
           class="search-input"
           placeholder="Tìm tên, email, SĐT..."
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)">
+          (input)="onSearchInput($any($event.target).value)">
       </div>
       <select
         class="filter-select"
-        [ngModel]="selectedStatus()"
-        (ngModelChange)="selectedStatus.set($event)">
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="onStatusChange()">
         <option *ngFor="let s of statusOptions" [value]="s.value">
           {{ s.label }}
         </option>
@@ -68,15 +67,15 @@
           <th>Khách hàng</th>
           <th>Email</th>
           <th>Số điện thoại</th>
-          <th>Đơn hàng</th>
-          <th>Tổng chi tiêu</th>
+<!--          <th>Đơn hàng</th>-->
+<!--          <th>Tổng chi tiêu</th>-->
           <th>Ngày tham gia</th>
           <th>Trạng thái</th>
           <th>Thao tác</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let customer of filteredCustomers(); let i = index">
+        <tr *ngFor="let customer of customers(); let i = index">
           <td>
             <div class="customer-cell">
               <div class="avatar" [style.background]="getAvatarColor(i) + '22'" [style.color]="getAvatarColor(i)">
@@ -90,10 +89,10 @@
           </td>
           <td class="email">{{ customer.email }}</td>
           <td class="phone">{{ customer.phone }}</td>
-          <td>
-            <span class="order-count">{{ customer.totalOrders }}</span>
-          </td>
-          <td class="spent">{{ formatPrice(customer.totalSpent) }}</td>
+<!--          <td>-->
+<!--            <span class="order-count">{{ customer.totalOrders }}</span>-->
+<!--          </td>-->
+<!--          <td class="spent">{{ formatPrice(customer.totalSpent) }}</td>-->
           <td class="date">{{ customer.joinDate }}</td>
           <td>
             <app-status-badge [status]="customer.status" type="customer"></app-status-badge>
@@ -115,13 +114,27 @@
 
     <div class="table-footer">
       <span class="result-count">
-        Hiển thị {{ filteredCustomers().length }} / {{ totalCustomers() }} khách hàng
+        Hiển thị {{ customers().length }} / {{ totalCustomers() }} khách hàng
       </span>
       <div class="pagination">
-        <button class="page-btn" disabled><mat-icon>chevron_left</mat-icon></button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn"><mat-icon>chevron_right</mat-icon></button>
+        <button class="page-btn"
+                [disabled]="pageIndex === 0"
+                (click)="goToPreviousPage()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <button class="page-btn"
+                *ngFor="let p of pagesArray"
+                [class.active]="p === pageIndex"
+                (click)="goToPage(p)">
+          {{ p + 1 }}
+        </button>
+
+        <button class="page-btn"
+                [disabled]="pageIndex >= totalPages - 1"
+                (click)="goToNextPage()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
       </div>
     </div>
 

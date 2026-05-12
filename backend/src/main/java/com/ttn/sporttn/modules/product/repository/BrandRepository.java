@@ -23,9 +23,9 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
             b.name,
             b.slug,
             b.color,
+            b.description,
             b.logoUrl,
             b.websiteUrl,
-            b.description,
             b.active,
             COUNT(p.id)
         )
@@ -36,9 +36,9 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
             b.name,
             b.slug,
             b.color,
+            b.description,
             b.logoUrl,
             b.websiteUrl,
-            b.description,
             b.active
         """)
     List<BrandResponse> findAllBrandResponses();

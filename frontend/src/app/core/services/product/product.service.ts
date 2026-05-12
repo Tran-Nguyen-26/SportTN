@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../../../../environments/enviroment";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {ApiResponse, ProductCardResponse} from "../../models/home-response/home-response";
 import {Observable} from "rxjs";
 import {
@@ -52,8 +52,25 @@ export class ProductService {
     return this.http.get<ApiResponse<ProductCardResponse[]>>(`${this.apiUrl}/popular`);
   }
 
-  getProductsForAdmin(params: any): Observable<ApiResponse<PageResponse<ProductAdminResponse>>> {
-    return this.http.get<ApiResponse<PageResponse<ProductAdminResponse>>>(`${this.apiUrl}/list`, { params })
+  getProductsForAdmin(params: {
+    page?: number;
+    size?: number;
+    keyword?: string;
+    categorySlug?: string;
+    active?: boolean;
+  }): Observable<ApiResponse<PageResponse<ProductAdminResponse>>> {
+
+    let httpParams = new HttpParams()
+      .set('page', params.page ?? 0)
+      .set('size', params.size ?? 10);
+
+    if (params.keyword)           httpParams = httpParams.set('keyword',      params.keyword);
+    if (params.categorySlug)      httpParams = httpParams.set('categorySlug', params.categorySlug);
+    if (params.active !== undefined) httpParams = httpParams.set('active',    String(params.active));
+
+    return this.http.get<ApiResponse<PageResponse<ProductAdminResponse>>>(
+      `${this.apiUrl}/list`, { params: httpParams }
+    );
   }
 
   updateProduct(id: number, data: ProductUpdateRequest): Observable<ApiResponse<ProductDetail>> {
@@ -83,5 +100,9 @@ export class ProductService {
       `${this.apiUrl}/filtered`,
       { params }
     );
+  }
+
+  deleteProduct(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/admin/${id}`);
   }
 }

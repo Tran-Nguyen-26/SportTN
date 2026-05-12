@@ -57,11 +57,11 @@
       <select class="filter-select" [(ngModel)]="selectedRole">
         <option *ngFor="let r of roleOptions" [value]="r.value">{{ r.label }}</option>
       </select>
-      <select class="filter-select" [(ngModel)]="selectedStatus">
-        <option value="">Tất cả trạng thái</option>
-        <option value="true">Đang hoạt động</option>
-        <option value="false">Đã vô hiệu hóa</option>
-      </select>
+<!--      <select class="filter-select" [(ngModel)]="selectedStatus">-->
+<!--        <option value="">Tất cả trạng thái</option>-->
+<!--        <option value="true">Đang hoạt động</option>-->
+<!--        <option value="false">Đã vô hiệu hóa</option>-->
+<!--      </select>-->
     </div>
 
     <!-- Table -->
@@ -208,7 +208,12 @@
 
         <div class="field">
           <label>Họ và tên <span class="req">*</span></label>
-          <input type="text" [(ngModel)]="form.name" placeholder="VD: Nguyễn Văn An">
+          <input type="text" [(ngModel)]="form.fullname" placeholder="VD: Nguyễn Văn An">
+        </div>
+
+        <div class="field">
+          <label>Username<span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.username">
         </div>
 
         <div class="field">

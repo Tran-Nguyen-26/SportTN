@@ -21,6 +21,7 @@ import com.ttn.sporttn.modules.user.entity.Address;
 import com.ttn.sporttn.modules.user.repository.AddressRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ import com.ttn.sporttn.modules.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -282,6 +284,14 @@ public class OrderService {
                 productRepository.save(product);
             }
 
+            invoiceRepository.findByOrderId(orderId)
+                    .ifPresent(invoice -> {
+                        invoice.setStatus("PAID");
+                        invoice.setIssueDate(LocalDateTime.now());
+                        invoiceRepository.save(invoice);
+                        log.info("[ORDER] Invoice cập nhật PAID. orderId={}", orderId);
+                    });
+
             if ("COD".equals(order.getPaymentMethod())
                     && "UNPAID".equals(order.getPaymentStatus())) {
                 order.setPaymentStatus("PAID");
@@ -293,6 +303,16 @@ public class OrderService {
                             log.info("[ORDER] COD - Cập nhật Payment=COMPLETED. orderId={}", orderId);
                         });
             }
+        }
+
+        if ("CANCELLED".equals(request.getStatus())) {
+
+            invoiceRepository.findByOrderId(orderId)
+                    .ifPresent(invoice -> {
+                        invoice.setStatus("CANCELLED");
+                        invoiceRepository.save(invoice);
+                        log.info("[ORDER] Invoice cập nhật CANCELLED. orderId={}", orderId);
+                    });
         }
 
         Order updated = orderRepository.save(order);
@@ -362,11 +382,24 @@ public class OrderService {
                 + Integer.toHexString((int)(Math.random() * 0xFFFF)).toUpperCase();
     }
 
-    /** Admin: lấy tất cả đơn hàng */
-    @Transactional(readOnly = true)
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(OrderResponse::from);
+    // OrderService
+    public Page<OrderResponse> getAllOrders(Pageable pageable, String keyword, String status) {
+        Specification<Order> spec = Specification.where(null);
+
+        if (StringUtils.hasText(status)) {
+            spec = spec.and((root, q, cb) ->
+                    cb.equal(root.get("status"), status));
+        }
+
+        if (StringUtils.hasText(keyword)) {
+            spec = spec.and((root, q, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("orderCode")), "%" + keyword.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("user").get("fullname")), "%" + keyword.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("user").get("phone")), "%" + keyword.toLowerCase() + "%")
+            ));
+        }
+
+        return orderRepository.findAll(spec, pageable).map(OrderResponse::from);
     }
 
     /** Admin: xem chi tiết không cần check userId */

@@ -16,8 +16,12 @@ import com.ttn.sporttn.modules.user.repository.AddressRepository;
 import com.ttn.sporttn.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,14 +37,25 @@ public class AdminCustomerService {
     private final OrderRepository orderRepository;
     private final AddressRepository addressRepository;
 
-    @Transactional(readOnly = true)
-    public List<AdminCustomerResponse> getAllCustomers() {
-        log.info("[AdminCustomerService] Fetching all customers");
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> UserRole.CUSTOMER.equals(user.getRole()))
-                .map(user -> convertToResponse(user, false)) // không load orderHistory cho list
-                .collect(Collectors.toList());
+    public Page<AdminCustomerResponse> getAllCustomers(Pageable pageable, String keyword, String status) {
+        Specification<User> spec = Specification.where(
+                (root, q, cb) -> cb.equal(root.get("role"), UserRole.CUSTOMER)
+        );
+
+        if (StringUtils.hasText(keyword)) {
+            spec = spec.and((root, q, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("fullname")), "%" + keyword.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("email")),    "%" + keyword.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("phone")),    "%" + keyword.toLowerCase() + "%")
+            ));
+        }
+
+        if (StringUtils.hasText(status)) {
+            spec = spec.and((root, q, cb) ->
+                    cb.equal(root.get("status"), UserStatus.valueOf(status)));
+        }
+
+        return userRepository.findAll(spec, pageable).map(AdminCustomerResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -56,22 +71,22 @@ public class AdminCustomerService {
         return convertToResponse(user, true); // load orderHistory cho detail
     }
 
-    @Transactional
-    public AdminCustomerResponse toggleActive(Long id, ToggleActiveRequest request) {
-        log.info("[AdminCustomerService] Toggle active customer ID: {}, status: {}", id, request.getStatus());
-
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        if (!UserRole.CUSTOMER.equals(user.getRole())) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        user.setStatus(UserStatus.valueOf(request.getStatus()));
-        user.setUpdatedAt(LocalDateTime.now());
-
-        return convertToResponse(userRepository.save(user), false);
-    }
+//    @Transactional
+//    public AdminCustomerResponse toggleActive(Long id, ToggleActiveRequest request) {
+//        log.info("[AdminCustomerService] Toggle active customer ID: {}, status: {}", id, request.getStatus());
+//
+//        User user = userRepository.findById(id)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+//
+//        if (!UserRole.CUSTOMER.equals(user.getRole())) {
+//            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+//        }
+//
+//        user.setStatus(UserStatus.valueOf(request.getStatus()));
+//        user.setUpdatedAt(LocalDateTime.now());
+//
+//        return convertToResponse(userRepository.save(user), false);
+//    }
 
     @Transactional
     public void deleteCustomer(Long id) {

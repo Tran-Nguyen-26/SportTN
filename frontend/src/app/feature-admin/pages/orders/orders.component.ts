@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PageEvent } from '@angular/material/paginator';
 import {
   OrderService,
@@ -7,7 +9,8 @@ import {
   OrderFilterParams,
   UpdateOrderStatusRequest,
   ORDER_STATUS_LABEL,
-  PAYMENT_METHOD_LABEL, OrderStatsResponse
+  PAYMENT_METHOD_LABEL,
+  OrderStatsResponse
 } from "../../../core/services/order/order.service";
 
 interface StatusTab {
@@ -20,21 +23,24 @@ interface StatusTab {
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.css']
 })
-export class OrdersComponent implements OnInit {
+export class OrdersComponent implements OnInit, OnDestroy {
 
-  // ── State ────────────────────────────────────────────────────────────────────
-  isLoading = false;
+  // ── State ─────────────────────────────────────────────────────────────────
+  isLoading      = false;
   orders: OrderResponse[] = [];
-  totalElements = 0;
-  pageIndex = 0;
-  pageSize = 10;
+  totalElements  = 0;
+  totalPages     = 0;
+  pageIndex      = 0;
+  pageSize       = 20;
 
-  searchQuery    = '';
+  searchKeyword  = '';
   selectedStatus = '';
   selectedOrder: OrderResponse | null = null;
   modalMode: 'view' | 'edit' = 'view';
 
-  // ── Filter ────────────────────────────────────────────────────────────────────
+  private searchSubject = new Subject<string>();
+
+  // ── Filter options ────────────────────────────────────────────────────────
   statusOptions: StatusTab[] = [
     { value: '',          label: 'Tất cả trạng thái' },
     { value: 'PENDING',   label: 'Chờ xử lý'         },
@@ -54,12 +60,26 @@ export class OrdersComponent implements OnInit {
 
   constructor(private orderService: OrderService) {}
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
     this.loadOrders();
     this.loadStats();
+
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.searchKeyword = keyword;
+      this.pageIndex     = 0;
+      this.loadOrders();
+    });
   }
 
-  // ── Load ──────────────────────────────────────────────────────────────────────
+  ngOnDestroy(): void {
+    this.searchSubject.complete();
+  }
+
+  // ── Load ──────────────────────────────────────────────────────────────────
   loadOrders(): void {
     this.isLoading = true;
 
@@ -67,7 +87,7 @@ export class OrdersComponent implements OnInit {
       page:    this.pageIndex,
       size:    this.pageSize,
       status:  this.selectedStatus as OrderStatus | '',
-      keyword: this.searchQuery || undefined
+      keyword: this.searchKeyword || undefined
     };
 
     this.orderService.adminGetOrders(params).subscribe({
@@ -75,6 +95,7 @@ export class OrdersComponent implements OnInit {
         if (res.data) {
           this.orders        = res.data.content;
           this.totalElements = res.data.totalElements;
+          this.totalPages    = res.data.totalPages;
         }
         this.isLoading = false;
       },
@@ -87,54 +108,74 @@ export class OrdersComponent implements OnInit {
 
   loadStats(): void {
     this.orderService.adminGetOrderStats().subscribe({
-      next: (res) => {
-        if (res.data) this.stats = res.data;
-      },
+      next: (res) => { if (res.data) this.stats = res.data; },
       error: (err) => console.error('[ADMIN-ORDER] Lỗi tải thống kê:', err)
     });
   }
 
-  // ── Filter & Search ───────────────────────────────────────────────────────────
+  // ── Search & Filter ───────────────────────────────────────────────────────
+  onSearchInput(keyword: string): void {
+    this.searchSubject.next(keyword);
+  }
+
   onStatusChange(): void {
     this.pageIndex = 0;
     this.loadOrders();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadOrders();
-  }
-
+  // ── Pagination ────────────────────────────────────────────────────────────
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize  = event.pageSize;
     this.loadOrders();
   }
 
-  // ── Modal ─────────────────────────────────────────────────────────────────────
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.pageIndex = page;
+      this.loadOrders();
+    }
+  }
+
+  goToPreviousPage(): void {
+    this.goToPage(this.pageIndex - 1);
+  }
+
+  goToNextPage(): void {
+    this.goToPage(this.pageIndex + 1);
+  }
+
+  get pagesArray(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────────
   openView(order: OrderResponse): void {
     this.selectedOrder = order;
-    this.modalMode = 'view';
+    this.modalMode     = 'view';
 
-    // Gọi API lấy chi tiết kèm items
     this.orderService.adminGetOrderById(order.id).subscribe({
-      next: (res) => {
-        if (res.data) this.selectedOrder = res.data;
-      },
+      next: (res) => { if (res.data) this.selectedOrder = res.data; },
       error: (err) => console.error('[ADMIN-ORDER] Lỗi tải chi tiết:', err)
     });
   }
 
   openEdit(order: OrderResponse): void {
     this.selectedOrder = { ...order };
-    this.modalMode = 'edit';
+    this.modalMode     = 'edit';
   }
 
   closeModal(): void {
     this.selectedOrder = null;
   }
 
-  // ── Update Status ─────────────────────────────────────────────────────────────
+  onOverlayClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
+      this.closeModal();
+    }
+  }
+
+  // ── Update Status ─────────────────────────────────────────────────────────
   updateStatus(orderId: number, status: OrderStatus): void {
     const payload: UpdateOrderStatusRequest = { status };
     this.orderService.adminUpdateStatus(orderId, payload).subscribe({
@@ -147,18 +188,19 @@ export class OrdersComponent implements OnInit {
     });
   }
 
-  // ── Cancel ────────────────────────────────────────────────────────────────────
+  // ── Cancel ────────────────────────────────────────────────────────────────
   cancelOrder(orderId: number, reason?: string): void {
     this.orderService.adminCancelOrder(orderId, reason).subscribe({
       next: () => {
         this.loadOrders();
+        this.loadStats();
         this.closeModal();
       },
       error: (err) => console.error('[ADMIN-ORDER] Lỗi hủy đơn:', err)
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────────
   getStatusLabel(status: string): string {
     return ORDER_STATUS_LABEL[status as OrderStatus] ?? status;
   }

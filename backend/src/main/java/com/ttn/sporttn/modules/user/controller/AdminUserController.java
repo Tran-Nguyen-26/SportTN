@@ -22,21 +22,18 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-    // GET /api/v1/admin/users
     @GetMapping
     public ResponseEntity<ApiResponse<List<AdminUserResponse>>> getAll() {
         log.info("[ADMIN_USER] Lấy danh sách admin users");
         return ResponseEntity.ok(ApiResponse.ok(adminUserService.getAllAdminUsers()));
     }
 
-    // GET /api/v1/admin/users/{id}
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<AdminUserResponse>> getById(@PathVariable Long id) {
         log.info("[ADMIN_USER] Lấy chi tiết admin user. id={}", id);
         return ResponseEntity.ok(ApiResponse.ok(adminUserService.getAdminUserById(id)));
     }
 
-    // POST /api/v1/admin/users
     @PostMapping
     public ResponseEntity<ApiResponse<AdminUserResponse>> create(
             @Valid @RequestBody AdminUserCreateRequest request
@@ -45,7 +42,6 @@ public class AdminUserController {
         return ResponseEntity.ok(ApiResponse.ok(adminUserService.createAdminUser(request)));
     }
 
-    // PUT /api/v1/admin/users/{id}
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<AdminUserResponse>> update(
             @PathVariable Long id,
@@ -55,17 +51,15 @@ public class AdminUserController {
         return ResponseEntity.ok(ApiResponse.ok(adminUserService.updateAdminUser(id, request)));
     }
 
-    // PATCH /api/v1/admin/users/{id}/active
     @PatchMapping("/{id}/active")
     public ResponseEntity<ApiResponse<AdminUserResponse>> toggleActive(
             @PathVariable Long id,
             @RequestBody ToggleActiveRequest request
     ) {
-        log.info("[ADMIN_USER] Toggle active. id={}, active={}", id, request.getStatus());
+        log.info("[ADMIN_USER] Toggle active. id={}, active={}", id, request.getActive());
         return ResponseEntity.ok(ApiResponse.ok(adminUserService.toggleActive(id, request)));
     }
 
-    // DELETE /api/v1/admin/users/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         log.info("[ADMIN_USER] Xóa admin user. id={}", id);

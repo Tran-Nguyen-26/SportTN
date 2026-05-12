@@ -18,14 +18,14 @@
           type="text"
           class="search-input"
           placeholder="Tìm tên sản phẩm, thương hiệu..."
-          [(ngModel)]="searchQuery">
+          (input)="onSearchInput($any($event.target).value)">
       </div>
 
-      <select class="filter-select" [(ngModel)]="selectedCategory">
-        <option *ngFor="let c of categories" [value]="c.value">
-          {{ c.label }}
-        </option>
-      </select>
+<!--      <select class="filter-select" [(ngModel)]="selectedCategory">-->
+<!--        <option *ngFor="let c of categories" [value]="c.value">-->
+<!--          {{ c.label }}-->
+<!--        </option>-->
+<!--      </select>-->
 
       <!-- View mode toggle -->
       <div class="view-toggle">
@@ -52,17 +52,17 @@
           <th>Sản phẩm</th>
           <th>Danh mục</th>
           <th>Thương hiệu</th>
-          <th>Giá gốc</th>
-          <th>Giá sale</th>
-          <th>Tồn kho</th>
-          <th>Đã bán</th>
+<!--          <th>Giá gốc</th>-->
+<!--          <th>Giá sale</th>-->
+<!--          <th>Tồn kho</th>-->
+<!--          <th>Đã bán</th>-->
           <th>Rating</th>
           <th>Trạng thái</th>
           <th>Thao tác</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let p of filteredProducts">
+        <tr *ngFor="let p of products()">
           <td>
             <div class="product-cell">
               <div class="product-thumb">
@@ -76,15 +76,15 @@
           </td>
           <td><span class="category-tag">{{ p.categoryName }}</span></td>
           <td class="brand">{{ p.brandName }}</td>
-          <td class="price">{{ formatPrice(p.minPrice) }}</td>
-          <td class="sale-price">
-            <span *ngIf="p.salePrice">{{ formatPrice(p.salePrice) }}</span>
-            <span class="no-sale" *ngIf="!p.salePrice">—</span>
-          </td>
-          <td [class.low-stock]="p.totalStock < 50" [class.no-stock]="p.totalStock === 0">
-            {{ p.totalStock }}
-          </td>
-          <td class="sold">{{ p.soldCount?.toLocaleString() }}</td>
+<!--          <td class="price">{{ formatPrice(p.minPrice) }}</td>-->
+<!--          <td class="sale-price">-->
+<!--            <span *ngIf="p.salePrice">{{ formatPrice(p.salePrice) }}</span>-->
+<!--            <span class="no-sale" *ngIf="!p.salePrice">—</span>-->
+<!--          </td>-->
+<!--          <td [class.low-stock]="p.totalStock < 50" [class.no-stock]="p.totalStock === 0">-->
+<!--            {{ p.totalStock }}-->
+<!--          </td>-->
+<!--          <td class="sold">{{ p.soldCount?.toLocaleString() }}</td>-->
           <td>
             <div class="rating-cell">
               {{ p.rating }}
@@ -121,10 +121,10 @@
                   <span>Chỉnh sửa</span>
                 </button>
 
-                <button class="dropdown-item" (click)="onToggleStatus(p)">
-                  <mat-icon>{{ p.active ? 'visibility_off' : 'visibility' }}</mat-icon>
-                  <span>{{ p.active ? 'Ẩn sản phẩm' : 'Hiện sản phẩm' }}</span>
-                </button>
+<!--                <button class="dropdown-item" (click)="onToggleStatus(p)">-->
+<!--                  <mat-icon>{{ p.active ? 'visibility_off' : 'visibility' }}</mat-icon>-->
+<!--                  <span>{{ p.active ? 'Ẩn sản phẩm' : 'Hiện sản phẩm' }}</span>-->
+<!--                </button>-->
 
                 <div class="dropdown-divider"></div>
 
@@ -144,7 +144,7 @@
 
     <!-- Grid view -->
     <div class="product-grid" *ngIf="viewMode === 'grid'">
-      <div class="product-grid-card" *ngFor="let p of filteredProducts">
+      <div class="product-grid-card" *ngFor="let p of products()">
         <div class="grid-thumb">
           <img [src]="p.mainImageUrl" [alt]="p.name" class="grid-image">
         </div>

@@ -69,8 +69,10 @@ public enum ErrorCode {
     INVOICE_CREATE_FAILED ("INVOICE_004", "Tạo hóa đơn thất bại",                      HttpStatus.INTERNAL_SERVER_ERROR),
     INVOICE_STATUS_INVALID("INVOICE_005", "Trạng thái hóa đơn không hợp lệ",           HttpStatus.BAD_REQUEST),
 
-    OTP_INVALID("OTP_001", "OTP không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED);
+    OTP_INVALID("OTP_001", "OTP không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),
 
+    CATEGORY_HAS_CHILDREN   ("CATEGORY_002", "Danh mục đang có danh mục con, vui lòng xóa trước",   HttpStatus.BAD_REQUEST),
+    CATEGORY_HAS_PRODUCTS   ("CATEGORY_003", "Danh mục đang có sản phẩm, không thể xóa",            HttpStatus.BAD_REQUEST);
     private final String code;
     private final String message;
     private final HttpStatus httpStatus;

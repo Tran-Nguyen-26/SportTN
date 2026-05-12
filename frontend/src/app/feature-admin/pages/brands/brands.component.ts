@@ -22,7 +22,7 @@ export class BrandsComponent implements OnInit {
   fieldErrors: { name?: string; slug?: string } = {};
 
   // ── Logo state ───────────────────────────────
-  logoSource: 'upload' | 'url' = 'upload';
+  logoSource: 'upload' | 'url' = 'url';
   logoPreview: string | null = null;
   logoUrlPreview: string = '';
   logoUrlValid: boolean | null = null;
@@ -165,8 +165,16 @@ export class BrandsComponent implements OnInit {
   }
 
   deleteBrand(id: number): void {
-    // TODO: confirm + API
-    // this.brands = this.brands().filter(b => b.id !== id);
+    if (!confirm('Bạn có chắc muốn xóa thương hiệu này?')) return;
+
+    this.brandService.deleteBrand(id).subscribe({
+      next: () => {
+        this.brands.update(brands => brands.filter(b => b.id !== id));
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Xóa thương hiệu thất bại');
+      }
+    });
   }
 
   // ── Name / Slug ──────────────────────────────

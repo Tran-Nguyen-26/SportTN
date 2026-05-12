@@ -7,6 +7,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.ttn.sporttn.common.dto.PageResponse;
+import com.ttn.sporttn.modules.cart.repository.CartItemRepository;
+import com.ttn.sporttn.modules.order.dto.request.OrderItemRequest;
+import com.ttn.sporttn.modules.order.entity.OrderItem;
+import com.ttn.sporttn.modules.order.repository.OrderItemRepository;
+import com.ttn.sporttn.modules.order.repository.OrderRepository;
 import com.ttn.sporttn.modules.payment.dto.request.ProductFilterRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.*;
 import com.ttn.sporttn.modules.product.dto.response.*;
@@ -48,6 +53,8 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
     private final ProductMapper productMapper;
+    private final CartItemRepository cartItemRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public ProductPageResponse getProductPage(String slug) {
         Product product = productRepository.findBySlug(slug)
@@ -323,26 +330,22 @@ public class ProductService {
     private void updateVariants(Product product, List<VariantUpdateRequest> variantRequests) {
         if (variantRequests == null) return;
 
-        // ID của các variant FE gửi lên (có id = update, không có id = thêm mới)
         Set<Long> requestIds = variantRequests.stream()
                 .map(VariantUpdateRequest::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        // Xóa variant không còn trong request
         product.getVariants().removeIf(v -> !requestIds.contains(v.getId()));
 
         product.getVariants().removeIf(v -> !requestIds.contains(v.getId()));
 
         for (VariantUpdateRequest vReq : variantRequests) {
             if (vReq.getId() != null) {
-                // Update variant đã có
                 product.getVariants().stream()
                         .filter(v -> v.getId().equals(vReq.getId()))
                         .findFirst()
                         .ifPresent(v -> mapVariantData(v, vReq));
             } else {
-                // Thêm variant mới
                 ProductVariant newVariant = new ProductVariant();
                 newVariant.setProduct(product);
                 newVariant.setVariantImages(new ArrayList<>());
@@ -354,8 +357,6 @@ public class ProductService {
         log.debug("[PRODUCT] Cập nhật {} variants. id={}", variantRequests.size(), product.getId());
     }
 
-// ── mapVariantData ────────────────────────────────────────────────────────────
-
     private void mapVariantData(ProductVariant v, VariantUpdateRequest vReq) {
         v.setSku(vReq.getSku());
         v.setColor(vReq.getColor());
@@ -366,7 +367,6 @@ public class ProductService {
         v.setStockQuantity(vReq.getStockQuantity());
         v.setWeightGram(vReq.getWeightGram());
 
-        // orphanRemoval = true → clear() tự xóa ảnh variant cũ
         v.getVariantImages().clear();
 
         if (vReq.getImageUrls() != null) {
@@ -393,16 +393,13 @@ public class ProductService {
                 .mainImageUrl(product.getMainImageUrl())
                 .active(product.isActive())
 
-                // Lấy ID để FE dễ dàng bind vào Dropdown
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .brandId(product.getBrand() != null ? product.getBrand().getId() : null)
 
-                // Map danh sách ảnh phụ từ List<ProductImage> sang List<String>
                 .extraImageUrls(product.getImages().stream()
-                        .map(ProductImage::getImageUrl) // Giả sử BaseImage có getUrl()
+                        .map(ProductImage::getImageUrl)
                         .collect(Collectors.toList()))
 
-                // Map danh sách biến thể
                 .variants(product.getVariants().stream()
                         .map(this::mapToVariantResponse)
                         .collect(Collectors.toList()))
@@ -421,8 +418,6 @@ public class ProductService {
                 .weightGram(variant.getWeightGram())
                 .active(variant.isActive())
                 .mainImageUrl(variant.getMainImageUrl())
-
-                // Map ảnh của từng variant
                 .imageUrls(variant.getVariantImages().stream()
                         .map(ProductVariantImage::getImageUrl)
                         .collect(Collectors.toList()))
@@ -432,19 +427,54 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         log.info("[PRODUCT] Xóa sản phẩm. id={}", id);
-        
+
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("[PRODUCT] Sản phẩm không tìm thấy. id={}", id);
                     return new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
                 });
-        
+
+        boolean hasOrders = orderItemRepository.existsByProductVariant_Product_Id(id);
+        if (hasOrders) {
+            product.setActive(false);
+            product.getVariants().forEach(v -> v.setActive(false));
+            productRepository.save(product);
+            log.info("[PRODUCT] Soft delete (đã có đơn hàng). id={}", id);
+            return;
+        }
+
+        cartItemRepository.deleteByProductVariant_Product_Id(id);
+
         productRepository.delete(product);
-        log.info("[PRODUCT] Xóa sản phẩm thành công. id={}", id);
+
+
+        log.info("[PRODUCT] Hard delete thành công. id={}", id);
     }
 
-    public Page<ProductAdminResponse> getProductsForAdmin(Pageable pageable) {
-        return productRepository.findAllForAdmin(pageable);
+    public Page<ProductAdminResponse> getProductsForAdmin(
+            Pageable pageable, String keyword, String categorySlug, Boolean active) {
+
+        Specification<Product> spec = Specification.where(null);
+
+        if (StringUtils.hasText(keyword)) {
+            spec = spec.and((root, q, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("name")),  "%" + keyword.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("slug")),  "%" + keyword.toLowerCase() + "%")
+            ));
+        }
+
+        if (StringUtils.hasText(categorySlug)) {
+            spec = spec.and((root, q, cb) ->
+                    cb.equal(root.get("category").get("slug"), categorySlug));
+        }
+
+        if (active != null) {
+            spec = spec.and((root, q, cb) ->
+                    cb.equal(root.get("active"), active));
+        }
+
+        return productRepository.findAll(spec, pageable)
+                .map(ProductAdminResponse::from);
     }
 
     public List<VariantResponse> getVariantsByProductId(Long productId) {
@@ -522,10 +552,10 @@ public class ProductService {
                 cb.equal(root.get("category").get("slug"), filter.getCategorySlug()));
         }
 
-        if (StringUtils.hasText(filter.getSubCategory())) {
-            spec = spec.and((root, q, cb) ->
-                cb.equal(root.get("subCategory").get("slug"), filter.getSubCategory()));
-        }
+//        if (StringUtils.hasText(filter.getSubCategory())) {
+//            spec = spec.and((root, q, cb) ->
+//                cb.equal(root.get("subCategory").get("slug"), filter.getSubCategory()));
+//        }
 
         if (!filter.getBrands().isEmpty()) {
             spec = spec.and((root, q, cb) ->
@@ -559,15 +589,12 @@ public class ProductService {
                         ? cb.asc(effectivePrice)
                         : cb.desc(effectivePrice));
             }
-
             q.distinct(true);
-
             return predicates.isEmpty()
                     ? cb.conjunction()
                     : cb.and(predicates.toArray(new Predicate[0]));
         });
 
-        // -- Query --
         Page<Product> productPage = productRepository.findAll(spec, pageable);
         List<ProductCardResponse> content = productPage.getContent()
                 .stream()

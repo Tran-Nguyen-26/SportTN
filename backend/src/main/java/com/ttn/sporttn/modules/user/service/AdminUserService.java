@@ -1,5 +1,7 @@
 package com.ttn.sporttn.modules.user.service;
 
+import com.ttn.sporttn.common.exception.BusinessException;
+import com.ttn.sporttn.common.exception.ErrorCode;
 import com.ttn.sporttn.modules.user.dto.request.admin.AdminUserCreateRequest;
 import com.ttn.sporttn.modules.user.dto.request.admin.AdminUserUpdateRequest;
 import com.ttn.sporttn.modules.user.dto.request.admin.ToggleActiveRequest;
@@ -126,14 +128,10 @@ public class AdminUserService {
 
     @Transactional
     public AdminUserResponse toggleActive(Long id, ToggleActiveRequest request) {
-        log.info("[AdminUserService] Toggle active user ID: {}, status: {}", id, request.getStatus());
-
+        log.info("[AdminUserService] Toggle active user ID: {}, status: {}", id, request.getActive());
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với id: " + id));
-
-        user.setStatus(UserStatus.valueOf(request.getStatus()));
-        user.setUpdatedAt(LocalDateTime.now());
-
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST));
+        user.setStatus(request.getActive() ? UserStatus.ACTIVE : UserStatus.INACTIVE);
         User updated = userRepository.save(user);
         return convertToResponse(updated);
     }

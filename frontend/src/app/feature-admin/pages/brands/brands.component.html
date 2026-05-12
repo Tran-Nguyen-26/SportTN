@@ -44,9 +44,9 @@
           <mat-icon class="bc-icon">inventory_2</mat-icon>
           {{ brand.totalProducts }} sản phẩm
         </div>
-        <div class="toggle" [class.on]="brand.active" (click)="brand.active = !brand.active">
-          <div class="toggle-thumb"></div>
-        </div>
+<!--        <div class="toggle" [class.on]="brand.active" (click)="brand.active = !brand.active">-->
+<!--          <div class="toggle-thumb"></div>-->
+<!--        </div>-->
       </div>
     </div>
 
@@ -134,13 +134,13 @@
 
         <!-- Source tabs -->
         <div class="img-source-tabs">
-          <button
-            class="img-source-tab"
-            [class.active]="logoSource === 'upload'"
-            (click)="logoSource = 'upload'">
-            <mat-icon>upload</mat-icon>
-            Tải lên
-          </button>
+<!--          <button-->
+<!--            class="img-source-tab"-->
+<!--            [class.active]="logoSource === 'upload'"-->
+<!--            (click)="logoSource = 'upload'">-->
+<!--            <mat-icon>upload</mat-icon>-->
+<!--            Tải lên-->
+<!--          </button>-->
           <button
             class="img-source-tab"
             [class.active]="logoSource === 'url'"
@@ -151,28 +151,28 @@
         </div>
 
         <!-- Upload -->
-        <ng-container *ngIf="logoSource === 'upload'">
-          <div class="logo-upload-zone" (click)="logoInput.click()" *ngIf="!logoPreview">
-            <input #logoInput type="file" accept="image/*" hidden (change)="onLogoChange($event)">
-            <div class="logo-upload-icon">
-              <mat-icon>add_photo_alternate</mat-icon>
-            </div>
-            <span class="logo-upload-text">Chọn file logo</span>
-            <span class="logo-upload-hint">PNG, SVG, JPG · Nền trong suốt tốt hơn · Tối đa 2MB</span>
-          </div>
-          <div class="logo-preview-wrap" *ngIf="logoPreview">
-            <div
-              class="logo-preview-box"
-              [style.background]="form.color + '18'"
-            >
-              <img [src]="logoPreview" alt="Logo preview" class="logo-preview-img">
-            </div>
-            <button class="logo-remove-btn" (click)="removeLogo()">
-              <mat-icon>close</mat-icon>
-              Xóa logo
-            </button>
-          </div>
-        </ng-container>
+<!--        <ng-container *ngIf="logoSource === 'upload'">-->
+<!--          <div class="logo-upload-zone" (click)="logoInput.click()" *ngIf="!logoPreview">-->
+<!--            <input #logoInput type="file" accept="image/*" hidden (change)="onLogoChange($event)">-->
+<!--            <div class="logo-upload-icon">-->
+<!--              <mat-icon>add_photo_alternate</mat-icon>-->
+<!--            </div>-->
+<!--            <span class="logo-upload-text">Chọn file logo</span>-->
+<!--            <span class="logo-upload-hint">PNG, SVG, JPG · Nền trong suốt tốt hơn · Tối đa 2MB</span>-->
+<!--          </div>-->
+<!--          <div class="logo-preview-wrap" *ngIf="logoPreview">-->
+<!--            <div-->
+<!--              class="logo-preview-box"-->
+<!--              [style.background]="form.color + '18'"-->
+<!--            >-->
+<!--              <img [src]="logoPreview" alt="Logo preview" class="logo-preview-img">-->
+<!--            </div>-->
+<!--            <button class="logo-remove-btn" (click)="removeLogo()">-->
+<!--              <mat-icon>close</mat-icon>-->
+<!--              Xóa logo-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </ng-container>-->
 
         <!-- URL -->
         <ng-container *ngIf="logoSource === 'url'">
@@ -242,18 +242,18 @@
       </div>
 
       <!-- Trạng thái -->
-      <div class="section">
-        <div class="section-label">Trạng thái</div>
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <span class="t-label">Kích hoạt</span>
-            <span class="t-desc">Thương hiệu hiển thị khi lọc sản phẩm</span>
-          </div>
-          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">
-            <div class="toggle-thumb"></div>
-          </div>
-        </div>
-      </div>
+<!--      <div class="section">-->
+<!--        <div class="section-label">Trạng thái</div>-->
+<!--        <div class="toggle-row">-->
+<!--          <div class="toggle-info">-->
+<!--            <span class="t-label">Kích hoạt</span>-->
+<!--            <span class="t-desc">Thương hiệu hiển thị khi lọc sản phẩm</span>-->
+<!--          </div>-->
+<!--          <div class="toggle" [class.on]="form.active" (click)="form.active = !form.active">-->
+<!--            <div class="toggle-thumb"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
 
     </div>
 

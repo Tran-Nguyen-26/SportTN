@@ -12,20 +12,16 @@ import com.ttn.sporttn.modules.cart.entity.CartItem;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    
-    /**
-     * Find cart item by cart ID and product variant ID
-     */
+
     Optional<CartItem> findByCartIdAndProductVariantId(Long cartId, Long variantId);
 
-    /**
-     * Delete all items from a cart
-     */
     @Modifying
     @Query("DELETE FROM CartItem ci WHERE ci.cart.id = :cartId")
     void deleteByCartId(@Param("cartId") Long cartId);
 
     @Modifying
     void deleteAllByCartUserId(Long userId);
+
+    void deleteByProductVariant_Product_Id(Long id);
 }
 

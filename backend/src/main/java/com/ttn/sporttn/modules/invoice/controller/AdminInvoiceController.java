@@ -1,13 +1,16 @@
 package com.ttn.sporttn.modules.invoice.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
+import com.ttn.sporttn.common.dto.PageResponse;
 import com.ttn.sporttn.modules.invoice.dto.response.InvoiceResponse;
 import com.ttn.sporttn.modules.invoice.dto.response.InvoiceStatsResponse;
 import com.ttn.sporttn.modules.invoice.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -20,15 +23,20 @@ public class AdminInvoiceController {
 
     /** Lấy danh sách hóa đơn có phân trang + filter */
     @GetMapping
-    public ApiResponse<Page<InvoiceResponse>> getAllInvoices(
+    public ApiResponse<PageResponse<InvoiceResponse>> getAllInvoices(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String keyword,
-            Pageable pageable) {
-        log.info("[ADMIN-INVOICE] Lấy danh sách hóa đơn. status={}, keyword={}", status, keyword);
-        return ApiResponse.ok(
-                invoiceService.getAllInvoices(status, keyword, pageable),
-                "Lấy danh sách hóa đơn thành công"
-        );
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        log.info("[ADMIN-INVOICE] Lấy danh sách hóa đơn. status={}, keyword={}, page={}, size={}",
+                status, keyword, page, size);
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("issueDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.unsorted());
+        Page<InvoiceResponse> result = invoiceService.getAllInvoices(status, keyword, pageable);
+
+
+        return ApiResponse.ok(PageResponse.from(result), "Lấy danh sách hóa đơn thành công");
     }
 
     /** Chi tiết hóa đơn */

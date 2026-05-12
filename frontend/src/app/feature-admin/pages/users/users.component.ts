@@ -36,7 +36,8 @@ export interface AdminUser {
 }
 
 export interface UserForm {
-  name: string;
+  fullname: string;
+  username: string;
   email: string;
   password: string;
   phone: string;
@@ -233,7 +234,8 @@ export class UsersComponent implements OnInit {
     if (user) {
       this.editingUser = user;
       this.form = {
-        name:        user.username,
+        fullname: user.fullname,
+        username:        user.username,
         email:       user.email,
         password:    '',
         phone:       user.phone,
@@ -262,7 +264,7 @@ export class UsersComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    const base = !!(this.form.name && this.form.email && this.form.role);
+    const base = !!(this.form.username && this.form.email && this.form.role);
     if (!this.editingUser) return base && this.form.password.length >= 8;
     return base;
   }
@@ -285,9 +287,9 @@ export class UsersComponent implements OnInit {
     this.isSaving = true;
 
     if (this.editingUser) {
-      // UPDATE
       const request: AdminUserUpdateRequest = {
-        name:        this.form.name,
+        fullname: this.form.fullname,
+        username:        this.form.username,
         phone:       this.form.phone,
         role:        this.form.role as UserRole,
         permissions: [...this.form.permissions],
@@ -313,7 +315,8 @@ export class UsersComponent implements OnInit {
     } else {
       // CREATE
       const request: AdminUserCreateRequest = {
-        name:        this.form.name,
+        fullname: this.form.fullname,
+        username:        this.form.username,
         email:       this.form.email,
         password:    this.form.password,
         phone:       this.form.phone,
@@ -325,7 +328,6 @@ export class UsersComponent implements OnInit {
       this.userService.createAdminUser(request).subscribe({
         next: (res) => {
           if (res.data) {
-            // Thêm user mới vào đầu list
             this.users.update(list => [res.data!, ...list]);
           }
           this.isSaving = false;
@@ -409,7 +411,7 @@ export class UsersComponent implements OnInit {
 
   private emptyForm(): UserForm {
     return {
-      name: '', email: '', password: '', phone: '',
+      fullname: '', username: '', email: '', password: '', phone: '',
       role: '', permissions: [], status: 'ACTIVE',
     };
   }

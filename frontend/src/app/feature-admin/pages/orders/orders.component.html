@@ -57,10 +57,12 @@
         <input
           type="text"
           class="search-input"
-          placeholder="Tìm mã đơn, khách hàng, sản phẩm..."
-          [(ngModel)]="searchQuery">
+          placeholder="Tìm mã đơn, tên khách, SĐT..."
+          (input)="onSearchInput($any($event.target).value)">
       </div>
-      <select class="filter-select" [(ngModel)]="selectedStatus">
+      <select class="filter-select"
+              [(ngModel)]="selectedStatus"
+              (ngModelChange)="onStatusChange()">
         <option *ngFor="let s of statusOptions" [value]="s.value">
           {{ s.label }}
         </option>
@@ -128,13 +130,22 @@
         Hiển thị {{ orders.length }} / {{ orders.length }} đơn hàng
       </span>
       <div class="pagination">
-        <button class="page-btn" disabled>
+        <button class="page-btn"
+                [disabled]="pageIndex === 0"
+                (click)="goToPreviousPage()">
           <mat-icon>chevron_left</mat-icon>
         </button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn">
+
+        <button class="page-btn"
+                *ngFor="let p of pagesArray"
+                [class.active]="p === pageIndex"
+                (click)="goToPage(p)">
+          {{ p + 1 }}
+        </button>
+
+        <button class="page-btn"
+                [disabled]="pageIndex >= totalPages - 1"
+                (click)="goToNextPage()">
           <mat-icon>chevron_right</mat-icon>
         </button>
       </div>

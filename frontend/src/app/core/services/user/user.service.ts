@@ -7,7 +7,8 @@ import { AdminUser, UserForm, UserRole } from '../../../feature-admin/pages/user
 import {PageResponse} from "../../models/page-response";
 
 export interface AdminUserCreateRequest {
-  name: string;
+  fullname: string;
+  username: string;
   email: string;
   password: string;
   phone: string;
@@ -17,7 +18,8 @@ export interface AdminUserCreateRequest {
 }
 
 export interface AdminUserUpdateRequest {
-  name: string;
+  fullname: string;
+  username: string;
   phone: string;
   role: UserRole;
   permissions: string[];

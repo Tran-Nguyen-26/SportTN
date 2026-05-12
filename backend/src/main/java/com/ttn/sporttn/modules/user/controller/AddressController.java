@@ -20,7 +20,6 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    // GET /api/v1/users/addresses -> getMyAddresses()
     @GetMapping
     public ResponseEntity<ApiResponse<List<AddressResponse>>> getMyAddresses(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -28,7 +27,6 @@ public class AddressController {
         return ResponseEntity.ok(ApiResponse.ok(addresses));
     }
 
-    // POST /api/v1/users/addresses -> createAddress()
     @PostMapping
     public ResponseEntity<ApiResponse<AddressResponse>> createAddress(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -37,7 +35,6 @@ public class AddressController {
         return ResponseEntity.ok(ApiResponse.ok(address));
     }
 
-    // PUT /api/v1/users/addresses/{id} -> updateAddress()
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<AddressResponse>> updateAddress(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -47,7 +44,6 @@ public class AddressController {
         return ResponseEntity.ok(ApiResponse.ok(address));
     }
 
-    // DELETE /api/v1/users/addresses/{id} -> deleteAddress()
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteAddress(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -56,7 +52,6 @@ public class AddressController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
-    // PATCH /api/v1/users/addresses/{id}/default -> setDefault()
     @PatchMapping("/{id}/default")
     public ResponseEntity<ApiResponse<AddressResponse>> setDefault(
             @AuthenticationPrincipal CustomUserDetails userDetails,

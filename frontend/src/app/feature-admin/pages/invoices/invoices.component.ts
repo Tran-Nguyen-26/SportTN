@@ -1,4 +1,6 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PageEvent } from '@angular/material/paginator';
 import {
   InvoiceService,
@@ -6,8 +8,8 @@ import {
   InvoiceStatsResponse,
   InvoiceFilterParams
 } from '../../../core/services/invoice/invoice.service';
-import {ProductService} from "../../../core/services/product/product.service";
-import {UserService} from "../../../core/services/user/user.service";
+import { ProductService } from "../../../core/services/product/product.service";
+import { UserService } from "../../../core/services/user/user.service";
 
 export interface InvoiceForm {
   customerId:      number | null;
@@ -50,26 +52,28 @@ interface ProductOption {
   templateUrl: './invoices.component.html',
   styleUrls: ['./invoices.component.css']
 })
-export class InvoicesComponent implements OnInit {
+export class InvoicesComponent implements OnInit, OnDestroy {
 
   // ── State ─────────────────────────────────────────────────────────────────
-  isLoading      = false;
-  invoices       = signal<InvoiceResponse[]>([]);
-  totalElements  = 0;
-  pageIndex      = 0;
-  pageSize       = 10;
+  isLoading     = false;
+  invoices      = signal<InvoiceResponse[]>([]);
+  totalElements = 0;
+  pageIndex     = 0;
+  pageSize      = 20;
 
-  searchQuery    = signal('');
+  searchKeyword  = '';
   selectedStatus = signal('');
 
   selectedInvoice: InvoiceResponse | null = null;
 
+  private searchSubject = new Subject<string>();
+
   stats: InvoiceStatsResponse = {
-    invoiceCount: 0,
-    paidCount: 0,
-    pendingCount: 0,
-    overdueCount: 0,
-    totalPaidAmount: 0,
+    invoiceCount:       0,
+    paidCount:          0,
+    pendingCount:       0,
+    overdueCount:       0,
+    totalPaidAmount:    0,
     totalPendingAmount: 0
   };
 
@@ -85,20 +89,33 @@ export class InvoicesComponent implements OnInit {
   ];
 
   // ── Create drawer ─────────────────────────────────────────────────────────
-  createVisible = false;
+  createVisible  = false;
   form: InvoiceForm = this.emptyForm();
   paymentMethods = ['VNPay', 'COD', 'Momo', 'Banking'];
 
   constructor(
     private invoiceService: InvoiceService,
     private productService: ProductService,
-    private userService: UserService,
+    private userService:    UserService,
   ) {}
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
     this.loadInvoices();
     this.loadStats();
+
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.searchKeyword = keyword;
+      this.pageIndex     = 0;
+      this.loadInvoices();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.searchSubject.complete();
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
@@ -109,7 +126,7 @@ export class InvoicesComponent implements OnInit {
       page:    this.pageIndex,
       size:    this.pageSize,
       status:  this.selectedStatus() || undefined,
-      keyword: this.searchQuery()    || undefined
+      keyword: this.searchKeyword    || undefined
     };
 
     this.invoiceService.getAllInvoices(params).subscribe({
@@ -127,7 +144,6 @@ export class InvoicesComponent implements OnInit {
     });
   }
 
-  // ── Load customers ────────────────────────────────────────────────────────
   loadCustomers(): void {
     this.userService.getCustomers({ page: 0, size: 100 }).subscribe({
       next: (res) => {
@@ -137,7 +153,7 @@ export class InvoicesComponent implements OnInit {
             name:    u.fullname,
             email:   u.email,
             phone:   u.phone ?? '',
-            address: ''        // UserService chưa trả address → để trống
+            address: ''
           }));
         }
       },
@@ -145,7 +161,6 @@ export class InvoicesComponent implements OnInit {
     });
   }
 
-// ── Load products ─────────────────────────────────────────────────────────
   loadProducts(): void {
     this.productService.getProductsForAdmin({ page: 0, size: 100, active: true }).subscribe({
       next: (res) => {
@@ -163,22 +178,18 @@ export class InvoicesComponent implements OnInit {
 
   loadStats(): void {
     this.invoiceService.getStats().subscribe({
-      next: (res) => {
-        if (res.data) this.stats = res.data;
-      },
+      next: (res) => { if (res.data) this.stats = res.data; },
       error: (err) => console.error('[INVOICE] Lỗi tải thống kê:', err)
     });
   }
 
   // ── Filter & Search ───────────────────────────────────────────────────────
-  onStatusChange(status: string): void {
-    this.selectedStatus.set(status);
-    this.pageIndex = 0;
-    this.loadInvoices();
+  onSearchInput(keyword: string): void {
+    this.searchSubject.next(keyword);
   }
 
-  onSearch(keyword: string): void {
-    this.searchQuery.set(keyword);
+  onStatusChange(status: string): void {
+    this.selectedStatus.set(status);
     this.pageIndex = 0;
     this.loadInvoices();
   }
@@ -192,12 +203,8 @@ export class InvoicesComponent implements OnInit {
   // ── Modal ─────────────────────────────────────────────────────────────────
   openInvoice(invoice: InvoiceResponse): void {
     this.selectedInvoice = invoice;
-
-    // Gọi API lấy chi tiết đầy đủ
     this.invoiceService.getInvoiceById(invoice.id).subscribe({
-      next: (res) => {
-        if (res.data) this.selectedInvoice = res.data;
-      },
+      next: (res) => { if (res.data) this.selectedInvoice = res.data; },
       error: (err) => console.error('[INVOICE] Lỗi tải chi tiết:', err)
     });
   }
@@ -246,9 +253,9 @@ export class InvoicesComponent implements OnInit {
   // ── Create drawer ─────────────────────────────────────────────────────────
   openCreate(): void {
     this.form          = this.emptyForm();
+    this.createVisible = true;
     this.loadCustomers();
     this.loadProducts();
-    this.createVisible = true;
   }
 
   closeCreate(): void {
@@ -291,6 +298,42 @@ export class InvoicesComponent implements OnInit {
     );
   }
 
+  saveInvoice(): void {
+    // TODO: implement
+  }
+
+  // ── Select helpers ────────────────────────────────────────────────────────
+  onSelectCustomer(customerId: number): void {
+    if (!customerId) {
+      this.form.customerId      = null;
+      this.form.customerName    = '';
+      this.form.customerEmail   = '';
+      this.form.customerPhone   = '';
+      this.form.customerAddress = '';
+      return;
+    }
+    const cust = this.customerList.find(c => c.id === +customerId);
+    if (!cust) return;
+    this.form.customerId      = cust.id;
+    this.form.customerName    = cust.name;
+    this.form.customerEmail   = cust.email;
+    this.form.customerPhone   = cust.phone;
+    this.form.customerAddress = cust.address;
+  }
+
+  onSelectProduct(index: number, productName: string): void {
+    if (!productName) {
+      this.form.items[index].sku       = '';
+      this.form.items[index].unitPrice = 0;
+      return;
+    }
+    const prod = this.productList.find(p => p.name === productName);
+    if (!prod) return;
+    this.form.items[index].productName = prod.name;
+    this.form.items[index].sku         = prod.sku;
+    this.form.items[index].unitPrice   = prod.price;
+  }
+
   // ── Paginator helpers ─────────────────────────────────────────────────────
   get pageStart(): number {
     return this.pageIndex * this.pageSize + 1;
@@ -298,6 +341,11 @@ export class InvoicesComponent implements OnInit {
 
   get pageEnd(): number {
     return Math.min((this.pageIndex + 1) * this.pageSize, this.totalElements);
+  }
+
+  get totalPages(): number[] {
+    const count = Math.ceil(this.totalElements / this.pageSize);
+    return Array.from({ length: count }, (_, i) => i);
   }
 
   private emptyForm(): InvoiceForm {
@@ -315,44 +363,6 @@ export class InvoicesComponent implements OnInit {
       discount:        0,
       taxPercent:      10,
     };
-  }
-
-  onSelectCustomer(customerId: number): void {
-    if (!customerId) {
-      this.form.customerId      = null;
-      this.form.customerName    = '';
-      this.form.customerEmail   = '';
-      this.form.customerPhone   = '';
-      this.form.customerAddress = '';
-      return;
-    }
-
-    const cust = this.customerList.find(c => c.id === +customerId);
-    if (!cust) return;
-    this.form.customerId      = cust.id;
-    this.form.customerName    = cust.name;
-    this.form.customerEmail   = cust.email;
-    this.form.customerPhone   = cust.phone;
-    this.form.customerAddress = cust.address;
-  }
-
-  onSelectProduct(index: number, productName: string): void {
-    if (!productName) {
-      this.form.items[index].sku       = '';
-      this.form.items[index].unitPrice = 0;
-      return;
-    }
-
-    const prod = this.productList.find(p => p.name === productName);
-    if (!prod) return;
-
-    this.form.items[index].productName = prod.name;
-    this.form.items[index].sku         = prod.sku;
-    this.form.items[index].unitPrice   = prod.price;
-  }
-
-  saveInvoice() {
-
   }
 
   protected readonly Math = Math;

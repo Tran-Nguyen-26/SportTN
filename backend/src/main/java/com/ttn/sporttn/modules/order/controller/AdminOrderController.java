@@ -1,6 +1,7 @@
 package com.ttn.sporttn.modules.order.controller;
 
 import com.ttn.sporttn.common.dto.ApiResponse;
+import com.ttn.sporttn.common.dto.PageResponse;
 import com.ttn.sporttn.modules.order.dto.request.UpdateOrderStatusRequest;
 import com.ttn.sporttn.modules.order.dto.response.OrderDetailResponse;
 import com.ttn.sporttn.modules.order.dto.response.OrderResponse;
@@ -10,8 +11,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -22,12 +26,18 @@ public class AdminOrderController {
 
     private final OrderService orderService;
 
-    /** Lấy tất cả đơn hàng có phân trang */
     @GetMapping
-    public ApiResponse<Page<OrderResponse>> getAllOrders(Pageable pageable) {
-        log.info("[ADMIN-ORDER] Lấy danh sách đơn hàng. page={}", pageable.getPageNumber());
-        Page<OrderResponse> response = orderService.getAllOrders(pageable);
-        return ApiResponse.ok(response, "Lấy danh sách đơn hàng thành công");
+    public ResponseEntity<ApiResponse<PageResponse<OrderResponse>>> getAllOrders(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false)    String keyword,
+            @RequestParam(required = false)    String status) {
+
+        log.info("[ADMIN-ORDER] Lấy danh sách đơn hàng. page={}, status={}, keyword={}", page, status, keyword);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<OrderResponse> result = orderService.getAllOrders(pageable, keyword, status);
+        return ResponseEntity.ok(ApiResponse.ok(PageResponse.from(result), "Lấy danh sách đơn hàng thành công"));
     }
 
     /** Chi tiết đơn hàng */

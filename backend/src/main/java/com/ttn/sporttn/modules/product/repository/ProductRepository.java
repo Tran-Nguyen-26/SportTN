@@ -70,4 +70,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     """)
     Page<Product> searchProducts(@Param("q") String q, Pageable pageable);
 
+    boolean existsByBrandId(Long brandId);
+
+    boolean existsByCategoryId(Long id);
 }

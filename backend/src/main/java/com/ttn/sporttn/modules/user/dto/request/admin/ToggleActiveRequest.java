@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class ToggleActiveRequest {
-    private String status;
+    private Boolean active;
 }
 

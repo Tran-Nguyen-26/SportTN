@@ -31,7 +31,6 @@ public class ReportService {
     @Transactional(readOnly = true)
     public byte[] exportRevenuePdf(LocalDate from, LocalDate to) throws Exception {
 
-        // ── 1. Gọi SP tổng quan ───────────────────────────────────────────
         StoredProcedureQuery summaryQuery = entityManager
                 .createStoredProcedureQuery("rpt_revenue_summary")
                 .registerStoredProcedureParameter(1, LocalDate.class, ParameterMode.IN)
@@ -50,7 +49,6 @@ public class ReportService {
         BigDecimal codRevenue      = toBigDecimal(summary[5]);
         BigDecimal vnpayRevenue    = toBigDecimal(summary[6]);
 
-        // ── 2. Tính % thanh toán ──────────────────────────────────────────
         BigDecimal totalPayment = codRevenue.add(vnpayRevenue);
         String codPercent = totalPayment.compareTo(BigDecimal.ZERO) > 0
                 ? String.valueOf(codRevenue.multiply(BigDecimal.valueOf(100))
@@ -61,7 +59,6 @@ public class ReportService {
                                  .divide(totalPayment, 0, RoundingMode.HALF_UP))
                 : "0";
 
-        // ── 3. Parameters cho JasperReports ──────────────────────────────
         Map<String, Object> params = new HashMap<>();
         params.put("FROM_DATE",        from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         params.put("TO_DATE",          to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -75,7 +72,6 @@ public class ReportService {
         params.put("VNPAY_REVENUE",    formatPrice(vnpayRevenue));
         params.put("VNPAY_PERCENT",    vnpayPercent);
 
-        // ── 4. Gọi SP doanh thu theo ngày ────────────────────────────────
         StoredProcedureQuery chartQuery = entityManager
                 .createStoredProcedureQuery("rpt_revenue_by_day")
                 .registerStoredProcedureParameter(1, LocalDate.class, ParameterMode.IN)
@@ -96,7 +92,6 @@ public class ReportService {
 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(rows);
 
-        // ── 5. Gọi SP top sản phẩm ────────────────────────────────────────
         StoredProcedureQuery topProductsQuery = entityManager
                 .createStoredProcedureQuery("rpt_top_products")
                 .registerStoredProcedureParameter(1, LocalDate.class, ParameterMode.IN)
@@ -120,7 +115,6 @@ public class ReportService {
 
         params.put("TOP_PRODUCTS", topProducts);
 
-        // ── 6. Compile & fill template ────────────────────────────────────
         InputStream template = getClass()
                 .getResourceAsStream("/reports/revenue_report.jrxml");
 

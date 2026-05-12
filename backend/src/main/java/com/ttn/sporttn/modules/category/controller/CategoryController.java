@@ -60,7 +60,6 @@ public class CategoryController {
      * POST /api/v1/categories
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
         @Valid @RequestBody CreateCategoryRequest request
     ) {
@@ -74,7 +73,6 @@ public class CategoryController {
      * PUT /api/v1/categories/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
         @PathVariable Long id,
         @Valid @RequestBody UpdateCategoryRequest request
@@ -88,7 +86,6 @@ public class CategoryController {
      * DELETE /api/v1/categories/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(
         @PathVariable Long id
     ) {
@@ -97,7 +94,6 @@ public class CategoryController {
     }
 
     @PatchMapping("/{id}/toggle-show-on-home")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> toggleShowOnHome(
         @PathVariable Long id
     ) {

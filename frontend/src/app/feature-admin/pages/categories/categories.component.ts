@@ -138,7 +138,7 @@ export class CategoriesComponent implements OnInit {
         active: form.active,
       }
 
-      this.categoryService.updateCategory(form.categoryId!, request).subscribe({
+      this.categoryService.updateCategory(categoryId, request).subscribe({
         next: (res) => {
           if (res.data) {
             this.categories.update(list =>
@@ -197,18 +197,19 @@ export class CategoriesComponent implements OnInit {
   onDelete(cat: CategoryAdminResponse): void {
     const categoryId = cat.categoryId;
 
-    if (!confirm(`Xóa danh mục "${cat.name}"?`)) return;
+    if (!confirm(`Bạn có chắc chắn muốn xóa danh mục "${cat.name}"?\nHành động này không thể hoàn tác.`)) return;
 
     const previousList = this.categories();
-    this.categories.update(list => list.filter(c => (c.categoryId || c.categoryId) !== categoryId));
+    this.categories.update(list => list.filter(c => c.categoryId !== categoryId));
 
     this.categoryService.deleteCategory(categoryId).subscribe({
-      next: (response) => {
-        console.log('Xóa danh mục thành công:', response);
+      next: () => {
+        alert(`✓ Đã xóa danh mục "${cat.name}" thành công.`);
       },
-      error: (error) => {
-        console.error('Lỗi khi xóa danh mục:', error);
+      error: (err) => {
         this.categories.set(previousList);
+        const msg = err?.error?.message || 'Xóa danh mục thất bại, vui lòng thử lại.';
+        alert(`⚠ ${msg}`);
       }
     });
   }

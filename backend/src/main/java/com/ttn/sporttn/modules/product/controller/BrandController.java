@@ -38,4 +38,10 @@ public class BrandController {
         BrandResponse brand = brandService.updateBrand(brandId, request);
         return ResponseEntity.ok(ApiResponse.ok(brand, "Cập nhật thương hiệu thành công"));
     }
+
+    @DeleteMapping("/{brandId}")
+    public ResponseEntity<ApiResponse<?>> deleteBrand(@PathVariable Long brandId) {
+        brandService.deleteBrand(brandId);
+        return ResponseEntity.ok(ApiResponse.ok("Xóa thương hiệu thành công"));
+    }
 }

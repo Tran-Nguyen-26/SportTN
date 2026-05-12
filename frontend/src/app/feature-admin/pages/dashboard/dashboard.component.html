@@ -47,10 +47,10 @@
         <div class="stat-icon" [ngClass]="s.color">
           <mat-icon>{{ s.icon }}</mat-icon>
         </div>
-        <div class="stat-trend" [class.up]="s.trend >= 0" [class.down]="s.trend < 0">
-          <mat-icon>{{ s.trend >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
-          <span>{{ s.trend >= 0 ? '+' : '' }}{{ s.trend }}%</span>
-        </div>
+<!--        <div class="stat-trend" [class.up]="s.trend >= 0" [class.down]="s.trend < 0">-->
+<!--          <mat-icon>{{ s.trend >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>-->
+<!--          <span>{{ s.trend >= 0 ? '+' : '' }}{{ s.trend }}%</span>-->
+<!--        </div>-->
       </div>
       <div class="stat-value">{{ s.value }}</div>
       <div class="stat-label">{{ s.label }}</div>

@@ -1,10 +1,13 @@
 package com.ttn.sporttn.modules.product.service;
 
+import com.ttn.sporttn.common.exception.BusinessException;
+import com.ttn.sporttn.common.exception.ErrorCode;
 import com.ttn.sporttn.modules.product.dto.request.admin.BrandAddRequest;
 import com.ttn.sporttn.modules.product.dto.request.admin.BrandUpdateRequest;
 import com.ttn.sporttn.modules.product.dto.response.admin.BrandResponse;
 import com.ttn.sporttn.modules.product.entity.Brand;
 import com.ttn.sporttn.modules.product.repository.BrandRepository;
+import com.ttn.sporttn.modules.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,6 +27,7 @@ import java.util.regex.Pattern;
 public class BrandService {
 
     private final BrandRepository brandRepository;
+    private final ProductRepository productRepository;
 
     @Cacheable(value = "brands")
     public List<BrandResponse> getBrands() {
@@ -120,5 +124,21 @@ public class BrandService {
                 .active(brand.getActive())
                 .totalProducts(brand.getProducts() != null ? (long) brand.getProducts().size() : 0L)
                 .build();
+    }
+
+    @CacheEvict(value = "brands", allEntries = true)
+    @Transactional
+    public void deleteBrand(Long brandId) {
+        Brand brand = brandRepository.findById(brandId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST));
+
+        boolean hasProducts = productRepository.existsByBrandId(brandId);
+        if (hasProducts) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST,
+                    "Không thể xóa thương hiệu đang có sản phẩm");
+        }
+
+        brandRepository.delete(brand);
+        log.info("[BRAND] Xóa thương hiệu. brandId={}", brandId);
     }
 }

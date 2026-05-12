@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {environment} from "../../../../environments/enviroment";
 import {ApiResponse} from "../../models/home-response/home-response";
+import {PageResponse} from "../../models/page-response";
+import {CustomerFilterParams} from "../../../feature-admin/pages/customers/customers.component";
 
 export interface AdminCustomer {
   id: number;
@@ -52,8 +54,17 @@ export class AdminCustomerService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<ApiResponse<AdminCustomer[]>> {
-    return this.http.get<ApiResponse<AdminCustomer[]>>(this.API_URL);
+  getAll(params: CustomerFilterParams = {}): Observable<ApiResponse<PageResponse<AdminCustomer>>> {
+    let httpParams = new HttpParams()
+      .set('page', params.page ?? 0)
+      .set('size', params.size ?? 10);
+
+    if (params.keyword) httpParams = httpParams.set('keyword', params.keyword);
+    if (params.status)  httpParams = httpParams.set('status',  params.status);
+
+    return this.http.get<ApiResponse<PageResponse<AdminCustomer>>>(
+      this.API_URL, { params: httpParams }
+    );
   }
 
   getById(id: number): Observable<ApiResponse<AdminCustomer>> {
