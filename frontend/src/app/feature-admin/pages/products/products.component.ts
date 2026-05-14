@@ -18,7 +18,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   totalElements  = signal(0);
   totalPages     = signal(0);
   currentPage    = signal(0);
-  pageSize       = signal(20);
+  pageSize       = signal(10);
 
   searchKeyword    = '';
   selectedCategory = '';
@@ -118,6 +118,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.currentPage.set(pageIndex);
       this.loadProducts();
     }
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage.set(0);
+    this.loadProducts();
   }
 
   goToPreviousPage(): void {

@@ -30,6 +30,7 @@
           <mat-icon matPrefix>mail_outline</mat-icon>
           <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email là bắt buộc</mat-error>
           <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Email không hợp lệ</mat-error>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('leadingDigitNotAllowed')">Email không hợp lệ</mat-error>
           <mat-error *ngIf="registerForm.get('email')?.hasError('alreadyExists')">
             Email này đã được sử dụng
           </mat-error>

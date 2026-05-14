@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
 import {AuthService} from "../../../../core/services/auth/auth.service";
 import {RegisterRequest} from "../../../../core/models/auth/auth.model";
 import {Router} from "@angular/router";
+import {smartEmailValidator} from "../../../../validators/email.validator";
 
 @Component({
   selector: 'app-register',
@@ -23,7 +24,7 @@ export class RegisterPageComponent implements OnInit {
   ngOnInit(): void {
     this.registerForm = this.fb.group({
       // Step 1
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, smartEmailValidator]],
       // Step 2
       username: ['', [Validators.required, Validators.minLength(3)]],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],

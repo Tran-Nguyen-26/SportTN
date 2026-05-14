@@ -349,3 +349,15 @@
   align-items: center;
   justify-content: center;
 }
+
+.page-size-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.page-size-wrap .filter-select {
+  width: 70px;
+}

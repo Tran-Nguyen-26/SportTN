@@ -26,7 +26,6 @@ public class CustomerService {
     // ── Step 1: Gửi OTP ─────────────────────────────
 
     public void sendOtp(String email) {
-        // Kiểm tra email tồn tại
         if (!userRepository.existsByEmail(email)) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
@@ -47,11 +46,9 @@ public class CustomerService {
         log.info("[FORGOT_PASSWORD] OTP hợp lệ. email={}", email);
     }
 
-    // ── Step 3: Reset mật khẩu ──────────────────────
 
     @Transactional
     public void resetPassword(String email, String otp, String newPassword) {
-        // Verify OTP lần cuối
         if (!otpStore.verify(email, otp)) {
             throw new BusinessException(ErrorCode.OTP_INVALID);
         }
@@ -63,7 +60,6 @@ public class CustomerService {
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
 
-        // Xóa OTP sau khi dùng
         otpStore.remove(email);
         log.info("[FORGOT_PASSWORD] Đặt lại mật khẩu thành công. email={}", email);
     }

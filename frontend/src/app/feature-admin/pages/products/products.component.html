@@ -206,6 +206,18 @@
         Hiển thị <b>{{ products().length }}</b> / <b>{{ totalElements() }}</b> sản phẩm
       </span>
 
+      <div class="page-size-wrap">
+        <span>Mỗi trang:</span>
+        <select class="filter-select"
+                [ngModel]="pageSize()"
+                (ngModelChange)="pageSize.set($event); onPageSizeChange()">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
+
       <div class="pagination">
         <button
           class="page-btn"

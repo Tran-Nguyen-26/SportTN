@@ -33,21 +33,21 @@
   </div>
 
   <!-- Filter Bar -->
-  <div class="filter-bar">
-    <div class="filter-tabs">
-      <button
-        *ngFor="let tab of statusTabs"
-        class="filter-tab"
-        [class.active]="activeFilter === tab.value"
-        (click)="setFilter(tab.value)">
-        <mat-icon>{{ tab.icon }}</mat-icon>
-        {{ tab.label }}
-        <span class="tab-count" *ngIf="getCountByStatus(tab.value) > 0">
-          {{ getCountByStatus(tab.value) }}
-        </span>
-      </button>
-    </div>
-  </div>
+<!--  <div class="filter-bar">-->
+<!--    <div class="filter-tabs">-->
+<!--      <button-->
+<!--        *ngFor="let tab of statusTabs"-->
+<!--        class="filter-tab"-->
+<!--        [class.active]="activeFilter === tab.value"-->
+<!--        (click)="setFilter(tab.value)">-->
+<!--        <mat-icon>{{ tab.icon }}</mat-icon>-->
+<!--        {{ tab.label }}-->
+<!--        <span class="tab-count" *ngIf="getCountByStatus(tab.value) > 0">-->
+<!--          {{ getCountByStatus(tab.value) }}-->
+<!--        </span>-->
+<!--      </button>-->
+<!--    </div>-->
+<!--  </div>-->
 
   <!-- Loading -->
   <div class="loader-container" *ngIf="isLoading">
@@ -107,7 +107,7 @@
         <!-- Tổng tiền -->
         <div class="order-total-col">
           <span class="meta-label">Tổng thanh toán</span>
-          <span class="order-amount">{{ order.totalAmount | currency:'VND':'':'1.0-0' }}đ</span>
+          <span class="order-amount">{{ order.finalAmount | currency:'VND':'':'1.0-0' }}đ</span>
         </div>
 
         <!-- Arrow -->
@@ -247,7 +247,9 @@
               </div>
               <div class="pay-row">
                 <span class="pay-label">Phí vận chuyển</span>
-                <span class="free-badge">Miễn phí</span>
+                <span class="free-badge" *ngIf="selectedOrder()?.shippingFee !== undefined && selectedOrder()?.shippingFee !== null">
+                  {{ selectedOrder()?.shippingFee === 0 ? 'Miễn phí' : (selectedOrder()?.shippingFee | number:'1.0-0') + ' đ' }}
+                </span>
               </div>
               <div class="pay-row" *ngIf="selectedOrder()?.shippingFee">
                 <span class="pay-label">Giảm giá</span>
@@ -285,14 +287,14 @@
 <!--        <mat-icon>download_for_offline</mat-icon>-->
 <!--        Xuất hóa đơn PDF-->
 <!--      </button>-->
-      <button
-        mat-stroked-button
-        class="btn-reorder"
-        *ngIf="selectedOrder()?.status === 'DELIVERED'"
-        (click)="reorder(selectedOrder()!)">
-        <mat-icon>replay</mat-icon>
-        Mua lại
-      </button>
+<!--      <button-->
+<!--        mat-stroked-button-->
+<!--        class="btn-reorder"-->
+<!--        *ngIf="selectedOrder()?.status === 'DELIVERED'"-->
+<!--        (click)="reorder(selectedOrder()!)">-->
+<!--        <mat-icon>replay</mat-icon>-->
+<!--        Mua lại-->
+<!--      </button>-->
       <button
         mat-stroked-button
         class="btn-cancel"

@@ -31,7 +31,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   totalElements  = 0;
   totalPages     = 0;
   pageIndex      = 0;
-  pageSize       = 20;
+  pageSize       = 10;
 
   searchKeyword  = '';
   selectedStatus = '';
@@ -124,9 +124,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   // ── Pagination ────────────────────────────────────────────────────────────
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize  = event.pageSize;
+
+  onPageSizeChange(): void {
+    this.pageIndex = 0;
     this.loadOrders();
   }
 

@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from "../../../../core/services/auth/auth.service";
+import {smartEmailValidator} from "../../../../validators/email.validator";
 
 @Component({
   selector: 'app-login-page',
@@ -62,7 +63,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
   initForm(): void {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, smartEmailValidator]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false]
     });

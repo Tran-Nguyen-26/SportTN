@@ -34,13 +34,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findByParentIsNullAndActiveTrueOrderByDisplayOrderAsc();
 
-    // Category cha — hiện sections trên home
     List<Category> findByParentIsNullAndShowOnHomeTrueAndActiveTrueOrderByDisplayOrderAsc();
 
 
     List<Category> findByParentIdAndActiveTrueOrderByDisplayOrderAsc(Long parentId);
 
-    @Query("SELECT c.id as categoryId, c.slug as slug, p.name as parent, " +
+    @Query(value = "SELECT c.id as categoryId, c.slug as slug, p.name as parent, " +
             "COUNT(prod.id) as productCount, c.displayOrder as displayOrder, " +
             "c.showOnHome as showOnHome, c.active as active " +
             "FROM Category c " +

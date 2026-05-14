@@ -30,17 +30,12 @@ public class InventorySerivce {
     @Value("${inventory.low-stock-threshold:10}")
     private Integer lowStockThreshold;
 
-    /**
-     * Giảm số lượng hàng (khi bán hàng)
-     */
     @Transactional
     public StockResponse decreaseStock(Long variantId, Integer quantity, User user, String reason) {
-        // Validate input
         if (quantity == null || quantity <= 0) {
             throw new BusinessException(ErrorCode.INVALID_QUANTITY);
         }
 
-        // Find variant
         ProductVariant variant = productRepository.findById(variantId)
                 .map(product -> product.getVariants().stream()
                         .filter(v -> v.getId().equals(variantId))
@@ -48,26 +43,19 @@ public class InventorySerivce {
                         .orElseThrow(() -> new BusinessException(ErrorCode.VARIANT_NOT_FOUND)))
                 .orElseThrow(() -> new BusinessException(ErrorCode.VARIANT_NOT_FOUND));
 
-        // Check stock
         if (variant.getStockQuantity() < quantity) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_STOCK);
         }
 
-        // Update stock
         variant.setStockQuantity(variant.getStockQuantity() - quantity);
 
-        // Create log
         createInventoryLog(variant, -quantity, "EXPORT_ORDER", user, reason);
 
         return buildStockResponse(variant);
     }
 
-    /**
-     * Tăng số lượng hàng (khi nhập hoặc trả hàng)
-     */
     @Transactional
     public StockResponse increaseStock(Long variantId, Integer quantity, User user, String actionType, String reason) {
-        // Validate input
         if (quantity == null || quantity <= 0) {
             throw new BusinessException(ErrorCode.INVALID_QUANTITY);
         }
@@ -77,7 +65,6 @@ public class InventorySerivce {
             throw new BusinessException(ErrorCode.INVALID_REQUEST);
         }
 
-        // Find variant
         ProductVariant variant = productRepository.findById(variantId)
                 .map(product -> product.getVariants().stream()
                         .filter(v -> v.getId().equals(variantId))
@@ -85,10 +72,8 @@ public class InventorySerivce {
                         .orElseThrow(() -> new BusinessException(ErrorCode.VARIANT_NOT_FOUND)))
                 .orElseThrow(() -> new BusinessException(ErrorCode.VARIANT_NOT_FOUND));
 
-        // Update stock
         variant.setStockQuantity(variant.getStockQuantity() + quantity);
 
-        // Create log
         createInventoryLog(variant, quantity, actionType, user, reason);
 
         return buildStockResponse(variant);
@@ -109,9 +94,6 @@ public class InventorySerivce {
         return buildStockResponse(variant);
     }
 
-    /**
-     * Lấy lịch sử thay đổi hàng tồn kho
-     */
     @Transactional(readOnly = true)
     public List<InventoryLogResponse> getInventoryLogs(Long variantId) {
         ProductVariant variant = productRepository.findById(variantId)
@@ -127,9 +109,6 @@ public class InventorySerivce {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lấy lịch sử thay đổi trong khoảng thời gian
-     */
     @Transactional(readOnly = true)
     public List<InventoryLogResponse> getInventoryLogsByDateRange(Long variantId, LocalDateTime startDate, LocalDateTime endDate) {
         ProductVariant variant = productRepository.findById(variantId)
@@ -145,9 +124,7 @@ public class InventorySerivce {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Kiểm tra hàng tồn kho thấp
-     */
+
     @Transactional(readOnly = true)
     public boolean isLowStock(Long variantId) {
         ProductVariant variant = productRepository.findById(variantId)
@@ -175,9 +152,6 @@ public class InventorySerivce {
         inventoryLogRepository.save(log);
     }
 
-    /**
-     * Build StockResponse từ ProductVariant
-     */
     private StockResponse buildStockResponse(ProductVariant variant) {
         return StockResponse.builder()
                 .variantId(variant.getId())
@@ -188,9 +162,6 @@ public class InventorySerivce {
                 .build();
     }
 
-    /**
-     * Build InventoryLogResponse từ InventoryLog
-     */
     private InventoryLogResponse buildInventoryLogResponse(InventoryLog log) {
         return InventoryLogResponse.builder()
                 .id(log.getId())

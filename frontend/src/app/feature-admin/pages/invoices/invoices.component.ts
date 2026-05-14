@@ -59,7 +59,7 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   invoices      = signal<InvoiceResponse[]>([]);
   totalElements = 0;
   pageIndex     = 0;
-  pageSize      = 20;
+  pageSize      = 10;
 
   searchKeyword  = '';
   selectedStatus = signal('');
@@ -181,6 +181,11 @@ export class InvoicesComponent implements OnInit, OnDestroy {
       next: (res) => { if (res.data) this.stats = res.data; },
       error: (err) => console.error('[INVOICE] Lỗi tải thống kê:', err)
     });
+  }
+
+  onPageSizeChange(): void {
+    this.pageIndex = 0;
+    this.loadInvoices();
   }
 
   // ── Filter & Search ───────────────────────────────────────────────────────

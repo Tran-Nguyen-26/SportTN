@@ -85,7 +85,7 @@
 
     <!-- Giá đơn lẻ (Snapshot) -->
     <span class="unit-price" *ngIf="data.quantity > 1">
-      {{ data.subTotal | number:'1.0-0' }} đ/sp
+      {{ unitPrice() | number:'1.0-0' }} đ/sp
     </span>
   </div>
 

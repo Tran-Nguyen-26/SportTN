@@ -67,7 +67,6 @@ public class OrderService {
                 .findByIdAndUserId(msg.getAddressId(), msg.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
-        // 3. Tạo Order
         Order order = Order.builder()
                 .user(user)
                 .paymentMethod(msg.getPaymentMethod())
@@ -77,7 +76,6 @@ public class OrderService {
                 .orderCode(generateOrderCode())
                 .build();
 
-        // 4. Snapshot địa chỉ → ShippingInfo
         ShippingInfo shippingInfo = ShippingInfo.builder()
                 .order(order)
                 .receiverName(address.getReceiverName())
@@ -87,7 +85,6 @@ public class OrderService {
 
         order.setShippingInfo(shippingInfo);
 
-        // 5. Tạo OrderItems + trừ tồn kho
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<OrderItem> items = new ArrayList<>();
 
@@ -213,7 +210,6 @@ public class OrderService {
                 .multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
             totalAmount = totalAmount.add(subtotal);
 
-            // Decrease stock
             variant.setStockQuantity(variant.getStockQuantity() - itemRequest.getQuantity());
             productVariantRepository.save(variant);
         }
@@ -227,7 +223,6 @@ public class OrderService {
             log.debug("[ORDER] Áp dụng voucher. voucherId={}", request.getVoucherId());
         }
 
-        // Save order
         Order savedOrder = orderRepository.save(order);
         log.info("[ORDER] Tạo đơn hàng thành công. orderId={}, orderCode={}, amount={}",
             savedOrder.getId(), savedOrder.getOrderCode(), savedOrder.getFinalAmount());
@@ -243,9 +238,6 @@ public class OrderService {
             .map(OrderResponse::from);
     }
 
-    /**
-     * Get order detail by ID
-     */
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(Long orderId, Long userId) {
         log.info("[ORDER] Lấy chi tiết đơn hàng. orderId={}, userId={}", orderId, userId);
@@ -265,9 +257,6 @@ public class OrderService {
         return OrderDetailResponse.from(order);
     }
 
-    /**
-     * Update order status (Admin only)
-     */
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
         log.info("[ORDER] Cập nhật trạng thái đơn hàng. orderId={}, status={}", orderId, request.getStatus());
@@ -321,9 +310,6 @@ public class OrderService {
         return OrderResponse.from(updated);
     }
 
-    /**
-     * Cancel order
-     */
     @Transactional
     public OrderResponse cancelOrder(Long orderId, Long userId, String cancelReason) {
         log.info("[ORDER] Customer hủy đơn. orderId={}, userId={}", orderId, userId);
@@ -353,9 +339,7 @@ public class OrderService {
         return OrderResponse.from(updatedOrder);
     }
 
-    /**
-     * Count total orders by user
-     */
+
     @Transactional(readOnly = true)
     public long countUserOrders(Long userId) {
         return orderRepository.countByUserId(userId);
@@ -382,7 +366,6 @@ public class OrderService {
                 + Integer.toHexString((int)(Math.random() * 0xFFFF)).toUpperCase();
     }
 
-    // OrderService
     public Page<OrderResponse> getAllOrders(Pageable pageable, String keyword, String status) {
         Specification<Order> spec = Specification.where(null);
 
@@ -402,7 +385,6 @@ public class OrderService {
         return orderRepository.findAll(spec, pageable).map(OrderResponse::from);
     }
 
-    /** Admin: xem chi tiết không cần check userId */
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetailAdmin(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -410,7 +392,6 @@ public class OrderService {
         return OrderDetailResponse.from(order);
     }
 
-    /** Admin: hủy đơn không cần check userId */
     @Transactional
     public OrderResponse adminCancelOrder(Long orderId, String cancelReason) {
         Order order = orderRepository.findById(orderId)
@@ -420,7 +401,6 @@ public class OrderService {
             throw new BusinessException(ErrorCode.INVALID_REQUEST);
         }
 
-        // Hoàn lại tồn kho
         for (OrderItem item : order.getItems()) {
             ProductVariant variant = item.getProductVariant();
             variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());

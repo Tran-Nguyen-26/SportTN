@@ -86,4 +86,10 @@ export class CartItemComponent {
     const item = this.itemSignal();
     return item?.variant?.mainImageUrl || 'assets/images/placeholder-product.png';
   });
+
+  unitPrice = computed(() => {
+    const item = this.itemSignal();
+    if (!item) return 0;
+    return item.variant.salePrice || item.variant.originalPrice;
+  });
 }

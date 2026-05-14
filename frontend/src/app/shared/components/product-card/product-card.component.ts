@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductCardResponse } from '../../../core/models/home-response/home-response';
 import { CartItem } from '../add-to-cart-drawer/add-to-cart-drawer.component';
+import {AddToCartRequest, CartService} from "../../../core/services/cart/cart.service";
 
 interface Spec {
   icon: string;
@@ -25,7 +26,7 @@ export class ProductCardComponent {
   drawerOpen    = false;
   drawerProduct: ProductCardResponse | null = null;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private cartService: CartService) {}
 
   goToProduct(): void {
     if (this.product?.slug) {
@@ -33,13 +34,24 @@ export class ProductCardComponent {
     }
   }
 
-  onAddToCart(event: Event): void {
-    event.stopPropagation();
-    this.triggerDrawer();  // ← đổi tên
-  }
-
   onAddedToCart(item: CartItem): void {
-    console.log('Thêm vào giỏ:', item);
+    const request: AddToCartRequest = {
+      variantId: item.variantId,
+      quantity:  item.quantity
+    };
+
+    this.cartService.addItemToCart(request).subscribe({
+      next: (res) => {
+        if (res.data) {
+          console.log('Thêm vào giỏ thành công:', res.data);
+          // tuỳ bạn: toast, cập nhật badge số lượng giỏ hàng...
+        }
+      },
+      error: (err) => {
+        console.error('Thêm vào giỏ thất bại:', err);
+        // tuỳ bạn: hiển thị thông báo lỗi
+      }
+    });
   }
 
   toggleWish(e: Event): void {

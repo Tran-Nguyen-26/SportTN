@@ -22,7 +22,7 @@ public class EmailService {
 
             helper.setTo(toEmail);
             helper.setSubject("SportTN - Mã OTP đặt lại mật khẩu");
-            helper.setText(buildEmailContent(otp), true); // true = HTML
+            helper.setText(buildEmailContent(otp), true);
 
             mailSender.send(message);
             log.info("[EMAIL] Gửi OTP thành công. email={}", toEmail);

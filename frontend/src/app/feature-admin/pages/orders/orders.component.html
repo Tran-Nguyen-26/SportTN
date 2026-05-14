@@ -127,8 +127,17 @@
     <!-- Pagination -->
     <div class="table-footer">
       <span class="result-count">
-        Hiển thị {{ orders.length }} / {{ orders.length }} đơn hàng
+        Hiển thị {{ orders.length }} / {{ totalElements }} đơn hàng
       </span>
+      <div class="page-size-wrap">
+        <span>Mỗi trang:</span>
+        <select class="filter-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
       <div class="pagination">
         <button class="page-btn"
                 [disabled]="pageIndex === 0"

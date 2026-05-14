@@ -31,13 +31,13 @@
         <span class="stat-label">Chờ thanh toán</span>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon red"><mat-icon>warning</mat-icon></div>
-      <div class="stat-info">
-        <span class="stat-value">{{ stats.overdueCount }}</span>
-        <span class="stat-label">Quá hạn</span>
-      </div>
-    </div>
+<!--    <div class="stat-card">-->
+<!--      <div class="stat-icon red"><mat-icon>warning</mat-icon></div>-->
+<!--      <div class="stat-info">-->
+<!--        <span class="stat-value">{{ stats.overdueCount }}</span>-->
+<!--        <span class="stat-label">Quá hạn</span>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 
   <div class="table-card">
@@ -51,11 +51,11 @@
           placeholder="Tìm mã HĐ, khách hàng, mã đơn..."
           (input)="onSearchInput($any($event.target).value)">
       </div>
-      <select class="filter-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
-        <option *ngFor="let s of statusOptions" [value]="s.value">
-          {{ s.label }}
-        </option>
-      </select>
+<!--      <select class="filter-select" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">-->
+<!--        <option *ngFor="let s of statusOptions" [value]="s.value">-->
+<!--          {{ s.label }}-->
+<!--        </option>-->
+<!--      </select>-->
 <!--      <button class="btn-export">-->
 <!--        <mat-icon>download</mat-icon>-->
 <!--        Xuất PDF-->
@@ -128,6 +128,15 @@
         <span class="summary-value orange">{{ formatPrice(stats.totalPendingAmount) }}</span>
       </div>
       <div class="summary-spacer"></div>
+      <div class="page-size-wrap">
+        <span>Mỗi trang:</span>
+        <select class="filter-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
       <div class="pagination">
         <button class="page-btn"
                 [disabled]="pageIndex === 0"
@@ -216,14 +225,14 @@
             <span class="meta-label">Ngày tạo</span>
             <span class="meta-value">{{ selectedInvoice.issueDate }}</span>
           </div>
-          <div class="meta-row">
-            <span class="meta-label">Hạn thanh toán</span>
-            <span
-              class="meta-value"
-              [class.overdue-text]="selectedInvoice.status === 'OVERDUE'">
-              {{ selectedInvoice.dueDate }}
-            </span>
-          </div>
+<!--          <div class="meta-row">-->
+<!--            <span class="meta-label">Hạn thanh toán</span>-->
+<!--            <span-->
+<!--              class="meta-value"-->
+<!--              [class.overdue-text]="selectedInvoice.status === 'OVERDUE'">-->
+<!--              {{ selectedInvoice.dueDate }}-->
+<!--            </span>-->
+<!--          </div>-->
           <div class="meta-row">
             <span class="meta-label">Phương thức</span>
             <span class="meta-value">

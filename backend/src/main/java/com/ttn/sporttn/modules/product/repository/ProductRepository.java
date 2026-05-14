@@ -61,10 +61,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     LEFT JOIN FETCH p.category c
     WHERE p.active = true
       AND (
-        LOWER(p.name)        LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
         LOWER(p.description) LIKE LOWER(CONCAT('%', :q, '%')) OR
-        LOWER(b.name)        LIKE LOWER(CONCAT('%', :q, '%')) OR
-        LOWER(c.name)        LIKE LOWER(CONCAT('%', :q, '%'))
+        LOWER(b.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(c.name) LIKE LOWER(CONCAT('%', :q, '%'))
       )
     ORDER BY p.soldCount DESC, p.rating DESC
     """)

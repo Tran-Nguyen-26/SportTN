@@ -62,7 +62,7 @@ export class OrderHistoryComponent implements OnInit {
   allOrders: OrderResponse[] = [];
   activeFilter = 'ALL';
 
-  pageSize = 5;
+  pageSize = 10;
   pageIndex = 0;
   totalElements = 0;
 
@@ -190,7 +190,7 @@ export class OrderHistoryComponent implements OnInit {
 
   get totalSpent(): number {
     return this.allOrders
-      .filter(o => o.status !== 'CANCELLED' && o.status !== 'REFUNDED')
+      .filter(o => o.status !== 'CANCELLED' && o.status !== 'REFUNDED' && o.status !== 'PENDING')
       .reduce((sum, o) => sum + o.finalAmount, 0);
   }
 
@@ -198,7 +198,7 @@ export class OrderHistoryComponent implements OnInit {
 
   viewOrderDetails(order: OrderResponse): void {
     this.showDetails = true;
-    this.selectedOrder.set(order); // hiện modal ngay với data có sẵn
+    this.selectedOrder.set(order);
     document.body.style.overflow = 'hidden';
 
     this.orderService.getOrderById(order.id).subscribe({
@@ -250,8 +250,6 @@ export class OrderHistoryComponent implements OnInit {
   }
 
   getStepTime(stepIndex: number, order: OrderResponse): string {
-    // BE hiện chưa trả về timestamp từng bước
-    // Chỉ hiển thị createdAt cho bước đầu
     if (stepIndex === 0) {
       return new Intl.DateTimeFormat('vi-VN', {
         hour: '2-digit', minute: '2-digit',
@@ -288,20 +286,33 @@ export class OrderHistoryComponent implements OnInit {
   // ── Actions ───────────────────────────────────────────────────────────────────
 
   cancelOrder(order: OrderResponse): void {
-    // TODO: this.orderService.cancelOrder(order.id).subscribe(...)
-    console.log('[ORDER-HISTORY] Hủy đơn hàng:', order.id);
+    const confirmed = confirm(`Bạn có chắc muốn hủy đơn #${order.id}?`);
+    if (!confirmed) return;
+
+    this.orderService.cancelOrder(order.id, 'Khách hàng hủy đơn').subscribe({
+      next: (res) => {
+        if (res.data) {
+          const index = this.allOrders.findIndex(o => o.id === order.id);
+          if (index !== -1) {
+            this.allOrders[index] = { ...this.allOrders[index], status: 'CANCELLED' };
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Hủy đơn thất bại:', err);
+      }
+    });
   }
 
-  reorder(order: OrderResponse): void {
-    // TODO: thêm tất cả items vào cart
-    console.log('[ORDER-HISTORY] Mua lại đơn hàng:', order.id);
-  }
-
-  downloadInvoice(): void {
-    const order = this.selectedOrder();
-    if (!order) return;
-    console.log('[ORDER-HISTORY] Xuất hóa đơn:', order.id);
-  }
+  // reorder(order: OrderResponse): void {
+  //   console.log('[ORDER-HISTORY] Mua lại đơn hàng:', order.id);
+  // }
+  //
+  // downloadInvoice(): void {
+  //   const order = this.selectedOrder();
+  //   if (!order) return;
+  //   console.log('[ORDER-HISTORY] Xuất hóa đơn:', order.id);
+  // }
 
   onImgError(event: Event): void {
     const img = event.target as HTMLImageElement;

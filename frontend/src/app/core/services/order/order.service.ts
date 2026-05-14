@@ -206,28 +206,23 @@ export class OrderService {
 
   // ── Customer endpoints ──────────────────────────────────────────────────────
 
-  /** Tạo đơn hàng mới */
   createOrder(payload: CreateOrderRequest): Observable<string> {
     return this.http.post<string>(this.apiCustomer, payload);
   }
 
-  /** Lấy danh sách đơn của user hiện tại (có phân trang & filter) */
   getMyOrders(params: OrderFilterParams = {}): Observable<ApiResponse<OrderPage>> {
     const httpParams = this.buildParams(params);
     return this.http.get<ApiResponse<OrderPage>>(this.apiCustomer, { params: httpParams });
   }
 
-  /** Lấy chi tiết đơn hàng theo id */
   getOrderById(id: number): Observable<ApiResponse<OrderResponse>> {
     return this.http.get<ApiResponse<OrderResponse>>(`${this.apiCustomer}/${id}`);
   }
 
-  /** Lấy chi tiết đơn hàng theo orderCode */
   getOrderByCode(orderCode: string): Observable<OrderResponse> {
     return this.http.get<OrderResponse>(`${this.apiCustomer}/code/${orderCode}`);
   }
 
-  /** Hủy đơn hàng (Customer) */
   cancelOrder(id: number, reason?: string): Observable<ApiResponse<OrderSummary>> {
     const body: CancelOrderRequest = {
       cancelReason: reason || 'Khách hàng hủy đơn'

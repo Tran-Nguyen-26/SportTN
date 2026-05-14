@@ -38,7 +38,7 @@ export class CustomersComponent implements OnInit, OnDestroy {
   totalElements  = 0;
   totalPages     = 0;
   pageIndex      = 0;
-  pageSize       = 20;
+  pageSize       = 10;
 
   searchKeyword  = '';
   selectedStatus = '';
@@ -112,8 +112,14 @@ export class CustomersComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Computed stats (từ data hiện tại trên trang) ──────────────────────────
-  totalCustomers  = computed(() => this.customers().length);
+  onPageSizeChange(): void {
+    this.pageIndex = 0;
+    this.loadCustomers();
+  }
+
+  get totalCustomers(): number {
+    return this.totalElements;
+  }
 
   activeCustomers = computed(() =>
     this.customers().filter(c => c.status === 'ACTIVE').length
