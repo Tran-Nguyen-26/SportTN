@@ -29,8 +29,23 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variant_id", nullable = false)
+    @JoinColumn(name = "variant_id", nullable = true)
     private ProductVariant productVariant;
+
+    @Column(name = "snapshot_name")
+    private String snapshotName;
+
+    @Column(name = "snapshot_image_url")
+    private String snapshotImageUrl;
+
+    @Column(name = "snapshot_sku", length = 50)
+    private String snapshotSku;
+
+    @Column(name = "snapshot_color", length = 50)
+    private String snapshotColor;
+
+    @Column(name = "snapshot_size", length = 20)
+    private String snapshotSize;
 
     @Column(nullable = false)
     private Integer quantity;

@@ -173,7 +173,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     this.productService.deleteProduct(id).subscribe({
       next: () => {
-        this.products.update(list => list.filter(p => p.id !== id));
+        alert('Đã ngừng bán sản phẩm');
+        this.loadProducts();
       },
       error: (err) => {
         console.error('[PRODUCT] Lỗi xóa sản phẩm:', err);

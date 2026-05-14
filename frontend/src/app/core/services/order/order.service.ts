@@ -51,6 +51,7 @@ export interface OrderItem {
   quantity: number;
   priceAtPurchase: number;
   subtotal: number;
+  productStillAvailable: boolean;
 }
 
 // ── Order (response từ BE) ────────────────────────────────────────────────────

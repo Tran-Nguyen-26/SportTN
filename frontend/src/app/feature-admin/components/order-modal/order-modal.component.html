@@ -214,7 +214,7 @@
       </ng-container>
 
       <ng-container *ngIf="isEditMode">
-        <button class="btn btn-danger" (click)="onCancelOrder()" *ngIf="canEdit && !showCancelConfirm">Hủy đơn</button>
+<!--        <button class="btn btn-danger" (click)="onCancelOrder()" *ngIf="canEdit && !showCancelConfirm">Hủy đơn</button>-->
         <div class="confirm-cancel" *ngIf="showCancelConfirm">
           <input class="form-control" [(ngModel)]="cancelReason" placeholder="Lý do hủy (tùy chọn)">
           <span class="confirm-text">Xác nhận hủy?</span>

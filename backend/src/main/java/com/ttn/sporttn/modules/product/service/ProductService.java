@@ -433,6 +433,10 @@ public class ProductService {
 
         boolean hasOrders = orderItemRepository.existsByProductVariant_Product_Id(id);
         if (hasOrders) {
+            product.setDeleted(true);
+            product.getVariants().forEach(v -> {
+                v.setDeleted(true);
+            });
             product.setActive(false);
             product.getVariants().forEach(v -> v.setActive(false));
             productRepository.save(product);
@@ -443,7 +447,6 @@ public class ProductService {
         cartItemRepository.deleteByProductVariant_Product_Id(id);
 
         productRepository.delete(product);
-
 
         log.info("[PRODUCT] Hard delete thành công. id={}", id);
     }
@@ -544,6 +547,9 @@ public class ProductService {
 
         Specification<Product> spec = Specification.where(null);
 
+        spec = spec.and((root, q, cb) ->
+                cb.isFalse(root.get("deleted")));
+
         if (StringUtils.hasText(filter.getSubCategory())) {
             spec = spec.and((root, q, cb) ->
                     cb.equal(root.get("category").get("slug"), filter.getSubCategory()));
@@ -568,7 +574,11 @@ public class ProductService {
         spec = spec.and((root, q, cb) -> {
             if (q == null) return null;
 
-            Join<Product, ProductVariant> v = root.join("variants", JoinType.LEFT);
+            Join<Product, ProductVariant> v =
+                    root.join("variants", JoinType.LEFT);
+
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.isFalse(v.get("deleted")));
 
             Expression<BigDecimal> effectivePrice = cb.<BigDecimal>selectCase()
                     .when(cb.and(
@@ -577,8 +587,6 @@ public class ProductService {
                             cb.lessThan(v.get("salePrice"), v.get("originalPrice"))
                     ), v.get("salePrice"))
                     .otherwise(v.get("originalPrice"));
-
-            List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getMinPrice() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(effectivePrice, filter.getMinPrice()));

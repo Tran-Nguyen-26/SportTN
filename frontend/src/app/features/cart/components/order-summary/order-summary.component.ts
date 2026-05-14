@@ -200,7 +200,6 @@ export class OrderSummaryComponent implements OnInit {
     }
 
     if (!this.isCOD) {
-      // Mở modal nhập thông tin thanh toán cho các method khác
       this.showPaymentModal = true;
       return;
     }
@@ -239,7 +238,6 @@ export class OrderSummaryComponent implements OnInit {
 
     this.orderService.createOrder(request).subscribe({
       next: () => {
-        // BE trả 202 — RabbitMQ xử lý async
         this.orderState = 'success';
         setTimeout(() => {
           this.orderPlaced.emit();

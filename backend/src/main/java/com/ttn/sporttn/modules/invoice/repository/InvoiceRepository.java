@@ -53,4 +53,12 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     BigDecimal sumAmountByStatus(@Param("status") String status);
 
     List<Invoice> findAllByStatusAndDueDateBefore(String status, LocalDateTime now);
+
+    @Query("""
+        SELECT COALESCE(SUM(i.finalAmount), 0)
+        FROM Invoice i
+        WHERE i.status = 'PAID'
+          AND i.issueDate BETWEEN :from AND :to
+    """)
+    BigDecimal sumRevenueByPeriod(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

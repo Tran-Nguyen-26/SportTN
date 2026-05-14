@@ -108,6 +108,11 @@ public class OrderService {
                     .productVariant(variant)
                     .quantity(i.getQuantity())
                     .priceAtPurchase(unitPrice)
+                    .snapshotName(variant.getProduct().getName())
+                    .snapshotSku(variant.getSku())
+                    .snapshotColor(variant.getColor())
+                    .snapshotSize(variant.getSize())
+                    .snapshotImageUrl(variant.getProduct().getMainImageUrl())
                     .build());
         }
 

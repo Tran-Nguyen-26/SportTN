@@ -1,5 +1,6 @@
 package com.ttn.sporttn.modules.overview.service;
 
+import com.ttn.sporttn.modules.invoice.repository.InvoiceRepository;
 import com.ttn.sporttn.modules.order.repository.OrderRepository;
 import com.ttn.sporttn.modules.overview.dto.response.*;
 import com.ttn.sporttn.modules.product.repository.ProductVariantRepository;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class DashboardService {
 
     private final OrderRepository orderRepository;
+    private final InvoiceRepository invoiceRepository;
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;
 
@@ -90,7 +92,7 @@ public class DashboardService {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private BigDecimal getRevenue(LocalDateTime from, LocalDateTime to) {
-        BigDecimal revenue = orderRepository.sumRevenueByPeriod(from, to);
+        BigDecimal revenue = invoiceRepository.sumRevenueByPeriod(from, to);
         return revenue != null ? revenue : BigDecimal.ZERO;
     }
 

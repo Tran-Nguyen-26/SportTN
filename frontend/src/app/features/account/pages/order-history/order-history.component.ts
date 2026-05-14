@@ -62,7 +62,7 @@ export class OrderHistoryComponent implements OnInit {
   allOrders: OrderResponse[] = [];
   activeFilter = 'ALL';
 
-  pageSize = 10;
+  pageSize = 30;
   pageIndex = 0;
   totalElements = 0;
 

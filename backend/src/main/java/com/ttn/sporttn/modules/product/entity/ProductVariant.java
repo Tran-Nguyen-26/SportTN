@@ -64,6 +64,10 @@ public class ProductVariant {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "bit default 0")
+    private boolean deleted = false;
+
     @Column(name = "main_image_url")
     private String mainImageUrl;
 

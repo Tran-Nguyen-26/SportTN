@@ -73,20 +73,20 @@
       </section>
 
       <!-- Thương hiệu -->
-      <section class="filter-section">
-        <h4 class="filter-section__title">Thương hiệu</h4>
-        <div class="check-list">
-          <label *ngFor="let brand of brands" class="check-item">
-            <input type="checkbox"
-                   [checked]="isBrandSelected(brand.id)"
-                   (change)="toggleBrand(brand)"
-                   class="check-item__input">
-            <span class="check-item__box"></span>
-            <span class="check-item__label">{{ brand.name }}</span>
-<!--            <span class="check-item__count">({{ brand.count | number }})</span>-->
-          </label>
-        </div>
-      </section>
+<!--      <section class="filter-section">-->
+<!--        <h4 class="filter-section__title">Thương hiệu</h4>-->
+<!--        <div class="check-list">-->
+<!--          <label *ngFor="let brand of brands" class="check-item">-->
+<!--            <input type="checkbox"-->
+<!--                   [checked]="isBrandSelected(brand.id)"-->
+<!--                   (change)="toggleBrand(brand)"-->
+<!--                   class="check-item__input">-->
+<!--            <span class="check-item__box"></span>-->
+<!--            <span class="check-item__label">{{ brand.name }}</span>-->
+<!--&lt;!&ndash;            <span class="check-item__count">({{ brand.count | number }})</span>&ndash;&gt;-->
+<!--          </label>-->
+<!--        </div>-->
+<!--      </section>-->
 
       <!-- Khoảng giá -->
       <section class="filter-section">

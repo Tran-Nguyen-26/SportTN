@@ -3,29 +3,48 @@
 -- ────────────────────────────────────────────────────────────
 CREATE OR ALTER PROCEDURE rpt_revenue_summary
     @FromDate DATE,
-    @ToDate DATE
+    @ToDate   DATE
 AS
 BEGIN
     SET NOCOUNT ON;
+
     SELECT
-        COALESCE(SUM(o.final_amount), 0) AS total_revenue,
-        COUNT(o.id) AS total_orders,
-        SUM(CASE WHEN o.status = 'DELIVERED' THEN 1 ELSE 0 END) AS done_orders,
-        SUM(CASE WHEN o.status = 'CANCELLED' THEN 1 ELSE 0 END) AS cancelled_orders,
-        COALESCE(AVG(o.final_amount), 0) AS avg_order_value,
-
         COALESCE(SUM(CASE
-                         WHEN o.payment_method = 'COD'AND o.status = 'DELIVERED'
-                             THEN o.final_amount ELSE 0
+                         WHEN i.status = 'PAID'
+                             THEN i.final_amount
+                         ELSE 0
+            END), 0) AS total_revenue,
+        COUNT(DISTINCT o.id) AS total_orders,
+        SUM(CASE
+                WHEN o.status = 'DELIVERED'
+                    THEN 1
+                ELSE 0
+            END) AS done_orders,
+        SUM(CASE
+                WHEN o.status = 'CANCELLED'
+                    THEN 1
+                ELSE 0
+            END) AS cancelled_orders,
+        COALESCE(AVG(CASE
+                         WHEN i.status = 'PAID'
+                             THEN i.final_amount
+            END), 0) AS avg_order_value,
+        COALESCE(SUM(CASE
+                         WHEN o.payment_method = 'COD'
+                             AND i.status = 'PAID'
+                             THEN i.final_amount
+                         ELSE 0
             END), 0) AS cod_revenue,
-
         COALESCE(SUM(CASE
-                         WHEN o.payment_method = 'VNPAY' AND o.status = 'DELIVERED'
-                             THEN o.final_amount ELSE 0
+                         WHEN o.payment_method = 'VNPAY'
+                             AND i.status = 'PAID'
+                             THEN i.final_amount
+                         ELSE 0
             END), 0) AS vnpay_revenue
-
-    FROM orders o
-    WHERE CAST(o.created_at AS DATE) BETWEEN @FromDate AND @ToDate;
+    FROM invoices i
+             JOIN orders o ON o.id = i.order_id
+    WHERE CAST(i.issue_date AS DATE)
+              BETWEEN @FromDate AND @ToDate;
 END;
 
 

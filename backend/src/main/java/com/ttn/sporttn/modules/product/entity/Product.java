@@ -72,6 +72,10 @@ public class Product {
 
     private boolean active;
 
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "bit default 0")
+    private boolean deleted = false;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

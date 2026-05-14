@@ -27,23 +27,37 @@ public class OrderItemResponse {
     private Integer quantity;
     private BigDecimal priceAtPurchase;
     private BigDecimal subtotal;
+    private boolean productStillAvailable;
 
     public static OrderItemResponse from(OrderItem item) {
         ProductVariant variant = item.getProductVariant();
         BigDecimal subtotal = item.getPriceAtPurchase()
-            .multiply(BigDecimal.valueOf(item.getQuantity()));
+                .multiply(BigDecimal.valueOf(item.getQuantity()));
+
+        boolean available = variant != null && !variant.isDeleted();
 
         return OrderItemResponse.builder()
-            .id(item.getId())
-            .variantId(item.getProductVariant().getId())
-            .productName(item.getProductVariant().getProduct().getName())
-            .productSku(item.getProductVariant().getSku())
-            .quantity(item.getQuantity())
-            .color(variant.getColor())
-            .size(variant.getSize())
-            .imageUrl(variant.getMainImageUrl())
-            .priceAtPurchase(item.getPriceAtPurchase())
-            .subtotal(subtotal)
-            .build();
+                .id(item.getId())
+                .variantId(available ? variant.getId() : null)
+                .productName(item.getSnapshotName() != null
+                        ? item.getSnapshotName()
+                        : (available ? variant.getProduct().getName() : "Sản phẩm không còn tồn tại"))
+                .productSku(item.getSnapshotSku() != null
+                        ? item.getSnapshotSku()
+                        : (available ? variant.getSku() : null))
+                .color(item.getSnapshotColor() != null
+                        ? item.getSnapshotColor()
+                        : (available ? variant.getColor() : null))
+                .size(item.getSnapshotSize() != null
+                        ? item.getSnapshotSize()
+                        : (available ? variant.getSize() : null))
+                .imageUrl(item.getSnapshotImageUrl() != null
+                        ? item.getSnapshotImageUrl()
+                        : (available ? variant.getMainImageUrl() : null))
+                .quantity(item.getQuantity())
+                .priceAtPurchase(item.getPriceAtPurchase())
+                .subtotal(subtotal)
+                .productStillAvailable(available)
+                .build();
     }
 }

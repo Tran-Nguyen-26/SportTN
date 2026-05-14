@@ -199,9 +199,22 @@
                 <img [src]="item.imageUrl" [alt]="item.productName" (error)="onImgError($event)">
               </div>
               <div class="product-info">
-                <span class="product-name">{{ item.productName }}</span>
-                <span class="product-variant">{{ item.color }} - {{ item.size }}</span>
-                <span class="product-qty">x{{ item.quantity }}</span>
+                <span class="product-name">
+                  {{ item.productName }}
+                </span>
+                <span class="product-variant">
+                  {{ item.color }} - {{ item.size }}
+                </span>
+
+                <span class="product-qty">
+                  x{{ item.quantity }}
+                </span>
+                <div
+                  class="product-unavailable"
+                  *ngIf="!item.productStillAvailable">
+                  <mat-icon>info</mat-icon>
+                  <span>Sản phẩm đã ngừng kinh doanh</span>
+                </div>
               </div>
               <div class="product-price">
                 {{ item.priceAtPurchase | currency:'VND':'':'1.0-0' }}đ
