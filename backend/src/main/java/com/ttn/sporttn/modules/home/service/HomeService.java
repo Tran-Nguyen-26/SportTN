@@ -33,7 +33,7 @@ public class HomeService {
 
     private static final Pageable TOP_10 = PageRequest.of(0, 10);
 
-    @Cacheable("home-page")
+//    @Cacheable("home-page")
     public HomeResponse getHomeData() {
         log.info("Lấy dữ liệu home-page");
         return HomeResponse.builder()
@@ -115,7 +115,10 @@ public class HomeService {
                 .collect(Collectors.toList());
 
         List<ProductCardResponse> products = productRepository
-                .findTop10ByCategoryIdAndActiveTrueOrderBySoldCountDesc(category.getId(), TOP_10)
+                .findTop10ByCategoryOrParent(
+                        category.getId(),
+                        PageRequest.of(0, 10)
+                )
                 .stream()
                 .map(productMapper::toProductCartResponse)
                 .collect(Collectors.toList());

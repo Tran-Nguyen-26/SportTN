@@ -296,6 +296,8 @@ export class OrderHistoryComponent implements OnInit {
           if (index !== -1) {
             this.allOrders[index] = { ...this.allOrders[index], status: 'CANCELLED' };
           }
+          this.showDetails = false;
+          alert('Hủy đơn hàng thành công!');
         }
       },
       error: (err) => {

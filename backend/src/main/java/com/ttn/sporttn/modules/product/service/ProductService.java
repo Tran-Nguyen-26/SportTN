@@ -20,10 +20,7 @@ import com.ttn.sporttn.modules.product.entity.*;
 import com.ttn.sporttn.modules.product.mapper.ProductMapper;
 import com.ttn.sporttn.modules.product.repository.ProductVariantRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -547,19 +544,25 @@ public class ProductService {
 
         Specification<Product> spec = Specification.where(null);
 
-        if (StringUtils.hasText(filter.getCategorySlug())) {
+        if (StringUtils.hasText(filter.getSubCategory())) {
             spec = spec.and((root, q, cb) ->
-                cb.equal(root.get("category").get("slug"), filter.getCategorySlug()));
+                    cb.equal(root.get("category").get("slug"), filter.getSubCategory()));
+        } else if (StringUtils.hasText(filter.getCategorySlug())) {
+            spec = spec.and((root, q, cb) -> {
+                Subquery<Long> categorySubquery = q.subquery(Long.class);
+                Root<Category> categoryRoot = categorySubquery.from(Category.class);
+                categorySubquery.select(categoryRoot.get("id"))
+                        .where(cb.or(
+                                cb.equal(categoryRoot.get("slug"), filter.getCategorySlug()),
+                                cb.equal(categoryRoot.get("parent").get("slug"), filter.getCategorySlug())
+                        ));
+                return root.get("category").get("id").in(categorySubquery);
+            });
         }
-
-//        if (StringUtils.hasText(filter.getSubCategory())) {
-//            spec = spec.and((root, q, cb) ->
-//                cb.equal(root.get("subCategory").get("slug"), filter.getSubCategory()));
-//        }
 
         if (!filter.getBrands().isEmpty()) {
             spec = spec.and((root, q, cb) ->
-                root.get("brand").get("name").in(filter.getBrands()));
+                    root.get("brand").get("name").in(filter.getBrands()));
         }
 
         spec = spec.and((root, q, cb) -> {

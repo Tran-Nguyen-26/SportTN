@@ -28,7 +28,7 @@ export class StatusBadgeComponent {
     const customerMap: Record<string, any> = {
       'ACTIVE':   { label: 'Hoạt động',   cssClass: 'badge-success' },
       'INACTIVE': { label: 'Vô hiệu hóa', cssClass: 'badge-danger' },
-    };
+  };
 
     const mapByType = {
       order: orderMap,

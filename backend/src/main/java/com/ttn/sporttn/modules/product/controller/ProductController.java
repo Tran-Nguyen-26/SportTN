@@ -36,10 +36,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    /**
-     * Get product by ID
-     * GET /api/v1/products/{id}
-     */
     @GetMapping("/id/{id}")
     public ResponseEntity<ApiResponse<ProductDetailResponse>> getProduct(
         @PathVariable Long id
@@ -63,10 +59,6 @@ public class ProductController {
             .body(ApiResponse.ok(product, "Tạo sản phẩm thành công"));
     }
 
-    /**
-     * Delete product (Admin only)
-     * DELETE /api/v1/products/{id}
-     */
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

@@ -73,4 +73,12 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     boolean existsByBrandId(Long brandId);
 
     boolean existsByCategoryId(Long id);
+
+    @Query("SELECT p FROM Product p WHERE p.active = true AND " +
+            "(p.category.id = :categoryId OR p.category.parent.id = :categoryId) " +
+            "ORDER BY p.soldCount DESC")
+    List<Product> findTop10ByCategoryOrParent(
+            @Param("categoryId") Long categoryId,
+            Pageable pageable
+    );
 }

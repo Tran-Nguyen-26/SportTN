@@ -129,20 +129,6 @@ public class OrderService {
 
         orderRepository.save(order);
 
-        Invoice invoice = Invoice.builder()
-                .order(order)
-                .invoiceNumber("INV-" + String.format("%06d", order.getId()))
-                .issueDate(LocalDateTime.now())
-                .dueDate(LocalDateTime.now().plusDays(7))
-                .subtotal(totalAmount)
-                .taxAmount(BigDecimal.ZERO)
-                .finalAmount(finalAmount)
-                .status("PENDING")
-                .note(msg.getCustomerNote())
-                .build();
-
-        invoiceRepository.save(invoice);
-
         if ("COD".equals(msg.getPaymentMethod())) {
             Payment payment = Payment.builder()
                     .order(order)
@@ -259,14 +245,32 @@ public class OrderService {
 
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
-        log.info("[ORDER] Cập nhật trạng thái đơn hàng. orderId={}, status={}", orderId, request.getStatus());
-
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REQUEST));
 
-        order.setStatus(request.getStatus());
+        String newStatus = request.getStatus();
+        order.setStatus(newStatus);
 
-        if ("DELIVERED".equals(request.getStatus())) {
+        if ("CONFIRMED".equals(newStatus)) {
+            boolean invoiceExists = invoiceRepository.findByOrderId(orderId).isPresent();
+            if (!invoiceExists) {
+                Invoice invoice = Invoice.builder()
+                        .order(order)
+                        .invoiceNumber("INV-" + String.format("%06d", order.getId()))
+                        .issueDate(LocalDateTime.now())
+                        .dueDate(LocalDateTime.now().plusDays(7))
+                        .subtotal(order.getTotalAmount())
+                        .taxAmount(BigDecimal.ZERO)
+                        .finalAmount(order.getFinalAmount())
+                        .status("PENDING")
+                        .note(order.getCustomerNote())
+                        .build();
+                invoiceRepository.save(invoice);
+                log.info("[ORDER] Invoice tạo mới. orderId={}", orderId);
+            }
+        }
+
+        if ("DELIVERED".equals(newStatus)) {
             for (OrderItem item : order.getItems()) {
                 Product product = item.getProductVariant().getProduct();
                 product.setSoldCount(product.getSoldCount() + item.getQuantity());
@@ -276,9 +280,8 @@ public class OrderService {
             invoiceRepository.findByOrderId(orderId)
                     .ifPresent(invoice -> {
                         invoice.setStatus("PAID");
-                        invoice.setIssueDate(LocalDateTime.now());
                         invoiceRepository.save(invoice);
-                        log.info("[ORDER] Invoice cập nhật PAID. orderId={}", orderId);
+                        log.info("[ORDER] Invoice PAID. orderId={}", orderId);
                     });
 
             if ("COD".equals(order.getPaymentMethod())
@@ -289,24 +292,27 @@ public class OrderService {
                             payment.setPaymentStatus("COMPLETED");
                             payment.setPaidAt(LocalDateTime.now());
                             paymentRepository.save(payment);
-                            log.info("[ORDER] COD - Cập nhật Payment=COMPLETED. orderId={}", orderId);
+                            log.info("[ORDER] COD Payment COMPLETED. orderId={}", orderId);
                         });
             }
         }
 
-        if ("CANCELLED".equals(request.getStatus())) {
+        if ("CANCELLED".equals(newStatus)) {
+            for (OrderItem item : order.getItems()) {
+                ProductVariant variant = item.getProductVariant();
+                variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+                productVariantRepository.save(variant);
+            }
 
-            invoiceRepository.findByOrderId(orderId)
-                    .ifPresent(invoice -> {
-                        invoice.setStatus("CANCELLED");
-                        invoiceRepository.save(invoice);
-                        log.info("[ORDER] Invoice cập nhật CANCELLED. orderId={}", orderId);
-                    });
+            Invoice invoice = invoiceRepository.findByOrderId(orderId).orElse(null);
+            if (invoice != null) {
+                invoiceRepository.delete(invoice);
+                invoiceRepository.flush();
+                log.info("[ORDER] Invoice đã xoá. orderId={}", orderId);
+            }
         }
 
         Order updated = orderRepository.save(order);
-        log.info("[ORDER] Cập nhật trạng thái thành công. orderId={}, status={}, paymentStatus={}",
-                orderId, updated.getStatus(), updated.getPaymentStatus());
         return OrderResponse.from(updated);
     }
 
