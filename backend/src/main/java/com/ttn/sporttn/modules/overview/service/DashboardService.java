@@ -3,6 +3,7 @@ package com.ttn.sporttn.modules.overview.service;
 import com.ttn.sporttn.modules.invoice.repository.InvoiceRepository;
 import com.ttn.sporttn.modules.order.repository.OrderRepository;
 import com.ttn.sporttn.modules.overview.dto.response.*;
+import com.ttn.sporttn.modules.overview.repository.DashboardRepositoryCustomImpl;
 import com.ttn.sporttn.modules.product.repository.ProductVariantRepository;
 import com.ttn.sporttn.modules.user.entity.UserRole;
 import com.ttn.sporttn.modules.user.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,42 +28,47 @@ public class DashboardService {
     private final InvoiceRepository invoiceRepository;
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final DashboardRepositoryCustomImpl dashboardRepositoryCustom;
 
     // ── STATS ─────────────────────────────────────────────────────────────────
 
+//    public DashboardStatsResponse getStats(String period) {
+//        LocalDateTime[] current  = getRange(period);
+//        LocalDateTime[] previous = getPreviousRange(period);
+//
+//        BigDecimal currentRevenue  = getRevenue(current[0],  current[1]);
+//        BigDecimal previousRevenue = getRevenue(previous[0], previous[1]);
+//
+//        long currentOrders   = orderRepository.countByCreatedAtBetween(current[0],  current[1]);
+//        long previousOrders  = orderRepository.countByCreatedAtBetween(previous[0], previous[1]);
+//
+//        long currentCustomers  = userRepository.countByRoleAndCreatedAtBetween(UserRole.CUSTOMER, current[0],  current[1]);
+//        long previousCustomers = userRepository.countByRoleAndCreatedAtBetween(UserRole.CUSTOMER, previous[0], previous[1]);
+//
+//        long totalProducts = productVariantRepository.countByStockQuantityGreaterThan(0);
+//
+//        return DashboardStatsResponse.builder()
+//                .revenue(currentRevenue)
+//                .newOrders(currentOrders)
+//                .newCustomers(currentCustomers)
+//                .totalProducts(totalProducts)
+//                .revenueTrend(calcTrend(previousRevenue.doubleValue(), currentRevenue.doubleValue()))
+//                .orderTrend(calcTrend(previousOrders, currentOrders))
+//                .customerTrend(calcTrend(previousCustomers, currentCustomers))
+//                .build();
+//    }
+
     public DashboardStatsResponse getStats(String period) {
-        LocalDateTime[] current  = getRange(period);
-        LocalDateTime[] previous = getPreviousRange(period);
-
-        BigDecimal currentRevenue  = getRevenue(current[0],  current[1]);
-        BigDecimal previousRevenue = getRevenue(previous[0], previous[1]);
-
-        long currentOrders   = orderRepository.countByCreatedAtBetween(current[0],  current[1]);
-        long previousOrders  = orderRepository.countByCreatedAtBetween(previous[0], previous[1]);
-
-        long currentCustomers  = userRepository.countByRoleAndCreatedAtBetween(UserRole.CUSTOMER, current[0],  current[1]);
-        long previousCustomers = userRepository.countByRoleAndCreatedAtBetween(UserRole.CUSTOMER, previous[0], previous[1]);
-
-        long totalProducts = productVariantRepository.countByStockQuantityGreaterThan(0);
-
-        return DashboardStatsResponse.builder()
-                .revenue(currentRevenue)
-                .newOrders(currentOrders)
-                .newCustomers(currentCustomers)
-                .totalProducts(totalProducts)
-                .revenueTrend(calcTrend(previousRevenue.doubleValue(), currentRevenue.doubleValue()))
-                .orderTrend(calcTrend(previousOrders, currentOrders))
-                .customerTrend(calcTrend(previousCustomers, currentCustomers))
-                .build();
+        LocalDateTime[] current = getRange(period);
+        return dashboardRepositoryCustom.getStatsViaStore(current[0], current[1]);
     }
 
     // ── REVENUE CHART ─────────────────────────────────────────────────────────
 
     public List<RevenueChartResponse> getRevenueChart(String period) {
-        LocalDateTime from = getRange(period)[0];
-        LocalDateTime to   = getRange(period)[1];
+        LocalDateTime[] current = getRange(period);
 
-        return orderRepository.getRevenueChart(from, to);
+        return dashboardRepositoryCustom.getRevenueChart(current[0].toLocalDate(), current[1].toLocalDate());
     }
 
     // ── TOP PRODUCTS ──────────────────────────────────────────────────────────

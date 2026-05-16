@@ -77,8 +77,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p FROM Product p WHERE p.active = true AND " +
             "(p.category.id = :categoryId OR p.category.parent.id = :categoryId) " +
             "ORDER BY p.soldCount DESC")
-    List<Product> findTop10ByCategoryOrParent(
-            @Param("categoryId") Long categoryId,
-            Pageable pageable
-    );
+    List<Product> findTop10ByCategoryOrParent(@Param("categoryId") Long categoryId, Pageable pageable);
 }

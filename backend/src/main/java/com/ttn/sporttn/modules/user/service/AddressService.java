@@ -71,14 +71,14 @@ public class AddressService {
         }
 
         address.setReceiverName(request.getReceiverName());
-        address.setReceiverPhone(request.getReceiverName());
+        address.setReceiverPhone(request.getReceiverPhone());
         address.setProvince(request.getProvince());
         address.setDistrict(request.getDistrict());
         address.setWard(request.getWard());
         address.setAddressDetail(request.getAddressDetail());
         address.setIsDefault(request.getIsDefault());
 
-        address = addressRepository.save(address);
+//        address = addressRepository.save(address);
         return mapToResponse(address);
     }
 

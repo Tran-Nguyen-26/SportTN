@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
 
     forkJoin({
       stats:         this.dashboardService.getStats(this.selectedPeriod as any),
-      revenueChart:  this.dashboardService.getRevenueChart(period),
+      revenueChart:  this.dashboardService.getRevenueChart(this.selectedPeriod as any),
       topProducts:   this.dashboardService.getTopProducts(period),
       lowStock:      this.dashboardService.getLowStock(10),
       recentOrders:  this.dashboardService.getRecentOrders(10),

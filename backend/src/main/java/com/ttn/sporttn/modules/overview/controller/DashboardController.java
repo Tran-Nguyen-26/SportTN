@@ -33,7 +33,7 @@ public class DashboardController {
 
     @GetMapping("/revenue-chart")
     public ApiResponse<List<RevenueChartResponse>> getRevenueChart(
-            @RequestParam(defaultValue = "week") String period) {
+            @RequestParam(defaultValue = "today") String period) {
         log.info("[DASHBOARD] Lấy biểu đồ doanh thu. period={}", period);
         return ApiResponse.ok(
                 dashboardService.getRevenueChart(period),

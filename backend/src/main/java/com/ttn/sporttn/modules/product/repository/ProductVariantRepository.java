@@ -18,6 +18,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     JOIN FETCH pv.product p
     WHERE pv.stockQuantity <= :threshold
     ORDER BY pv.stockQuantity ASC
-""")
+    """)
     List<ProductVariant> findLowStock(@Param("threshold") int threshold);
 }

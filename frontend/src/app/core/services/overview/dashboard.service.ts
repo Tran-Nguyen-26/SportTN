@@ -64,7 +64,7 @@ export class DashboardService {
     });
   }
 
-  getRevenueChart(period:  'week' | 'month' | 'year' = 'week'): Observable<ApiResponse<RevenueChartResponse[]>> {
+  getRevenueChart(period:  'today' | 'week' | 'month' | 'year' = 'today'): Observable<ApiResponse<RevenueChartResponse[]>> {
     return this.http.get<ApiResponse<RevenueChartResponse[]>>(`${this.apiUrl}/revenue-chart`, {
       params: { period }
     });

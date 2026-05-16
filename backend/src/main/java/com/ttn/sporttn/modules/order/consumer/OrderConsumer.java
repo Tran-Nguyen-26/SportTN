@@ -34,7 +34,6 @@ public class OrderConsumer {
             log.info("Xử lý đơn hàng thành công: userId={}", message.getUserId());
         } catch (Exception e) {
             log.error("Lỗi xử lý đơn hàng: {}", e.getMessage());
-            // message sẽ vào Dead Letter Queue nếu đã cấu hình
             throw e;
         }
     }
@@ -43,7 +42,6 @@ public class OrderConsumer {
     public void handleFailedOrder(OrderMessage message) {
         log.error("[MQ] Đơn hàng thất bại vào DLQ: userId={}, message={}",
                 message.getUserId(), message);
-        // TODO: gửi email thông báo / alert
     }
 }
 

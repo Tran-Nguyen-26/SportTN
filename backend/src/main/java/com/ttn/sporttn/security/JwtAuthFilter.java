@@ -1,4 +1,4 @@
-package com.ttn.sporttn.security;
+    package com.ttn.sporttn.security;
 
 import com.ttn.sporttn.modules.user.entity.UserStatus;
 import com.ttn.sporttn.modules.user.repository.UserRepository;

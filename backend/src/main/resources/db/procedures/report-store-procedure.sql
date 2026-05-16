@@ -1,6 +1,4 @@
--- ────────────────────────────────────────────────────────────
---  1. Tổng quan doanh thu
--- ────────────────────────────────────────────────────────────
+-- 1. Tổng doanh thu
 CREATE OR ALTER PROCEDURE rpt_revenue_summary
     @FromDate DATE,
     @ToDate   DATE
@@ -48,16 +46,13 @@ BEGIN
 END;
 
 
--- ────────────────────────────────────────────────────────────
---  2. Doanh thu theo ngày
--- ────────────────────────────────────────────────────────────
+-- 2. Doanh thu theo ngày
 CREATE OR ALTER PROCEDURE rpt_revenue_by_day
     @FromDate DATE,
     @ToDate DATE
 AS
 BEGIN
     SET NOCOUNT ON;
-
     WITH DateRange AS (
         SELECT @FromDate AS dt
         UNION ALL
@@ -78,11 +73,7 @@ BEGIN
     OPTION (MAXRECURSION 365);
 END;
 
-
-
--- ────────────────────────────────────────────────────────────
---  3. Top sản phẩm bán chạy
--- ────────────────────────────────────────────────────────────
+-- 3. Top sản phẩm bán chạy
 CREATE OR ALTER PROCEDURE rpt_top_products
     @FromDate DATE,
     @ToDate   DATE,
@@ -92,15 +83,15 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT TOP (@TopN)
-        p.name                                  AS product_name,
-        c.name                                  AS category,
-        SUM(oi.quantity)                        AS sold,
+        p.name AS product_name,
+        c.name AS category,
+        SUM(oi.quantity) AS sold,
         SUM(oi.quantity * oi.price_at_purchase) AS revenue
     FROM order_items oi
              JOIN product_variants pv ON pv.id = oi.variant_id
-             JOIN products         p  ON p.id  = pv.product_id
-             JOIN categories       c  ON c.id  = p.category_id
-             JOIN orders           o  ON o.id  = oi.order_id
+             JOIN products p  ON p.id  = pv.product_id
+             JOIN categories c  ON c.id  = p.category_id
+             JOIN orders o  ON o.id  = oi.order_id
     WHERE o.status = 'DELIVERED'
       AND CAST(o.created_at AS DATE) BETWEEN @FromDate AND @ToDate
     GROUP BY p.id, p.name, c.name

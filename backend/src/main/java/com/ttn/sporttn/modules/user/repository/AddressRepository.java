@@ -7,11 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public interface AddressRepository extends JpaRepository<Address, Long> {
+public interface AddressRepository extends JpaRepository<Address, Long>, AddressRepositoryCustom{
     Optional<Address> findByIdAndUserId(Long addressId, Long userId);
 
     List<Address> findByUserOrderByIsDefaultDescCreatedAtDesc(User user);

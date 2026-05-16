@@ -80,22 +80,26 @@ export class AuthService {
   }
 
   logout(): void {
-    const authData = this.currentUserSubject.value;
-    const refreshToken = authData?.refreshToken;
+    // const authData = this.currentUserSubject.value;
+    // const refreshToken = authData?.refreshToken;
 
-    if (refreshToken) {
-      this.http.post(`${this.API_URL}/logout`, {refreshToken})
-        .subscribe({
-          next: () => {
-            console.log('Backend đã hủy session');
-            this.cleanUpAndNavigate();
-          },
-          error: (err) => {
-            console.error('Lỗi khi gọi API logout', err);
-            this.cleanUpAndNavigate();
-          }
-        })
-    }
+    // if (refreshToken) {
+    //   this.http.post(`${this.API_URL}/logout`, {refreshToken})
+    //     .subscribe({
+    //       next: () => {
+    //         console.log('Backend đã hủy session');
+    //         this.cleanUpAndNavigate();
+    //       },
+    //       error: (err) => {
+    //         console.error('Lỗi khi gọi API logout', err);
+    //         this.cleanUpAndNavigate();
+    //       }
+    //     })
+    // }
+
+    localStorage.removeItem('token');
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/']);
   }
 
   private cleanUpAndNavigate(): void {

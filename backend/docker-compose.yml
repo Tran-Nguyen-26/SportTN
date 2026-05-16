@@ -15,14 +15,13 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq_dev
     ports:
-      - "5672:5672"   # Cổng kết nối
-      - "15672:15672" # Cổng vào giao diện Web để học trực quan
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
-    restart: always
 
   redis:
     image: redis:7-alpine
@@ -31,7 +30,6 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    restart: always
     command: redis-server --appendonly yes
 
 volumes:
